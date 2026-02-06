@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
@@ -11,7 +11,11 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+  const redirectParam = searchParams.get('redirect')
+  const redirectTo =
+    redirectParam && redirectParam.startsWith('/') ? redirectParam : '/studio'
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +31,9 @@ export default function RegisterPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/login?registered=true')
+      router.push(
+        `/login?registered=true&redirect=${encodeURIComponent(redirectTo)}`
+      )
     }
   }
 
@@ -66,7 +72,13 @@ export default function RegisterPage() {
         </button>
       </form>
       <p className="text-center mt-4 text-sm">
-        已有账号？<Link href="/login" className="underline">登录</Link>
+        已有账号？{' '}
+        <Link
+          href={`/login?redirect=${encodeURIComponent(redirectTo)}`}
+          className="underline"
+        >
+          登录
+        </Link>
       </p>
     </div>
   )
