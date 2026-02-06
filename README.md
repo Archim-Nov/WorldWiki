@@ -1,4 +1,4 @@
-# Newworld Wiki (Museum Universe)
+# NewWorldWiki (Museum Universe)
 
 沉浸式“博物馆宇宙 / 网状探索 wiki”。核心体验是视觉画廊 + 内链探索，而非传统目录或搜索。
 
@@ -15,10 +15,15 @@
 - `/studio`（Sanity Studio）
 - `/sitemap.xml`
 
-## 内容类型
-- country / region / creature / hero / story
-- 富文本支持内链、外链注解
-- 详情页底部展示混合类型“相关推荐”（自动补位至 3 项）
+## 仓库（私有）
+```
+https://github.com/Archim-Nov/NewWorldWiki.git
+```
+
+克隆到其他设备：
+```bash
+git clone https://github.com/Archim-Nov/NewWorldWiki.git
+```
 
 ## 本地开发
 ```bash
