@@ -1,0 +1,42 @@
+{
+  "_id": "story-starlit-index",
+  "_type": "story",
+  "title": "Starlit Index",
+  "slug": { "_type": "slug", "current": "starlit-index" },
+  "content": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_key": "ext-archive",
+          "_type": "externalLink",
+          "url": "https://example.com/archives/starlit-index"
+        }
+      ],
+      "children": [
+        { "_type": "span", "text": "研究员在旧档案中发现一页被星光洗亮的索引。", "marks": [] },
+        { "_type": "span", "text": "查看外部档案", "marks": ["ext-archive"] },
+        { "_type": "span", "text": "，就能追溯这段航行的来源。", "marks": [] }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_key": "link-steppe",
+          "_type": "internalLink",
+          "reference": { "_type": "reference", "_ref": "region-emerald-steppe" }
+        }
+      ],
+      "children": [
+        { "_type": "span", "text": "索引中还标注了 ", "marks": [] },
+        { "_type": "span", "text": "Emerald Steppe", "marks": ["link-steppe"] },
+        { "_type": "span", "text": " 的观测点，与迁徙路线相互对应。", "marks": [] }
+      ]
+    }
+  ],
+  "relatedRegions": [{ "_type": "reference", "_ref": "region-emerald-steppe" }],
+  "relatedHeroes": [{ "_type": "reference", "_ref": "hero-sable" }]
+}

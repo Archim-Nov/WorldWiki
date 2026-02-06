@@ -1,0 +1,59 @@
+{
+  "_id": "story-river-of-echoes",
+  "_type": "story",
+  "title": "River of Echoes",
+  "slug": { "_type": "slug", "current": "river-of-echoes" },
+  "content": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_key": "link-azure",
+          "_type": "internalLink",
+          "reference": { "_type": "reference", "_ref": "region-azure-bay" }
+        }
+      ],
+      "children": [
+        { "_type": "span", "text": "Lyra 的航图第一次记录了 ", "marks": [] },
+        { "_type": "span", "text": "Azure Bay", "marks": ["link-azure"] },
+        { "_type": "span", "text": " 上一条隐秘水道，她在潮汐间听见回声。", "marks": [] }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_key": "link-glow",
+          "_type": "internalLink",
+          "reference": { "_type": "reference", "_ref": "creature-glowmoth" }
+        }
+      ],
+      "children": [
+        { "_type": "span", "text": "她沿着光点追踪，发现 ", "marks": [] },
+        { "_type": "span", "text": "Glowmoth", "marks": ["link-glow"] },
+        { "_type": "span", "text": " 在雾中指引方向。", "marks": [] }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_key": "link-lyra",
+          "_type": "internalLink",
+          "reference": { "_type": "reference", "_ref": "hero-lyra" }
+        }
+      ],
+      "children": [
+        { "_type": "span", "text": "故事的尾声写在 ", "marks": [] },
+        { "_type": "span", "text": "Lyra", "marks": ["link-lyra"] },
+        { "_type": "span", "text": " 的手记里：每一次回声，都对应一条新的航线。", "marks": [] }
+      ]
+    }
+  ],
+  "relatedHeroes": [{ "_type": "reference", "_ref": "hero-lyra" }],
+  "relatedRegions": [{ "_type": "reference", "_ref": "region-azure-bay" }],
+  "relatedCreatures": [{ "_type": "reference", "_ref": "creature-glowmoth" }]
+}

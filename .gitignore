@@ -1,0 +1,43 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# build outputs
+.next
+out
+build
+dist
+
+# coverage
+coverage
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (opt-in to commit examples)
+.env*
+!.env.example
+!.env.local.example
+
+# misc
+.DS_Store
+Thumbs.db
+
+# local tooling
+.claude/
+backups/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
