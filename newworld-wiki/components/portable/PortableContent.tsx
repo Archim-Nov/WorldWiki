@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PortableText, type PortableTextComponents } from 'next-sanity'
+import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
 import clsx from 'clsx'
 
 const typeToRoute: Record<string, string> = {
@@ -54,7 +54,7 @@ export function PortableContent({
 }) {
   return (
     <div className={clsx('space-y-4 text-sm text-muted-foreground leading-7', className)}>
-      <PortableText value={value} components={components} />
+      <PortableText value={value as PortableTextBlock[]} components={components} />
     </div>
   )
 }

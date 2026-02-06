@@ -5,15 +5,27 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
+import type { UserRole } from '@/types/profile'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
+  const [role, setRole] = useState<UserRole | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
+      if (data.user) {
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+          .then(({ data: profile }) => {
+            setRole(profile?.role ?? null)
+          })
+      }
     })
   }, [])
 
@@ -30,12 +42,14 @@ export default function DashboardPage() {
         <div className="space-y-4">
           <p>欢迎，{user.email}</p>
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/studio"
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
-            >
-              进入 Studio
-            </Link>
+            {role === 'editor' && (
+              <Link
+                href="/studio"
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+              >
+                进入 Studio
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="px-4 py-2 border rounded-md"

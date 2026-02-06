@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getUserProfile } from '@/lib/supabase/profile'
 
 export const metadata = {
   title: 'Sanity Studio',
@@ -10,13 +10,14 @@ export default async function StudioLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const profile = await getUserProfile()
 
-  if (!user) {
+  if (!profile) {
     redirect('/login?redirect=/dashboard')
+  }
+
+  if (profile.role !== 'editor') {
+    redirect('/dashboard')
   }
 
   return children
