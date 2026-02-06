@@ -4,6 +4,7 @@
 
 ## 登录与权限
 要在线创作/修改内容，需要具备 Sanity Studio 的访问权限（管理员或编辑）。
+用户分级说明见：`docs/USER_ROLES.md`。
 
 ### 在线登录（推荐）
 1. 打开项目的 Studio 地址：`https://你的域名/studio`

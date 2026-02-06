@@ -10,6 +10,7 @@ Last updated: 2026-02-06
 - `docs/wiki/*` - completed baseline spec (architecture, data model, ops)
 - `docs/CONTENT_GUIDE.md` - creator-friendly content filling guide
 - `docs/SAMPLE_CONTENT.md` - sample long-form content index (IDs + slugs)
+- `docs/USER_ROLES.md` - user role tiers (reader vs editor)
 - Repo (private): `https://github.com/Archim-Nov/NewWorldWiki.git`
 
 ## App routes (Next.js App Router)

@@ -45,6 +45,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ## 内容填充与样例
 - 创作者指南：`docs/CONTENT_GUIDE.md`
 - 长详情样例索引：`docs/SAMPLE_CONTENT.md`
+- 用户分级清单：`docs/USER_ROLES.md`
 - 生成长详情样例（会创建/覆盖 sample-* 文档 ID）：
 ```bash
 npx sanity exec sanity/scripts/seed-long-details.js --dataset production
