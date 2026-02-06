@@ -16,7 +16,7 @@ export default async function StudioLayout({
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/login?redirect=/studio')
+    redirect('/login?redirect=/dashboard')
   }
 
   return children

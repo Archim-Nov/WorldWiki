@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const supabase = createClient()
   const redirectParam = searchParams.get('redirect')
   const redirectTo =
-    redirectParam && redirectParam.startsWith('/') ? redirectParam : '/studio'
+    redirectParam && redirectParam.startsWith('/') ? redirectParam : '/dashboard'
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()

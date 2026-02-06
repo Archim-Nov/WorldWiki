@@ -6,7 +6,7 @@ const navItems = [
   { href: '/creatures', label: '生物' },
   { href: '/champions', label: '英雄' },
   { href: '/stories', label: '故事' },
-  { href: '/studio', label: 'Studio' },
+  { href: '/login', label: '登录' },
 ]
 
 export function Header() {
