@@ -6,7 +6,7 @@ Last updated: 2026-02-06
 
 ## Overview
 - Dataset: `production`
-- Seed script: `newworld-wiki/sanity/scripts/seed-long-details.js`
+- Seed script: `sanity/scripts/seed-long-details.js`
 - Count: 25 docs (5 per type)
 - Images: unique random photos from `picsum.photos` uploaded into Sanity assets
 - Stories: each story body is 1000+ Chinese characters

@@ -3,7 +3,7 @@
 ## 主线选型（最终采用）
 | 模块 | 选型 | 理由 |
 |---|---|---|
-| 前端框架 | Next.js 14 (App Router) | SSR/SSG/ISR 原生支持 |
+| 前端框架 | Next.js 16 (App Router) | SSR/SSG/ISR 原生支持 |
 | CMS | Sanity.io | Schema 灵活、预览好用 |
 | Auth + DB | Supabase | 单一体系、低维护 |
 | 部署 | Vercel | Next.js 原生生态 |

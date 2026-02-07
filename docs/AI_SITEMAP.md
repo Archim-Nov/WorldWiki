@@ -2,19 +2,18 @@
 
 Purpose: a compact, stable map of this repo so future agents can orient quickly.
 
-Last updated: 2026-02-06
+Last updated: 2026-02-07
 
 ## Start here
-- `FEATURE_CHECKLIST.md` - product intent and experience principles
-- `docs/roadmap/milestones.md` - executable milestones and status
+- `docs/PROJECT_STATUS.md` - project overview, milestones, feature status, design checklist
 - `docs/wiki/*` - completed baseline spec (architecture, data model, ops)
 - `docs/CONTENT_GUIDE.md` - creator-friendly content filling guide
 - `docs/SAMPLE_CONTENT.md` - sample long-form content index (IDs + slugs)
 - `docs/USER_ROLES.md` - user role tiers (reader vs editor)
-- Repo (private): `https://github.com/Archim-Nov/NewWorldWiki.git`
+- Repo (private): `https://github.com/Archim-Nov/WorldWiki.git`
 
 ## App routes (Next.js App Router)
-- `/` - `newworld-wiki/app/(marketing)/page.tsx`
+- `/` - `app/(marketing)/page.tsx`
 - `/countries` + `/countries/[slug]` - list/detail
 - `/regions` + `/regions/[slug]`
 - `/creatures` + `/creatures/[slug]`
@@ -23,28 +22,28 @@ Last updated: 2026-02-06
 - `/about`, `/contact`
 
 ## Layout & UI
-- Marketing layout: `newworld-wiki/app/(marketing)/layout.tsx`
-- Header/Footer: `newworld-wiki/components/layout/*`
-- Detail page styles: `newworld-wiki/app/(marketing)/*/[slug]/*-detail.css`
-- Detail page layouts: `newworld-wiki/app/(marketing)/*/[slug]/layout.tsx`
-- List page CSS modules: `newworld-wiki/app/(marketing)/*/page.module.css`
-- Global styles: `newworld-wiki/app/globals.css`
+- Marketing layout: `app/(marketing)/layout.tsx`
+- Header/Footer: `components/layout/*`
+- Detail page styles: `app/(marketing)/*/[slug]/*-detail.css`
+- Detail page layouts: `app/(marketing)/*/[slug]/layout.tsx`
+- List page CSS modules: `app/(marketing)/*/page.module.css`
+- Global styles: `app/globals.css`
 
 ## Content model (Sanity)
-- Schemas: `newworld-wiki/sanity/schemas/*.ts`
-- Queries: `newworld-wiki/lib/sanity/queries.ts`
-- Seed data: `newworld-wiki/sanity/seed/sample-data.ndjson`
-- Long-detail seed script: `newworld-wiki/sanity/scripts/seed-long-details.js`
+- Schemas: `sanity/schemas/*.ts`
+- Queries: `lib/sanity/queries.ts`
+- Seed data: `sanity/seed/sample-data.ndjson`
+- Long-detail seed script: `sanity/scripts/seed-long-details.js`
 - Sample content index: `docs/SAMPLE_CONTENT.md`
 
 ## API routes
-- `/api/contact` - `newworld-wiki/app/api/contact/route.ts`
-- `/api/newsletter` - `newworld-wiki/app/api/newsletter/route.ts`
-- `/api/webhooks/sanity` - `newworld-wiki/app/api/webhooks/sanity/route.ts`
+- `/api/contact` - `app/api/contact/route.ts`
+- `/api/newsletter` - `app/api/newsletter/route.ts`
+- `/api/webhooks/sanity` - `app/api/webhooks/sanity/route.ts`
 
 ## SEO
-- Metadata: `newworld-wiki/app/layout.tsx`
-- Sitemap: `newworld-wiki/app/sitemap.ts`
+- Metadata: `app/layout.tsx`
+- Sitemap: `app/sitemap.ts`
 
 ## Terminal UTF-8 (fix garbled output without touching site)
 - Run: `scripts/terminal-utf8.ps1`

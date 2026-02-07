@@ -2,9 +2,10 @@
 
 ## 目录结构（标准）
 ```
-my-webapp/
+WorldWiki/
 ├── app/
 │   ├── (marketing)/
+│   ├── (auth)/
 │   ├── (dashboard)/
 │   ├── api/
 │   ├── layout.tsx
@@ -14,6 +15,9 @@ my-webapp/
 ├── lib/
 ├── sanity/
 ├── public/
+├── docs/
+├── scripts/
+├── types/
 ├── .env.local
 └── package.json
 ```
@@ -35,7 +39,7 @@ my-webapp/
 |---|---|
 | `lib/sanity/client.ts` | Sanity 客户端 |
 | `lib/sanity/queries.ts` | GROQ 查询 |
-| `app/(marketing)/blog/[slug]/page.tsx` | 博客详情渲染 |
+| `app/(marketing)/countries/[slug]/page.tsx` | 国家详情渲染 |
 | `app/api/contact/route.ts` | 联系表单 API |
 | `app/error.tsx` | 全局错误边界 |
 | `app/loading.tsx` | 全局加载状态 |

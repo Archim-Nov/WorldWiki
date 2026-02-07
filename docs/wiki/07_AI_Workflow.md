@@ -6,7 +6,7 @@
 | UI 组件 | `components/` | 遵循现有设计 Token |
 | 样式 | Tailwind 类名 | 不新增全局 CSS |
 | GROQ 查询 | `lib/sanity/queries.ts` | 必须可复用 |
-| 文案 | marketing/blog 草稿 | 上线前人工审核 |
+| 文案 | marketing 页面草稿 | 上线前人工审核 |
 
 ## 敏感区（AI 仅提议）
 | 区域 | 风险 | 处理 |

@@ -1,36 +1,56 @@
 # 内容与数据模型
 
 ## Sanity Schema（内容层）
-### 1) page
+### 1) country
+- `name` (string)
+- `slug` (slug)
+- `mapImage` (image)
+- `summary` (text)
+- `featuredRegions` (array of references → region)
+
+### 2) region
+- `name` (string)
+- `slug` (slug)
+- `mapImage` (image)
+- `summary` (text)
+- `country` (reference → country)
+- `featuredHeroes` (array of references → hero)
+
+### 3) hero
+- `name` (string)
+- `slug` (slug)
+- `title` (string)
+- `portrait` (image)
+- `region` (reference → region)
+- `country` (reference → country)
+- `roles` (array of string)
+- `faction` (string)
+- `bio` (portable text)
+- `relatedHeroes` (array of references → hero)
+
+### 4) creature
+- `name` (string)
+- `slug` (slug)
+- `portrait` (image)
+- `species` (string)
+- `category` (string: animal / plant / element)
+- `region` (reference → region)
+- `country` (reference → country)
+- `bio` (portable text)
+- `relatedStories` (array of references → story)
+
+### 5) story
 - `title` (string)
 - `slug` (slug)
+- `coverImage` (image)
 - `content` (portable text)
-- `seo` (object: title/description/image)
-
-### 2) post
-- `title`
-- `slug`
-- `excerpt`
-- `coverImage`
-- `content`
-- `publishedAt`
-- `updatedAt`
-- `author`
-- `tags`
-
-### 3) product
-- `title`
-- `slug`
-- `price`
-- `features`
-- `cta`
-- `seo`
+- `relatedHeroes` (array of references → hero)
+- `relatedRegions` (array of references → region)
+- `relatedCreatures` (array of references → creature)
 
 ## Supabase 数据模型（用户层）
 ### 必备表
-- `profiles`：`id (uuid)`、`email`、`name`、`avatar_url`
-- `subscriptions`：`id`、`user_id`、`status`、`plan`、`current_period_end`
-- `orders`：`id`、`user_id`、`amount`、`status`、`created_at`
+- `profiles`：`id (uuid)`、`email`、`name`、`avatar_url`、`role`
 
 ### 关系与原则
 - **用户主键**以 Supabase Auth 的 `user.id` 为唯一来源
@@ -56,22 +76,14 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = id);
 ```
 
-### subscriptions 表
+### subscriptions 表（预留）
 ```sql
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own subscriptions"
-  ON subscriptions FOR SELECT
-  USING (auth.uid() = user_id);
+-- 未来扩展时启用
 ```
 
-### orders 表
+### orders 表（预留）
 ```sql
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own orders"
-  ON orders FOR SELECT
-  USING (auth.uid() = user_id);
+-- 未来扩展时启用
 ```
 
 ### RLS 检查清单
@@ -126,10 +138,10 @@ export default defineCliConfig({
 
 **使用示例**：
 ```ts
-import type { Post, Page } from '@/types/sanity.types'
+import type { Hero, Country } from '@/types/sanity.types'
 
-async function getPost(slug: string): Promise<Post | null> {
-  return client.fetch(postQuery, { slug })
+async function getHero(slug: string): Promise<Hero | null> {
+  return client.fetch(heroQuery, { slug })
 }
 ```
 

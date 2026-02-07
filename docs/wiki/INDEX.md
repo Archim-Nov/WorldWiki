@@ -15,8 +15,8 @@
 | `docs/wiki/05_Data_Content_Model.md` | Sanity Schema 与 Supabase 数据模型 |
 | `docs/wiki/06_SEO_Performance.md` | SEO、SSG/ISR、性能基线 |
 | `docs/wiki/07_AI_Workflow.md` | AI 可改区域、风险点、审查流程 |
-| `docs/wiki/08_Execution_Checklists.md` | 分阶段计划 + 任务拆解 + Checklist |
 | `docs/wiki/09_Operations_Security.md` | 环境、发布、监控、安全基线 |
+| `docs/PROJECT_STATUS.md` | 里程碑状态 + 功能清单 + 设计验收（统合） |
 
 ## 关键决策（一句话）
 - **不是传统 SPA**：采用 SSR/SSG/ISR 的 Next.js 方案
