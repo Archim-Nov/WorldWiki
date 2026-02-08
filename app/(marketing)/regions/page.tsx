@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { client } from '@/lib/sanity/client'
 import { regionsQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
+import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
 
 type Region = {
@@ -18,13 +19,13 @@ export default async function RegionsPage() {
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
-      <header className="max-w-2xl mb-12">
+      <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>Regions</p>
         <h1 className={styles.title}>区域画廊</h1>
         <p className={styles.lead}>
           以地图与场景为线索，进入每一块世界碎片。
         </p>
-      </header>
+      </ScrollReveal>
 
       {regions.length === 0 ? (
         <p className={styles.empty}>

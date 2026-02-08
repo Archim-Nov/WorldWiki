@@ -11,6 +11,21 @@ const typeToRoute: Record<string, string> = {
 }
 
 const components: PortableTextComponents = {
+  types: {
+    image: ({ value }) => {
+      const url = value?.asset?.url ?? value?.asset?._ref
+      if (!url) return null
+      const alt = value?.alt ?? ''
+      return (
+        <figure className="portable-image-bleed">
+          <img src={url} alt={alt} loading="lazy" />
+          {value?.caption && (
+            <figcaption>{value.caption}</figcaption>
+          )}
+        </figure>
+      )
+    },
+  },
   marks: {
     internalLink: ({ value, children }) => {
       const reference = value?.reference

@@ -1,6 +1,7 @@
 import { client } from '@/lib/sanity/client'
 import { heroesQuery } from '@/lib/sanity/queries'
 import { ChampionsFilter } from '@/components/marketing/ChampionsFilter'
+import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
 
 type Hero = {
@@ -20,7 +21,7 @@ export default async function ChampionsPage() {
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
-      <header className="max-w-2xl mb-12">
+      <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>
           Champions
         </p>
@@ -28,7 +29,7 @@ export default async function ChampionsPage() {
         <p className={styles.lead}>
           每一位英雄都是一幅展品，选择你感兴趣的角色进入传记。
         </p>
-      </header>
+      </ScrollReveal>
 
       {heroes.length === 0 ? (
         <p className={styles.empty}>

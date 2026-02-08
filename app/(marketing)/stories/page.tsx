@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { client } from '@/lib/sanity/client'
 import { storiesQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
+import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
 
 type Story = {
@@ -16,7 +17,7 @@ export default async function StoriesPage() {
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
-      <header className="max-w-2xl mb-12">
+      <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>
           Stories
         </p>
@@ -24,7 +25,7 @@ export default async function StoriesPage() {
         <p className={styles.lead}>
           以小说与短篇链接世界的情绪与线索。
         </p>
-      </header>
+      </ScrollReveal>
 
       {stories.length === 0 ? (
         <p className={styles.empty}>

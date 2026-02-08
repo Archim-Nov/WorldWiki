@@ -31,6 +31,12 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'themeColor',
+      title: 'Theme Color',
+      type: 'string',
+      description: 'HSL hue value (0-360) for the region visual identity, e.g. "220" for blue, "0" for red, "140" for green',
+    }),
+    defineField({
       name: 'featuredRegions',
       title: 'Featured Regions',
       type: 'array',

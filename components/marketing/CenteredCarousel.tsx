@@ -198,7 +198,7 @@ export function CenteredCarousel({
 
   return (
     <div className={`space-y-4 ${className ?? ''}`}>
-      <div ref={viewportRef} className="relative overflow-hidden">
+      <div ref={viewportRef} className="relative overflow-x-clip">
         <div
           className={`home-carousel-track flex items-stretch ${
             isSnapping ? 'home-carousel-track-snap' : ''
@@ -212,7 +212,7 @@ export function CenteredCarousel({
               href={entry.item.href}
               data-active={entry.itemIndex === activeIndex}
               onClick={(event) => handleCardClick(event, trackIndex)}
-              className="home-carousel-card group rounded-3xl border bg-card overflow-hidden"
+              className="home-carousel-card group rounded-3xl border border-border/30 bg-card overflow-hidden"
             >
               <div className="h-[340px] sm:h-[440px] lg:h-[540px] bg-muted">
                 <img

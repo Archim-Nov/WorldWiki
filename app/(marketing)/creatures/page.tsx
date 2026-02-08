@@ -1,6 +1,7 @@
 import { client } from '@/lib/sanity/client'
 import { creaturesQuery } from '@/lib/sanity/queries'
 import { CreaturesFilter } from '@/components/marketing/CreaturesFilter'
+import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
 
 type Creature = {
@@ -18,13 +19,13 @@ export default async function CreaturesPage() {
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
-      <header className="max-w-2xl mb-12">
+      <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>Creatures</p>
         <h1 className={styles.title}>生物画廊</h1>
         <p className={styles.lead}>
           记录这个世界里的物种与生态切面。
         </p>
-      </header>
+      </ScrollReveal>
 
       {creatures.length === 0 ? (
         <p className={styles.empty}>

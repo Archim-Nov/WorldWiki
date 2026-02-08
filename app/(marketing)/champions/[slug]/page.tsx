@@ -22,11 +22,13 @@ type Hero = {
   region?: {
     name: string
     slug: { current: string }
+    themeColor?: string
     mapImage?: string
   }
   country?: {
     name: string
     slug: { current: string }
+    themeColor?: string
     mapImage?: string
   }
   bio?: unknown[]
@@ -115,32 +117,29 @@ export default async function HeroDetailPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 hero-detail">
-      <header className="hero-header text-center max-w-3xl mx-auto">
-        <div className="hero-avatar">
-          <div className="hero-avatar-ring">
-            <img
-              src={hero.portrait ?? placeholders.hero}
-              alt={hero.name}
-              className="hero-avatar-img"
-              loading="lazy"
-            />
+    <div className="hero-detail" style={(hero.region?.themeColor || hero.country?.themeColor) ? { '--theme-hue': hero.region?.themeColor ?? hero.country?.themeColor } as React.CSSProperties : undefined}>
+      <section className="hero-hero">
+        <div className="hero-hero-bleed">
+          <img
+            src={hero.portrait ?? placeholders.hero}
+            alt={hero.name}
+            className="hero-hero-image"
+          />
+          <div className="hero-hero-overlay" />
+        </div>
+        <div className="hero-hero-content">
+          <div className="hero-hero-lockup">
+            <span className="hero-hero-tag">Champion Archive</span>
+            <h1 className="hero-hero-title">{hero.name}</h1>
+            {hero.title && (
+              <p className="hero-hero-subtitle">{hero.title}</p>
+            )}
           </div>
         </div>
-        <p className="hero-kicker text-xs uppercase tracking-[0.4em] text-muted-foreground">
-          Champion Archive
-        </p>
-        <h1 className="hero-title text-4xl font-semibold mt-4">
-          {hero.name}
-        </h1>
-        {hero.title && (
-          <p className="hero-subtitle text-muted-foreground mt-3">
-            {hero.title}
-          </p>
-        )}
-      </header>
+      </section>
 
-      <section className="mt-12 grid gap-8 lg:grid-cols-[0.8fr_1.4fr_0.8fr]">
+      <div className="container mx-auto px-4 detail-body">
+      <section className="grid gap-8 lg:grid-cols-[0.8fr_1.4fr_0.8fr]">
         <aside className="order-3 space-y-6 lg:order-1">
           <div className="rounded-2xl border bg-card p-4 hero-panel">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -421,6 +420,7 @@ export default async function HeroDetailPage({
       </section>
 
       <RecommendationGrid items={recommendations} />
+      </div>
     </div>
   )
 }

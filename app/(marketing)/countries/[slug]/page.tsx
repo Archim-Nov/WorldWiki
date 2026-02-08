@@ -15,6 +15,7 @@ type Country = {
   name: string
   summary?: string
   mapImage?: string
+  themeColor?: string
   featuredRegions?: Array<{
     _id: string
     name: string
@@ -107,28 +108,29 @@ export default async function CountryDetailPage({
   }
 
   return (
-    <div className="country-detail container mx-auto px-4 py-16">
-      <section className="rounded-3xl border bg-card overflow-hidden">
-        <div className="relative aspect-[16/9] sm:aspect-[21/9] bg-muted">
+    <div className="country-detail" style={country.themeColor ? { '--theme-hue': country.themeColor } as React.CSSProperties : undefined}>
+      <section className="country-hero">
+        <div className="country-hero-bleed">
           <img
             src={country.mapImage ?? placeholders.country}
             alt={country.name}
-            className="h-full w-full object-cover"
+            className="country-hero-image"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
-          <div className="absolute bottom-6 left-6 max-w-xl text-white">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-              Country Atlas
-            </p>
-            <h1 className="text-4xl font-semibold mt-3">{country.name}</h1>
+          <div className="country-hero-overlay" />
+        </div>
+        <div className="country-hero-content">
+          <div className="country-hero-lockup">
+            <span className="country-hero-tag">Country Atlas</span>
+            <h1 className="country-hero-title">{country.name}</h1>
             {country.summary && (
-              <p className="text-sm text-white/80 mt-3">{country.summary}</p>
+              <p className="country-hero-summary">{country.summary}</p>
             )}
           </div>
         </div>
       </section>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="container mx-auto px-4 detail-body">
+      <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Regions
@@ -187,6 +189,7 @@ export default async function CountryDetailPage({
       )}
 
       <RecommendationGrid items={recommendations} />
+      </div>
     </div>
   )
 }

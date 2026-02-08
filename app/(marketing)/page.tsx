@@ -4,6 +4,7 @@ import { toRecommendation } from '@/lib/recommendations'
 import { CenteredCarousel } from '@/components/marketing/CenteredCarousel'
 import { FullscreenHero } from '@/components/marketing/FullscreenHero'
 import { RandomShowcase } from '@/components/marketing/RandomShowcase'
+import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
 
 export const dynamic = 'force-dynamic'
@@ -92,7 +93,7 @@ export default async function HomePage() {
 
       <div className="container mx-auto px-4 py-12 sm:py-16">
 
-      <section className="max-w-3xl mx-auto text-center mt-16">
+      <ScrollReveal as="section" className="max-w-3xl mx-auto text-center mt-16">
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
           Museum Universe
         </p>
@@ -103,7 +104,7 @@ export default async function HomePage() {
           随机展柜展示当下的内容切片，最新英雄与国家条目固定陈列，
           进入后直接阅读详情与关联。
         </p>
-      </section>
+      </ScrollReveal>
 
       {allRandomCards.length > 0 ? (
           <RandomShowcase items={allRandomCards} />
@@ -114,10 +115,15 @@ export default async function HomePage() {
         )}
       </div>
 
-      <section className="mt-24">
-        <div className="text-center mb-10">
+      <ScrollReveal className="mt-24">
+        <div className="ornament mb-6"><span className="ornament-symbol">&#x2726;</span></div>
+      </ScrollReveal>
+
+      <section className="mt-12">
+        <ScrollReveal className="text-center mb-10">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2" style={{ fontFamily: 'var(--font-cinzel), serif' }}>Champions</p>
           <h2 className="text-2xl font-semibold">英雄</h2>
-        </div>
+        </ScrollReveal>
         {heroCards.length > 0 ? (
           <CenteredCarousel items={heroCards} />
         ) : (
@@ -125,10 +131,15 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="mt-24 pb-24">
-        <div className="text-center mb-10">
+      <ScrollReveal className="mt-24">
+        <div className="ornament mb-6"><span className="ornament-symbol">&#x2726;</span></div>
+      </ScrollReveal>
+
+      <section className="mt-12 pb-24">
+        <ScrollReveal className="text-center mb-10">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2" style={{ fontFamily: 'var(--font-cinzel), serif' }}>Countries</p>
           <h2 className="text-2xl font-semibold">国家</h2>
-        </div>
+        </ScrollReveal>
         {countryCards.length > 0 ? (
           <CenteredCarousel items={countryCards} />
         ) : (

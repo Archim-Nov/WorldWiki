@@ -15,6 +15,7 @@ type Region = {
   name: string
   summary?: string
   mapImage?: string
+  themeColor?: string
   country?: { name: string; slug: { current: string }; mapImage?: string }
   featuredHeroes?: Array<{
     _id: string
@@ -101,33 +102,32 @@ export default async function RegionDetailPage({
   }
 
   return (
-    <div className="region-detail container mx-auto px-4 py-16">
-      <section className="relative overflow-hidden rounded-3xl border bg-card">
-        <div className="aspect-[4/3] bg-muted sm:aspect-[5/2]">
+    <div className="region-detail" style={region.themeColor ? { '--theme-hue': region.themeColor } as React.CSSProperties : undefined}>
+      <section className="region-hero">
+        <div className="region-hero-bleed">
           <img
             src={region.mapImage ?? placeholders.region}
             alt={region.name}
-            className="h-full w-full object-cover"
+            className="region-hero-image"
           />
+          <div className="region-hero-overlay" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        <div className="absolute bottom-6 left-6 max-w-2xl text-white">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-            Region Stage
-          </p>
-          <h1 className="text-4xl font-semibold mt-3">{region.name}</h1>
-          {region.country?.name && (
-            <p className="text-xs uppercase tracking-[0.2em] mt-3 text-white/80">
-              {region.country.name}
-            </p>
-          )}
-          {region.summary && (
-            <p className="text-sm mt-4 text-white/85">{region.summary}</p>
-          )}
+        <div className="region-hero-content">
+          <div className="region-hero-lockup">
+            <span className="region-hero-tag">Region Stage</span>
+            <h1 className="region-hero-title">{region.name}</h1>
+            {region.country?.name && (
+              <p className="region-hero-country">{region.country.name}</p>
+            )}
+            {region.summary && (
+              <p className="region-hero-summary">{region.summary}</p>
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="container mx-auto px-4 detail-body">
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-2xl border bg-card p-5 sm:p-6">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Region Notes
@@ -196,6 +196,7 @@ export default async function RegionDetailPage({
       )}
 
       <RecommendationGrid items={recommendations} />
+      </div>
     </div>
   )
 }

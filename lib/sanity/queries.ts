@@ -15,6 +15,7 @@ export const countryBySlugQuery = groq`
     _id,
     name,
     summary,
+    themeColor,
     "mapImage": mapImage.asset->url,
     "featuredRegions": select(
       count(featuredRegions) > 0 => featuredRegions[]->{
@@ -52,6 +53,7 @@ export const regionBySlugQuery = groq`
     _id,
     name,
     summary,
+    themeColor,
     "mapImage": mapImage.asset->url,
     country->{
       name,
@@ -109,11 +111,13 @@ export const heroBySlugQuery = groq`
     region->{
       name,
       slug,
+      themeColor,
       "mapImage": mapImage.asset->url
     },
     country->{
       name,
       slug,
+      themeColor,
       "mapImage": mapImage.asset->url
     },
     "bio": bio[]{
@@ -198,11 +202,13 @@ export const creatureBySlugQuery = groq`
     region->{
       name,
       slug,
+      themeColor,
       "mapImage": mapImage.asset->url
     },
     country->{
       name,
       slug,
+      themeColor,
       "mapImage": mapImage.asset->url
     },
     "bio": bio[]{

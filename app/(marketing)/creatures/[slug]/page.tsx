@@ -32,9 +32,10 @@ type Creature = {
     name: string
     slug: { current: string }
     _ref?: string
+    themeColor?: string
     mapImage?: string
   }
-  country?: { name: string; slug: { current: string }; mapImage?: string }
+  country?: { name: string; slug: { current: string }; themeColor?: string; mapImage?: string }
   bio?: unknown[]
   relatedStories?: Array<{
     _id: string
@@ -126,39 +127,33 @@ export default async function CreatureDetailPage({
   }
 
   return (
-    <div className="creature-detail container mx-auto px-4 py-16">
-      <section className="rounded-3xl border bg-card overflow-hidden">
-        <div className="h-[320px] bg-muted sm:h-[420px] lg:h-[520px]">
+    <div className="creature-detail" style={(creature.region?.themeColor || creature.country?.themeColor) ? { '--theme-hue': creature.region?.themeColor ?? creature.country?.themeColor } as React.CSSProperties : undefined}>
+      <section className="creature-hero">
+        <div className="creature-hero-bleed">
           <img
             src={creature.portrait ?? placeholders.creature}
             alt={creature.name}
-            className="h-full w-full object-cover"
+            className="creature-hero-image"
           />
+          <div className="creature-hero-overlay" />
         </div>
-        <div className="p-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Field Illustration
+        <div className="creature-hero-content">
+          <div className="creature-hero-lockup">
+            <span className="creature-hero-tag">Specimen Sheet</span>
+            <h1 className="creature-hero-title">{creature.name}</h1>
+            <div className="creature-hero-tags">
+              {creature.category && (
+                <span>{labelForCategory(creature.category)}</span>
+              )}
+              {creature.species && <span>{creature.species}</span>}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-3xl border bg-card p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Specimen Sheet
-        </p>
-        <h1 className="text-3xl font-semibold mt-4">{creature.name}</h1>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-          {creature.category ? (
-            <span className="rounded-full border px-3 py-1">
-              {labelForCategory(creature.category)}
-            </span>
-          ) : null}
-          {creature.species ? (
-            <span className="rounded-full border px-3 py-1">
-              {creature.species}
-            </span>
-          ) : null}
-        </div>
-
-        <div className="mt-6 rounded-2xl border p-4 text-sm">
+      <div className="container mx-auto px-4 detail-body">
+      <section className="rounded-3xl border bg-card p-6">
+        <div className="rounded-2xl border p-4 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">分类</span>
             <span>{labelForCategory(creature.category) ?? '未记录'}</span>
@@ -214,6 +209,7 @@ export default async function CreatureDetailPage({
       </section>
 
       <RecommendationGrid items={recommendations} />
+      </div>
     </div>
   )
 }

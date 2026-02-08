@@ -4,7 +4,7 @@ import { storyBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
 import { PortableContent } from '@/components/portable/PortableContent'
 import { RecommendationGrid } from '@/components/marketing/RecommendationGrid'
-import { StoryHeroFade } from '@/components/marketing/StoryHeroFade'
+import { StoryScrollFade } from '@/components/marketing/StoryScrollFade'
 import {
   addRecommendations,
   RecommendationItem,
@@ -199,7 +199,7 @@ export default async function StoryDetailPage({
 
   return (
     <div className="story-detail">
-      <StoryHeroFade />
+      <StoryScrollFade />
       <section className="story-hero">
         <div className="story-hero-bleed">
           <img
@@ -215,9 +215,19 @@ export default async function StoryDetailPage({
             <h1 className="story-hero-title">{story.title}</h1>
           </div>
         </div>
+        <div className="story-scroll-cta">
+          <span>滚屏以开始</span>
+          <i className="story-scroll-arrow" />
+        </div>
       </section>
 
       <div className="container mx-auto px-4 story-body-wrap">
+        <header className="story-article-header">
+          <span className="story-article-tag">Short Story</span>
+          <h2 className="story-article-title">{story.title}</h2>
+          <span className="story-article-divider" />
+        </header>
+
         <section className="story-body">
           <article className="story-body-card">
             {story.content && story.content.length > 0 ? (

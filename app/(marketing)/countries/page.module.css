@@ -45,85 +45,144 @@
   color: var(--muted-foreground);
 }
 
+/* ── Panoramic Atlas Strip ── */
 .card {
-  border: 1px solid var(--border);
-  background: var(--card);
+  display: block;
+  position: relative;
   border-radius: var(--radius-3xl);
   overflow: hidden;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  isolation: isolate;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12), 0 0 30px var(--section-countries-glow);
-}
-
-.cardMedia {
+.cardInner {
   position: relative;
-  background: var(--muted);
+  min-height: 280px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.cardBg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
 .cardImage {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 200ms ease;
+  filter: saturate(0.85) brightness(0.92);
+  transition: transform 600ms ease, filter 600ms ease;
 }
 
 .card:hover .cardImage {
-  transform: scale(1.02);
+  transform: scale(1.05);
+  filter: saturate(1) brightness(1);
 }
 
 .cardOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.6),
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0)
-  );
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 55%, transparent 100%),
+    linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+  transition: opacity 600ms ease;
 }
 
-.cardTitleWrap {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
+.card:hover .cardOverlay {
+  opacity: 0.85;
+}
+
+.cardContent {
+  position: relative;
+  z-index: 2;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
   color: #fff;
 }
 
-.cardTitle {
-  font-size: 1.5rem;
-  font-weight: 600;
+.cardIndex {
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+  font-family: var(--font-cinzel), serif;
+  color: rgba(255, 255, 255, 0.06);
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  z-index: 1;
+  pointer-events: none;
+  transition: color 600ms ease;
 }
 
-.cardBody {
-  padding: 20px;
-  border-left: 3px solid var(--section-countries);
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-bottom: 16px;
-  padding-left: 16px;
-  padding-top: 16px;
-  padding-bottom: 4px;
+.card:hover .cardIndex {
+  color: rgba(255, 255, 255, 0.1);
+}
+
+.cardName {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
 .cardSummary {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  margin-top: 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 480px;
+}
+
+.cardFooter {
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .cardCta {
-  margin-top: 1rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
+  font-size: 0.6875rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--section-countries);
+  border: 1px solid var(--section-countries-dim);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  transition: background 300ms ease, color 300ms ease;
+}
+
+.card:hover .cardCta {
+  background: var(--section-countries);
+  color: #000;
+}
+
+.cardDivider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
 }
 
 @media (min-width: 640px) {
   .title {
     font-size: 1.875rem;
+  }
+  .cardInner {
+    min-height: 340px;
+  }
+  .cardContent {
+    padding: 40px 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cardInner {
+    min-height: 400px;
   }
 }

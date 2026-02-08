@@ -2,21 +2,27 @@
 
 import { useEffect } from 'react'
 
-export function StoryHeroFade() {
+interface DetailHeroFadeProps {
+  rootSelector: string
+  bodySelector: string
+  cssVar: string
+}
+
+export function DetailHeroFade({
+  rootSelector,
+  bodySelector,
+  cssVar,
+}: DetailHeroFadeProps) {
   useEffect(() => {
-    const root = document.querySelector<HTMLElement>('.story-detail')
-    const body = document.querySelector<HTMLElement>('.story-body')
-    if (!root || !body) {
-      return
-    }
+    const root = document.querySelector<HTMLElement>(rootSelector)
+    const body = document.querySelector<HTMLElement>(bodySelector)
+    if (!root || !body) return
 
     const findScrollParent = (node: HTMLElement | null) => {
       let current: HTMLElement | null = node
       while (current && current !== document.body) {
         const style = window.getComputedStyle(current)
-        if (/(auto|scroll)/.test(style.overflowY)) {
-          return current
-        }
+        if (/(auto|scroll)/.test(style.overflowY)) return current
         current = current.parentElement
       }
       return null
@@ -44,7 +50,7 @@ export function StoryHeroFade() {
       const raw = (start - relativeTop) / (start - end)
       const clamped = Math.max(0, Math.min(1, raw))
 
-      root.style.setProperty('--story-hero-fade', clamped.toFixed(3))
+      root.style.setProperty(cssVar, clamped.toFixed(3))
       raf = 0
     }
 
@@ -60,11 +66,9 @@ export function StoryHeroFade() {
     return () => {
       scrollTarget.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
-      if (raf) {
-        window.cancelAnimationFrame(raf)
-      }
+      if (raf) window.cancelAnimationFrame(raf)
     }
-  }, [])
+  }, [rootSelector, bodySelector, cssVar])
 
   return null
 }

@@ -106,7 +106,7 @@ function ShowcaseCard({
   return (
     <Link
       href={card.href}
-      className={`group relative overflow-hidden border border-border/50 ${tall ? 'rounded-2xl' : 'rounded-lg'} ${className ?? ''}`}
+      className={`group relative overflow-hidden border border-border/30 ${tall ? 'rounded-2xl' : 'rounded-lg'} ${className ?? ''}`}
     >
       <div className={tall ? 'h-full' : 'h-full'}>
         <img
