@@ -47,7 +47,8 @@ const latestDetailsQuery = `*[_type in ["country","region","creature","hero","ma
   title,
   slug,
   "portrait": portrait.asset->url,
-  "mapImage": mapImage.asset->url
+  "mapImage": mapImage.asset->url,
+  "coverImage": coverImage.asset->url
 }`
 
 const latestCountriesQuery = `*[_type == "country"] | order(_updatedAt desc)[0..4] {
