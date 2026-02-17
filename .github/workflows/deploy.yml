@@ -31,7 +31,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Create archive
-        run: tar -czf release.tar.gz .next/standalone public .env.production
+        run: tar -czf release.tar.gz .next/standalone public
 
       - name: Upload to server
         uses: appleboy/scp-action@v0.1.7
