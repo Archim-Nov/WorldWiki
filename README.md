@@ -103,6 +103,14 @@ npx sanity exec sanity/scripts/seed-long-details.js --dataset production
 
 会生成 25 条样例内容（每类 5 条），用于快速验证页面效果。
 
+若你已经启用“国家/组织 + 魔法原理/法术”分组，可继续执行：
+
+```bash
+npx sanity exec sanity/scripts/seed-org-magic-content.js --dataset production
+```
+
+会补充 15 条内容（组织 5 + 原理 5 + 法术 5），并自动上传对应真实封面图。
+
 ## 内容模型
 
 五类核心实体以**关联关系**组织，而非层级分类：

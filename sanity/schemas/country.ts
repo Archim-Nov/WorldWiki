@@ -19,6 +19,19 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'kind',
+      title: 'Kind',
+      type: 'string',
+      options: {
+        list: [
+          { title: '国家', value: 'nation' },
+          { title: '组织', value: 'organization' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'nation',
+    }),
+    defineField({
       name: 'mapImage',
       title: 'Map Image',
       type: 'image',

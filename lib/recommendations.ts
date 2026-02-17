@@ -1,6 +1,12 @@
 import { placeholders } from '@/lib/placeholders'
 
-export type RecommendationType = 'hero' | 'region' | 'country' | 'creature' | 'story'
+export type RecommendationType =
+  | 'hero'
+  | 'region'
+  | 'country'
+  | 'creature'
+  | 'story'
+  | 'magic'
 
 export const typeLabels: Record<RecommendationType, string> = {
   hero: '英雄',
@@ -8,6 +14,7 @@ export const typeLabels: Record<RecommendationType, string> = {
   country: '国家',
   creature: '生物',
   story: '故事',
+  magic: '魔法',
 }
 
 export const typeRoutes: Record<RecommendationType, string> = {
@@ -16,6 +23,7 @@ export const typeRoutes: Record<RecommendationType, string> = {
   country: 'countries',
   creature: 'creatures',
   story: 'stories',
+  magic: 'magics',
 }
 
 const typePlaceholders: Record<RecommendationType, string> = {
@@ -24,6 +32,7 @@ const typePlaceholders: Record<RecommendationType, string> = {
   country: placeholders.country,
   creature: placeholders.creature,
   story: placeholders.story,
+  magic: placeholders.magic,
 }
 
 export type RecommendationItem = {
@@ -66,7 +75,7 @@ export function toRecommendation(
     image = item.portrait ?? image
   } else if (type === 'region' || type === 'country') {
     image = item.mapImage ?? image
-  } else if (type === 'story') {
+  } else if (type === 'story' || type === 'magic') {
     image = item.coverImage ?? image
   }
 

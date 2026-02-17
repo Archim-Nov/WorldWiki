@@ -8,6 +8,7 @@ const typeToRoute: Record<string, string> = {
   creature: 'creatures',
   hero: 'champions',
   story: 'stories',
+  magic: 'magics',
 }
 
 const components: PortableTextComponents = {

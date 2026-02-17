@@ -5,6 +5,7 @@ export const countriesQuery = groq`
     _id,
     name,
     slug,
+    kind,
     summary,
     "mapImage": mapImage.asset->url
   }
@@ -14,6 +15,7 @@ export const countryBySlugQuery = groq`
   *[_type == "country" && slug.current == $slug][0] {
     _id,
     name,
+    kind,
     summary,
     themeColor,
     "mapImage": mapImage.asset->url,
@@ -263,6 +265,70 @@ export const storiesQuery = groq`
   }
 `
 
+export const magicsQuery = groq`
+  *[_type == "magic"] | order(name asc) {
+    _id,
+    name,
+    slug,
+    kind,
+    element,
+    school,
+    summary,
+    "coverImage": coverImage.asset->url
+  }
+`
+
+export const magicBySlugQuery = groq`
+  *[_type == "magic" && slug.current == $slug][0] {
+    _id,
+    name,
+    slug,
+    kind,
+    element,
+    school,
+    summary,
+    "coverImage": coverImage.asset->url,
+    "details": details[]{
+      ...,
+      markDefs[]{
+        ...,
+        reference->{
+          _type,
+          _id,
+          slug,
+          title,
+          name,
+          "portrait": portrait.asset->url,
+          "mapImage": mapImage.asset->url,
+          "coverImage": coverImage.asset->url
+        }
+      }
+    },
+    "linkedRefs": details[].markDefs[_type == "internalLink"].reference->{
+      _type,
+      _id,
+      slug,
+      title,
+      name,
+      "portrait": portrait.asset->url,
+      "mapImage": mapImage.asset->url,
+      "coverImage": coverImage.asset->url
+    },
+    relatedHeroes[]->{
+      _id,
+      name,
+      slug,
+      "portrait": portrait.asset->url
+    },
+    relatedStories[]->{
+      _id,
+      title,
+      slug,
+      "coverImage": coverImage.asset->url
+    }
+  }
+`
+
 export const storyBySlugQuery = groq`
   *[_type == "story" && slug.current == $slug][0] {
     _id,
@@ -280,7 +346,8 @@ export const storyBySlugQuery = groq`
           title,
           name,
           "portrait": portrait.asset->url,
-          "mapImage": mapImage.asset->url
+          "mapImage": mapImage.asset->url,
+          "coverImage": coverImage.asset->url
         }
       }
     },
@@ -291,7 +358,8 @@ export const storyBySlugQuery = groq`
       title,
       name,
       "portrait": portrait.asset->url,
-      "mapImage": mapImage.asset->url
+      "mapImage": mapImage.asset->url,
+      "coverImage": coverImage.asset->url
     },
     relatedHeroes[]->{
       _id,
@@ -311,5 +379,37 @@ export const storyBySlugQuery = groq`
       slug,
       "portrait": portrait.asset->url
     }
+  }
+`
+
+export const globalSearchQuery = groq`
+  *[
+    _type in ["hero", "region", "country", "creature", "story", "magic"]
+    && defined(slug.current)
+    && (
+      name match $term
+      || title match $term
+      || summary match $term
+      || species match $term
+      || category match $term
+      || school match $term
+      || kind match $term
+      || element match $term
+    )
+  ] | order(_updatedAt desc) [0...$limit] {
+    _id,
+    _type,
+    slug,
+    name,
+    title,
+    summary,
+    species,
+    category,
+    kind,
+    element,
+    school,
+    "portrait": portrait.asset->url,
+    "mapImage": mapImage.asset->url,
+    "coverImage": coverImage.asset->url
   }
 `

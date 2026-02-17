@@ -59,3 +59,35 @@ Last updated: 2026-02-06
 ## Notes
 - Display names/titles are in Chinese and live in Sanity; use the IDs/slugs above for stable linking.
 - References: regions link to countries; stories link to related heroes/regions/creatures (see seed script).
+
+## Organizations + Magic Expansion (15)
+- Seed script: `sanity/scripts/seed-org-magic-content.js`
+- Count: 15 docs (organization 5 + principle 5 + spell 5)
+- Image strategy: curated real photos from Unsplash uploaded into Sanity assets
+
+### Organizations (5)
+| Document ID | Slug |
+| --- | --- |
+| `seed-org-astral-council` | `org-astral-council` |
+| `seed-org-ember-bank` | `org-ember-bank` |
+| `seed-org-veil-rangers` | `org-veil-rangers` |
+| `seed-org-runic-forge` | `org-runic-forge` |
+| `seed-org-echo-courier` | `org-echo-courier` |
+
+### Magic Principles (5)
+| Document ID | Slug |
+| --- | --- |
+| `seed-magic-principle-resonance` | `principle-resonance-law` |
+| `seed-magic-principle-anchor` | `principle-anchor-conservation` |
+| `seed-magic-principle-phase` | `principle-phase-shift` |
+| `seed-magic-principle-memory` | `principle-memory-circuit` |
+| `seed-magic-principle-threshold` | `principle-threshold-fission` |
+
+### Magic Spells (5)
+| Document ID | Slug | Element |
+| --- | --- | --- |
+| `seed-magic-spell-skyward-lance` | `spell-skyward-lance` | `fire` |
+| `seed-magic-spell-mire-bind` | `spell-mire-bind` | `earth` |
+| `seed-magic-spell-ember-gate` | `spell-ember-gate` | `fire` |
+| `seed-magic-spell-aurora-veil` | `spell-aurora-veil` | `water` |
+| `seed-magic-spell-silent-bell` | `spell-silent-bell` | `wind` |

@@ -7,6 +7,7 @@ const typeToRoute: Record<string, string> = {
   creature: 'creatures',
   hero: 'champions',
   story: 'stories',
+  magic: 'magics',
 }
 
 export async function POST(request: NextRequest) {

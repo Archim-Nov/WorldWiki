@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity'
 
 export default defineType({
-  name: 'hero',
-  title: 'Hero',
+  name: 'magic',
+  title: 'Magic',
   type: 'document',
   fields: [
     defineField({
@@ -12,11 +12,6 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-    }),
-    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -24,37 +19,62 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'portrait',
-      title: 'Portrait',
+      name: 'kind',
+      title: 'Kind',
+      type: 'string',
+      options: {
+        list: [
+          { title: '原理', value: 'principle' },
+          { title: '法术', value: 'spell' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'spell',
+    }),
+    defineField({
+      name: 'school',
+      title: 'School',
+      type: 'string',
+      description: 'e.g. Arcane, Divine, Nature',
+    }),
+    defineField({
+      name: 'element',
+      title: 'Element',
+      type: 'string',
+      options: {
+        list: [
+          { title: '火', value: 'fire' },
+          { title: '风', value: 'wind' },
+          { title: '土', value: 'earth' },
+          { title: '水', value: 'water' },
+        ],
+        layout: 'radio',
+      },
+      hidden: ({ parent }) => parent?.kind !== 'spell',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as { kind?: string } | undefined
+          if (parent?.kind === 'spell' && !value) {
+            return '法术必须选择元素属性'
+          }
+          return true
+        }),
+    }),
+    defineField({
+      name: 'summary',
+      title: 'Summary',
+      type: 'text',
+      rows: 3,
+    }),
+    defineField({
+      name: 'coverImage',
+      title: 'Cover Image',
       type: 'image',
       options: { hotspot: true },
     }),
     defineField({
-      name: 'region',
-      title: 'Region',
-      type: 'reference',
-      to: [{ type: 'region' }],
-    }),
-    defineField({
-      name: 'country',
-      title: 'Country',
-      type: 'reference',
-      to: [{ type: 'country' }],
-    }),
-    defineField({
-      name: 'roles',
-      title: 'Roles',
-      type: 'array',
-      of: [{ type: 'string' }],
-    }),
-    defineField({
-      name: 'faction',
-      title: 'Faction',
-      type: 'string',
-    }),
-    defineField({
-      name: 'bio',
-      title: 'Bio',
+      name: 'details',
+      title: 'Details',
       type: 'array',
       of: [
         {
@@ -103,6 +123,12 @@ export default defineType({
       title: 'Related Heroes',
       type: 'array',
       of: [{ type: 'reference', to: [{ type: 'hero' }] }],
+    }),
+    defineField({
+      name: 'relatedStories',
+      title: 'Related Stories',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'story' }] }],
     }),
   ],
 })

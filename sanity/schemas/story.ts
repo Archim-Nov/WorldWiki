@@ -48,6 +48,7 @@ export default defineType({
                       { type: 'creature' },
                       { type: 'hero' },
                       { type: 'story' },
+                      { type: 'magic' },
                     ],
                   },
                 ],

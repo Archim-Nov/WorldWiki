@@ -13,6 +13,7 @@ import {
 type Country = {
   _id: string
   name: string
+  kind?: 'nation' | 'organization'
   summary?: string
   mapImage?: string
   themeColor?: string
@@ -39,6 +40,7 @@ export default async function CountryDetailPage({
   }
 
   const regionCount = country.featuredRegions?.length ?? 0
+  const isOrganization = country.kind === 'organization'
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
 
@@ -92,7 +94,7 @@ export default async function CountryDetailPage({
   if (recommendations.length < 3) {
     const excludeIds = Array.from(seen)
     const fallback: RecommendationSource[] = await client.fetch(
-      `*[_type in ["hero","region","country","creature","story"] && !(_id in $excludeIds)] | order(_updatedAt desc)[0..10] {
+      `*[_type in ["hero","region","country","creature","story","magic"] && !(_id in $excludeIds)] | order(_updatedAt desc)[0..10] {
         _id,
         _type,
         title,
@@ -120,7 +122,9 @@ export default async function CountryDetailPage({
         </div>
         <div className="country-hero-content">
           <div className="country-hero-lockup">
-            <span className="country-hero-tag">Country Atlas</span>
+            <span className="country-hero-tag">
+              {isOrganization ? 'Organization Profile' : 'Country Atlas'}
+            </span>
             <h1 className="country-hero-title">{country.name}</h1>
             {country.summary && (
               <p className="country-hero-summary">{country.summary}</p>
@@ -133,7 +137,7 @@ export default async function CountryDetailPage({
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Regions
+            {isOrganization ? 'Branches' : 'Regions'}
           </p>
           <p className="text-2xl font-semibold mt-3">{regionCount}</p>
           <p className="text-sm text-muted-foreground mt-2">已记录区域数量</p>

@@ -101,7 +101,7 @@ export default async function HeroDetailPage({
   if (recommendations.length < 3) {
     const excludeIds = Array.from(seen)
     const fallback: RecommendationSource[] = await client.fetch(
-      `*[_type in ["hero","region","country","creature","story"] && !(_id in $excludeIds)] | order(_updatedAt desc)[0..10] {
+      `*[_type in ["hero","region","country","creature","story","magic"] && !(_id in $excludeIds)] | order(_updatedAt desc)[0..10] {
         _id,
         _type,
         title,

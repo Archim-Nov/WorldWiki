@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 type RawItem = {
   _id?: string
-  _type?: 'hero' | 'region' | 'country' | 'creature' | 'story'
+  _type?: 'hero' | 'region' | 'country' | 'creature' | 'story' | 'magic'
   slug?: { current: string }
   title?: string
   name?: string
@@ -20,7 +20,7 @@ type RawItem = {
   coverImage?: string
 }
 
-const randomPoolQuery = `*[_type in ["country","region","creature","hero","story"]][0..60] {
+const randomPoolQuery = `*[_type in ["country","region","creature","hero","story","magic"]][0..60] {
   _id,
   _type,
   title,
@@ -40,7 +40,7 @@ const latestHeroesQuery = `*[_type == "hero"] | order(_updatedAt desc)[0..4] {
   "portrait": portrait.asset->url
 }`
 
-const latestDetailsQuery = `*[_type in ["country","region","creature","hero"]] | order(_updatedAt desc)[0..4] {
+const latestDetailsQuery = `*[_type in ["country","region","creature","hero","magic"]] | order(_updatedAt desc)[0..4] {
   _id,
   _type,
   name,
