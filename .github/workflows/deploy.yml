@@ -19,7 +19,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build
@@ -31,7 +31,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Create archive
-        run: tar -czf release.tar.gz .next public
+        run: tar -czf release.tar.gz .next/standalone .next/static public
 
       - name: Upload to server
         uses: appleboy/scp-action@v0.1.7
@@ -54,10 +54,14 @@ jobs:
             tar -xzf release.tar.gz
             rm release.tar.gz
 
-            # 第一次部署时启动
+            # Next standalone server.js serves files from inside .next/standalone
+            mkdir -p .next/standalone/.next
+            cp -r .next/static .next/standalone/.next/static
+            cp -r public .next/standalone/public
+
             if pm2 list | grep -q wiki; then
-              pm2 reload wiki
+              pm2 restart wiki --update-env
             else
-              pm2 start .next/standalone/server.js --name wiki
-              pm2 save
+              pm2 start .next/standalone/server.js --name wiki --cwd /var/www/wiki
             fi
+            pm2 save
