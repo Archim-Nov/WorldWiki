@@ -79,7 +79,7 @@ export function RandomShowcase({ items }: Props) {
       </div>
 
       {displayed.length > 0 ? (
-        <div className="grid gap-3" style={{ gridTemplateRows: '300px 300px', gridTemplateColumns: '1fr 400px 400px' }}>
+        <div className="grid gap-3" style={{ gridTemplateRows: '1fr 1fr', gridTemplateColumns: '3fr 2fr 2fr', aspectRatio: '2 / 1' }}>
           {big && (
             <ShowcaseCard card={big} className="row-span-2 h-full" tall />
           )}
