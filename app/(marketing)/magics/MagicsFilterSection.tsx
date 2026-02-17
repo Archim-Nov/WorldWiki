@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { placeholders } from '@/lib/placeholders'
+import styles from './page.module.css'
 
 type MagicKind = 'principle' | 'spell'
 type MagicFilter = 'all' | MagicKind
@@ -45,12 +46,21 @@ function filterButtonClass(active: boolean) {
   ].join(' ')
 }
 
+function elementFilterButtonClass(active: boolean) {
+  return [
+    'rounded-full border px-3 py-1 text-xs transition',
+    active
+      ? 'border-primary bg-primary text-primary-foreground'
+      : 'text-muted-foreground hover:border-primary',
+  ].join(' ')
+}
+
 function renderMagicSection(kind: MagicKind, items: Magic[]) {
   if (items.length === 0) {
     return (
       <section>
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold">{sectionTitle(kind)}</h2>
+          <h2 className={styles.sectionTitle}>{sectionTitle(kind)}</h2>
           <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {sectionSubtitle(kind)}
           </span>
@@ -65,7 +75,7 @@ function renderMagicSection(kind: MagicKind, items: Magic[]) {
   return (
     <section>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">{sectionTitle(kind)}</h2>
+        <h2 className={styles.sectionTitle}>{sectionTitle(kind)}</h2>
         <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           {sectionSubtitle(kind)}
         </span>
@@ -75,27 +85,25 @@ function renderMagicSection(kind: MagicKind, items: Magic[]) {
           <Link
             key={magic._id}
             href={`/magics/${magic.slug.current}`}
-            className="group overflow-hidden rounded-2xl border bg-card transition hover:-translate-y-1 hover:shadow-lg"
+            className={`group ${styles.card}`}
           >
-            <div className="aspect-[16/10] bg-muted">
+            <div className={`aspect-[16/10] ${styles.cardMedia}`}>
               <img
                 src={magic.coverImage ?? placeholders.magic}
                 alt={magic.name}
-                className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                className={styles.cardImage}
                 loading="lazy"
               />
             </div>
-            <div className="p-4">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+            <div className={styles.cardBody}>
+              <div className={styles.cardMeta}>
                 {magic.school ? <span>{magic.school}</span> : null}
                 {magic.kind === 'spell' && magic.element ? (
-                  <span className="rounded-full border px-2 py-0.5 text-[10px] tracking-[0.12em]">
-                    {elementLabel(magic.element)}
-                  </span>
+                  <span className={styles.spellBadge}>{elementLabel(magic.element)}</span>
                 ) : null}
               </div>
-              <h2 className="mt-2 text-xl font-semibold">{magic.name}</h2>
-              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+              <h2 className={styles.cardName}>{magic.name}</h2>
+              <p className={`line-clamp-2 ${styles.cardSummary}`}>
                 {magic.summary ?? '查看这条魔法的完整设定与关联内容。'}
               </p>
             </div>
@@ -214,11 +222,7 @@ export function MagicsFilterSection({
               aria-pressed={spellElementFilter === 'all'}
               data-element-filter="all"
               onClick={() => setSpellElementFilter('all')}
-              className={`rounded-full border px-3 py-1 text-xs transition ${
-                spellElementFilter === 'all'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:border-primary'
-              }`}
+              className={elementFilterButtonClass(spellElementFilter === 'all')}
             >
               全部
             </button>
@@ -229,11 +233,7 @@ export function MagicsFilterSection({
                 aria-pressed={spellElementFilter === element}
                 data-element-filter={element}
                 onClick={() => setSpellElementFilter(element)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  spellElementFilter === element
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:border-primary'
-                }`}
+                className={elementFilterButtonClass(spellElementFilter === element)}
               >
                 {elementLabel(element)}
               </button>

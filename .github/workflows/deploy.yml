@@ -31,7 +31,8 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Create archive
-        run: tar -czf release.tar.gz .next/standalone public
+        run: tar -czf release.tar.gz .next/standalone .next/static public
+
 
       - name: Upload to server
         uses: appleboy/scp-action@v0.1.7
@@ -50,6 +51,21 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/wiki
+
+            # 解压
             tar -xzf release.tar.gz
+
+            # 确保 standalone 目录存在
+            mkdir -p standalone/.next
+
+            # 把 static 移动到正确位置
+            mv .next/static standalone/.next/
+
+            # 删除临时 .next 目录
+            rm -rf .next
+
+            # 删除压缩包
             rm release.tar.gz
+
+            # 重载
             pm2 reload wiki

@@ -103,6 +103,10 @@
   --section-stories: oklch(0.52 0.16 310);
   --section-stories-dim: oklch(0.52 0.16 310 / 25%);
   --section-stories-glow: oklch(0.52 0.16 310 / 12%);
+
+  --section-magics: oklch(0.48 0.17 255);
+  --section-magics-dim: oklch(0.48 0.17 255 / 28%);
+  --section-magics-glow: oklch(0.48 0.17 255 / 20%);
 }
 
 .dark {
@@ -158,6 +162,10 @@
   --section-stories: oklch(0.65 0.09 310);
   --section-stories-dim: oklch(0.65 0.09 310 / 25%);
   --section-stories-glow: oklch(0.65 0.09 310 / 12%);
+
+  --section-magics: oklch(0.64 0.11 255);
+  --section-magics-dim: oklch(0.64 0.11 255 / 28%);
+  --section-magics-glow: oklch(0.64 0.11 255 / 20%);
 }
 
 @layer base {
