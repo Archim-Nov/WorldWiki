@@ -2,15 +2,15 @@
   color: var(--foreground);
   background: var(--background);
   position: relative;
+  overflow-x: clip;
 }
 
 .page::before {
   content: '';
   position: fixed;
   top: -20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120%;
+  left: 0;
+  width: 100%;
   height: 60%;
   background: radial-gradient(
     ellipse 50% 60% at 50% 0%,
@@ -23,8 +23,8 @@
 }
 
 @keyframes home-breathe {
-  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-  50%      { opacity: 1;   transform: translateX(-50%) scale(1.08); }
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.05); }
 }
 
 :global(.home-carousel-track) {
@@ -68,9 +68,11 @@
 :global(.hero-fs) {
   --hero-fade: 0;
   position: relative;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
   margin-top: calc(-1 * (48px + 1px));
+  overflow-x: clip;
 }
 
 /* Image stage — clickable full viewport link */
@@ -80,7 +82,7 @@
   height: 100svh;
   min-height: 560px;
   overflow: hidden;
-  cursor: pointer;
+  cursor: default;
 }
 
 /* Slides */
@@ -175,6 +177,19 @@
   line-height: 1.1;
   color: #fff;
   text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+:global(.hero-fs-title-link) {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease, opacity 200ms ease;
+}
+:global(.hero-fs-title-link:hover) {
+  border-bottom-color: rgba(255, 255, 255, 0.75);
+}
+:global(.hero-fs-title-link:focus-visible) {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 4px;
 }
 
 /* Navigation — absolute over bottom-right of stage */

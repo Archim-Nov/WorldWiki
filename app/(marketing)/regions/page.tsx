@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { client } from '@/lib/sanity/client'
 import { regionsQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
@@ -18,7 +18,8 @@ export default async function RegionsPage() {
   const regions: Region[] = await client.fetch(regionsQuery)
 
   return (
-    <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
+    <div className={styles.page}>
+      <div className="container mx-auto px-4 py-12 sm:py-16">
       <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>Regions</p>
         <h1 className={styles.title}>区域画廊</h1>
@@ -61,6 +62,9 @@ export default async function RegionsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }
+
+

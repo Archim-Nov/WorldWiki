@@ -2,17 +2,18 @@
   color: var(--foreground);
   background: var(--background);
   position: relative;
+  overflow: hidden;
 }
 
 .page::before {
   content: '';
   position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 60%;
+  bottom: 0;
+  right: 0;
+  width: 100%;
   height: 50%;
   background: radial-gradient(
-    ellipse 60% 50% at 80% 90%,
+    ellipse 40% 50% at 88% 100%,
     var(--section-creatures-glow),
     transparent 70%
   );

@@ -1,4 +1,4 @@
-import { client } from '@/lib/sanity/client'
+﻿import { client } from '@/lib/sanity/client'
 import { creaturesQuery } from '@/lib/sanity/queries'
 import { CreaturesFilter } from '@/components/marketing/CreaturesFilter'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
@@ -18,7 +18,8 @@ export default async function CreaturesPage() {
   const creatures: Creature[] = await client.fetch(creaturesQuery)
 
   return (
-    <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
+    <div className={styles.page}>
+      <div className="container mx-auto px-4 py-12 sm:py-16">
       <ScrollReveal as="header" className="max-w-2xl mb-12">
         <p className={styles.eyebrow}>Creatures</p>
         <h1 className={styles.title}>生物画廊</h1>
@@ -34,6 +35,8 @@ export default async function CreaturesPage() {
       ) : (
         <CreaturesFilter creatures={creatures} />
       )}
+      </div>
     </div>
   )
 }
+

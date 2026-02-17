@@ -49,7 +49,7 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
   return (
     <section className="hero-fs">
       <HeroFade />
-      <Link href={current.href} className="hero-fs-stage">
+      <div className="hero-fs-stage">
         {items.map((item, i) => (
           <div
             key={item._id}
@@ -79,7 +79,9 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
             <div className="hero-fs-meta">
               <span className="hero-fs-tag">{current.typeLabel}</span>
               <h1 className="hero-fs-title" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
-                {current.title}
+                <Link href={current.href} className="hero-fs-title-link">
+                  {current.title}
+                </Link>
               </h1>
             </div>
 
@@ -91,7 +93,7 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
             </div>
           </div>
         </div>
-      </Link>
+      </div>
 
       {/* Nav — outside Link to avoid nested interactive elements */}
       {total > 1 ? (
