@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type CarouselItem = {
   _id: string
@@ -58,11 +59,13 @@ export function HorizontalCarousel({ items }: { items: CarouselItem[] }) {
             className="group min-w-[220px] sm:min-w-[260px] rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
           >
             <div className="h-[140px] sm:h-[160px] bg-muted">
-              <img
+              <Image
                 src={item.image}
                 alt={item.title}
+                width={520}
+                height={320}
                 className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                loading="lazy"
+                sizes="260px"
               />
             </div>
             <div className="p-4">

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono, Cinzel } from 'next/font/google'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
+import { ViewTransitionRouter } from '@/components/layout'
 import './globals.css'
 
 const geistSans = Geist({
@@ -34,7 +35,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ViewTransitionRouter />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

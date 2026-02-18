@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 type RecommendationItem = {
   _id: string
@@ -36,11 +37,13 @@ export function RecommendationGrid({
               className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="aspect-[4/3] bg-muted">
-                <img
+                <Image
                   src={item.image}
                   alt={item.title}
+                  width={960}
+                  height={720}
                   className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
               <div className="p-4">

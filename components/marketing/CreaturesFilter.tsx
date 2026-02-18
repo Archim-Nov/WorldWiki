@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
 import styles from '@/app/(marketing)/creatures/page.module.css'
 
@@ -137,11 +138,13 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
               className={`group ${styles.card}`}
             >
               <div className={`aspect-square ${styles.cardMedia}`}>
-                <img
+                <Image
                   src={creature.portrait ?? placeholders.creature}
                   alt={creature.name}
+                  width={900}
+                  height={900}
                   className={styles.cardImage}
-                  loading="lazy"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>
               <div className={styles.cardBody}>

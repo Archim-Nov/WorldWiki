@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const { name, email, message } = await request.json()
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     console.log('联系表单提交:', { name, email, message })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '提交失败，请稍后重试' },
       { status: 500 }

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
 import { creatureBySlugQuery } from '@/lib/sanity/queries'
@@ -130,10 +131,14 @@ export default async function CreatureDetailPage({
     <div className="creature-detail" style={(creature.region?.themeColor || creature.country?.themeColor) ? { '--theme-hue': creature.region?.themeColor ?? creature.country?.themeColor } as React.CSSProperties : undefined}>
       <section className="creature-hero">
         <div className="creature-hero-bleed">
-          <img
+          <Image
             src={creature.portrait ?? placeholders.creature}
             alt={creature.name}
+            width={1800}
+            height={900}
             className="creature-hero-image"
+            sizes="100vw"
+            priority
           />
           <div className="creature-hero-overlay" />
         </div>

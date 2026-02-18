@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { client } from "@/lib/sanity/client"
 import { globalSearchQuery } from "@/lib/sanity/queries"
 import {
@@ -61,11 +62,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="aspect-[16/10] bg-muted">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
+                    width={1280}
+                    height={800}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                 </div>
                 <div className="p-4">

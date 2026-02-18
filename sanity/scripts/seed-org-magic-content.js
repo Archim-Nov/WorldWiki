@@ -388,7 +388,6 @@ export async function attachImage(client, doc, fieldName) {
 export async function createAll(client, docs, label) {
   for (const doc of docs) {
     await client.createOrReplace(doc)
-    // eslint-disable-next-line no-console
     console.log(`${label}: ${doc._id}`)
   }
 }
@@ -422,7 +421,6 @@ export async function runSeed(client, docs = buildSeedDocs()) {
 if (!process.env.VITEST) {
   const client = getCliClient({ apiVersion: '2026-02-17', dataset: 'production' })
   runSeed(client).catch((error) => {
-    // eslint-disable-next-line no-console
     console.error(error)
     process.exit(1)
   })

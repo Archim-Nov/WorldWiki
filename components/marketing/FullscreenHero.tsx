@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { HeroFade } from './HeroFade'
 
 type HeroItem = {
@@ -61,14 +62,33 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
                   : 'hero-fs-slide--exit-prev'
             }`}
           >
-            <img
+            <Image
               src={item.image}
               alt={item.title}
+              width={1920}
+              height={1080}
               className="hero-fs-image"
+              sizes="100vw"
+              priority={i === active}
               draggable={false}
             />
           </div>
         ))}
+
+        <div className="hero-fs-welcome" aria-hidden="true">
+          <div className="hero-fs-welcome-lockup">
+            <p className="hero-fs-welcome-kicker">Museum Universe Archive</p>
+            <p
+              className="hero-fs-welcome-title"
+              style={{ fontFamily: 'var(--font-cinzel), serif' }}
+            >
+              WorldWiki
+            </p>
+            <p className="hero-fs-welcome-subtitle">
+              一个以详情为入口的世界观档案馆
+            </p>
+          </div>
+        </div>
 
         <div className="hero-fs-overlay" />
         <div className="hero-fs-vignette" />

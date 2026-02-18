@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
 import { regionBySlugQuery } from '@/lib/sanity/queries'
@@ -105,10 +106,14 @@ export default async function RegionDetailPage({
     <div className="region-detail" style={region.themeColor ? { '--theme-hue': region.themeColor } as React.CSSProperties : undefined}>
       <section className="region-hero">
         <div className="region-hero-bleed">
-          <img
+          <Image
             src={region.mapImage ?? placeholders.region}
             alt={region.name}
+            width={1800}
+            height={900}
             className="region-hero-image"
+            sizes="100vw"
+            priority
           />
           <div className="region-hero-overlay" />
         </div>
@@ -174,11 +179,13 @@ export default async function RegionDetailPage({
                 className="group w-36 shrink-0 rounded-xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="aspect-square bg-muted">
-                  <img
+                  <Image
                     src={hero.portrait ?? placeholders.hero}
                     alt={hero.name}
+                    width={640}
+                    height={640}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    loading="lazy"
+                    sizes="144px"
                   />
                 </div>
                 <div className="p-3">

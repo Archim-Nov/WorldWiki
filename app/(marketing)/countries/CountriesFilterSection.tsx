@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
 import styles from './page.module.css'
 
@@ -61,16 +62,18 @@ function renderCountrySection(kind: CountryKind, items: Country[]) {
             key={country._id}
             href={`/countries/${country.slug.current}`}
             className={styles.card}
-          >
-            <div className={styles.cardInner}>
-              <div className={styles.cardBg}>
-                <img
-                  src={country.mapImage ?? placeholders.country}
-                  alt={country.name}
-                  className={styles.cardImage}
-                  loading="lazy"
-                />
-              </div>
+            >
+              <div className={styles.cardInner}>
+                <div className={styles.cardBg}>
+                  <Image
+                    src={country.mapImage ?? placeholders.country}
+                    alt={country.name}
+                    width={1400}
+                    height={900}
+                    className={styles.cardImage}
+                    sizes="(max-width: 1024px) 100vw, 1200px"
+                  />
+                </div>
               <div className={styles.cardOverlay} />
               <span className={styles.cardIndex}>
                 {String(i + 1).padStart(2, '0')}

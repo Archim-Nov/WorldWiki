@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type CarouselItem = {
   _id: string
@@ -24,23 +25,24 @@ export function CenteredCarousel({
   className?: string
 }) {
   const displayItems = useMemo(() => clampSize(items, 5), [items])
-  const [position, setPosition] = useState(0)
-  const [isSnapping, setIsSnapping] = useState(false)
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const [metrics, setMetrics] = useState({ container: 0, card: 0 })
   const total = displayItems.length
   const showSides = total > 1
+  const [position, setPosition] = useState(() => (total > 1 ? total * 2 : 0))
+  const [isSnapping, setIsSnapping] = useState(false)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const previousTotalRef = useRef(total)
+  const [metrics, setMetrics] = useState({ container: 0, card: 0 })
 
   useEffect(() => {
-    if (total === 0) {
-      setPosition(0)
+    if (previousTotalRef.current === total) {
       return
     }
-    if (total === 1) {
-      setPosition(0)
-      return
-    }
-    setPosition(total * 2)
+
+    previousTotalRef.current = total
+    const frame = requestAnimationFrame(() => {
+      setPosition(total > 1 ? total * 2 : 0)
+    })
+    return () => cancelAnimationFrame(frame)
   }, [total])
 
   useEffect(() => {
@@ -56,6 +58,7 @@ export function CenteredCarousel({
     if (!node) {
       return
     }
+
     const update = () => {
       const width = node.clientWidth
       const ratio = showSides ? 0.76 : 1
@@ -64,19 +67,37 @@ export function CenteredCarousel({
         card: Math.round(width * ratio),
       })
     }
+
     update()
     const observer = new ResizeObserver(update)
     observer.observe(node)
     return () => observer.disconnect()
   }, [showSides])
 
+  const trackItems = useMemo(() => {
+    if (total <= 1) {
+      return displayItems.map((item, itemIndex) => ({
+        key: item._id,
+        item,
+        itemIndex,
+      }))
+    }
+
+    const copies = 5
+    return Array.from({ length: copies })
+      .flatMap(() => displayItems)
+      .map((item, trackIndex) => ({
+        key: `${item._id}-${trackIndex}`,
+        item,
+        itemIndex: trackIndex % total,
+      }))
+  }, [displayItems, total])
+
   if (total === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">暂无内容。</p>
-    )
+    return <p className="text-sm text-muted-foreground">No content yet.</p>
   }
 
-  const activeIndex = total > 0 ? ((position % total) + total) % total : 0
+  const activeIndex = ((position % total) + total) % total
 
   const goPrev = () => {
     if (!showSides) {
@@ -93,12 +114,10 @@ export function CenteredCarousel({
   }
 
   const goTo = (dotIndex: number) => {
-    if (dotIndex === activeIndex) {
+    if (dotIndex === activeIndex || !showSides) {
       return
     }
-    if (!showSides) {
-      return
-    }
+
     const forward = (dotIndex - activeIndex + total) % total
     const backward = (activeIndex - dotIndex + total) % total
     if (forward <= backward) {
@@ -108,31 +127,10 @@ export function CenteredCarousel({
     }
   }
 
-  const trackItems = useMemo(() => {
-    if (total <= 1) {
-      return displayItems.map((item, itemIndex) => ({
-        key: item._id,
-        item,
-        itemIndex,
-      }))
-    }
-    const copies = 5
-    return Array.from({ length: copies })
-      .flatMap(() => displayItems)
-      .map((item, trackIndex) => ({
-        key: `${item._id}-${trackIndex}`,
-        item,
-        itemIndex: trackIndex % total,
-      }))
-  }, [displayItems, total])
-
   const handleTransitionEnd = (
     event: React.TransitionEvent<HTMLDivElement>
   ) => {
-    if (event.target !== event.currentTarget) {
-      return
-    }
-    if (event.propertyName !== 'transform') {
+    if (event.target !== event.currentTarget || event.propertyName !== 'transform') {
       return
     }
     if (!showSides) {
@@ -153,12 +151,10 @@ export function CenteredCarousel({
     event: React.MouseEvent<HTMLAnchorElement>,
     trackIndex: number
   ) => {
-    if (!showSides) {
+    if (!showSides || trackIndex === position) {
       return
     }
-    if (trackIndex === position) {
-      return
-    }
+
     event.preventDefault()
     if (trackIndex === position - 1) {
       goPrev()
@@ -168,6 +164,7 @@ export function CenteredCarousel({
       goNext()
       return
     }
+
     const diff = trackIndex - position
     if (diff > 0) {
       setPosition((current) => current + 1)
@@ -186,8 +183,7 @@ export function CenteredCarousel({
   const gap = 50
   const translate =
     metrics.card > 0
-      ? (metrics.container - metrics.card) / 2 -
-        position * (metrics.card + gap)
+      ? (metrics.container - metrics.card) / 2 - position * (metrics.card + gap)
       : 0
 
   const trackStyle: CSSProperties = {
@@ -215,18 +211,18 @@ export function CenteredCarousel({
               className="home-carousel-card group rounded-3xl border border-border/30 bg-card overflow-hidden"
             >
               <div className="h-[340px] sm:h-[440px] lg:h-[540px] bg-muted">
-                <img
+                <Image
                   src={entry.item.image}
                   alt={entry.item.title}
+                  width={960}
+                  height={1280}
                   className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 76vw, 720px"
                 />
               </div>
               <div className="p-5 sm:p-6">
                 {cardLabel(entry.item)}
-                <h3 className="text-2xl font-semibold mt-2">
-                  {entry.item.title}
-                </h3>
+                <h3 className="text-2xl font-semibold mt-2">{entry.item.title}</h3>
               </div>
             </Link>
           ))}
@@ -240,7 +236,7 @@ export function CenteredCarousel({
             onClick={goPrev}
             className="rounded-full border px-3 py-1 text-sm transition hover:border-primary"
           >
-            ←
+            {'<'}
           </button>
           <div className="flex items-center gap-2">
             {displayItems.map((item, dotIndex) => (
@@ -249,9 +245,7 @@ export function CenteredCarousel({
                 type="button"
                 onClick={() => goTo(dotIndex)}
                 className={`h-2 w-2 rounded-full transition ${
-                  dotIndex === activeIndex
-                    ? 'bg-primary'
-                    : 'bg-muted-foreground/40'
+                  dotIndex === activeIndex ? 'bg-primary' : 'bg-muted-foreground/40'
                 }`}
                 aria-label={`Go to ${item.title}`}
               />
@@ -262,7 +256,7 @@ export function CenteredCarousel({
             onClick={goNext}
             className="rounded-full border px-3 py-1 text-sm transition hover:border-primary"
           >
-            →
+            {'>'}
           </button>
         </div>
       ) : null}

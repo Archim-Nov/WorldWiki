@@ -16,13 +16,11 @@ async function run() {
       .patch(id)
       .unset(['relatedHeroes', 'relatedRegions', 'relatedCreatures'])
       .commit()
-    // eslint-disable-next-line no-console
     console.log(`Cleared manual relations for ${id}`)
   }
 }
 
 run().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error(error)
   process.exit(1)
 })

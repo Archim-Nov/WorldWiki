@@ -449,7 +449,6 @@ async function attachImages(docs, fieldName, sizeName) {
 async function createAll(docs, label) {
   for (const doc of docs) {
     await client.createOrReplace(doc)
-    // eslint-disable-next-line no-console
     console.log(`${label}: ${doc._id}`)
   }
 }
@@ -461,7 +460,6 @@ async function patchCountryLinks(docs) {
       .patch(doc._id)
       .set({ featuredRegions: doc.featuredRegions })
       .commit()
-    // eslint-disable-next-line no-console
     console.log(`country links: ${doc._id}`)
   }
 }
@@ -473,7 +471,6 @@ async function patchRegionLinks(docs) {
     if (doc.featuredHeroes) updates.featuredHeroes = doc.featuredHeroes
     if (Object.keys(updates).length === 0) continue
     await client.patch(doc._id).set(updates).commit()
-    // eslint-disable-next-line no-console
     console.log(`region links: ${doc._id}`)
   }
 }
@@ -485,8 +482,17 @@ async function run() {
   await attachImages(creatures, 'portrait', 'portrait')
   await attachImages(stories, 'coverImage', 'cover')
 
-  const countryBase = countries.map(({ featuredRegions, ...rest }) => rest)
-  const regionBase = regions.map(({ country, featuredHeroes, ...rest }) => rest)
+  const countryBase = countries.map((country) => {
+    const copy = { ...country }
+    delete copy.featuredRegions
+    return copy
+  })
+  const regionBase = regions.map((region) => {
+    const copy = { ...region }
+    delete copy.country
+    delete copy.featuredHeroes
+    return copy
+  })
 
   await createAll(countryBase, 'country')
   await createAll(regionBase, 'region')
@@ -499,7 +505,6 @@ async function run() {
 }
 
 run().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error(error)
   process.exit(1)
 })

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
 import { countryBySlugQuery } from '@/lib/sanity/queries'
@@ -113,10 +114,14 @@ export default async function CountryDetailPage({
     <div className="country-detail" style={country.themeColor ? { '--theme-hue': country.themeColor } as React.CSSProperties : undefined}>
       <section className="country-hero">
         <div className="country-hero-bleed">
-          <img
+          <Image
             src={country.mapImage ?? placeholders.country}
             alt={country.name}
+            width={1800}
+            height={900}
             className="country-hero-image"
+            sizes="100vw"
+            priority
           />
           <div className="country-hero-overlay" />
         </div>
@@ -176,11 +181,13 @@ export default async function CountryDetailPage({
                 className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="aspect-[4/5] bg-muted">
-                  <img
+                  <Image
                     src={region.mapImage ?? placeholders.region}
                     alt={region.name}
+                    width={960}
+                    height={1200}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                 </div>
                 <div className="p-4">

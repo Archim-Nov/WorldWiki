@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
 import styles from './page.module.css'
 
@@ -88,11 +89,13 @@ function renderMagicSection(kind: MagicKind, items: Magic[]) {
             className={`group ${styles.card}`}
           >
             <div className={`aspect-[16/10] ${styles.cardMedia}`}>
-              <img
+              <Image
                 src={magic.coverImage ?? placeholders.magic}
                 alt={magic.name}
+                width={1280}
+                height={800}
                 className={styles.cardImage}
-                loading="lazy"
+                sizes="(max-width: 1024px) 100vw, 33vw"
               />
             </div>
             <div className={styles.cardBody}>

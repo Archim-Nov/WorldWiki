@@ -1,5 +1,5 @@
 import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const typeToRoute: Record<string, string> = {
   country: 'countries',
@@ -10,9 +10,38 @@ const typeToRoute: Record<string, string> = {
   magic: 'magics',
 }
 
-export async function POST(request: NextRequest) {
+type WebhookBody = {
+  _type?: string
+  slug?: { current?: string }
+}
+
+const WEBHOOK_SECRET_HEADER = 'x-sanity-webhook-secret'
+
+function validateWebhookSecret(request: Request) {
+  const expected = process.env.SANITY_WEBHOOK_SECRET
+  if (!expected) {
+    return NextResponse.json(
+      { error: 'SANITY_WEBHOOK_SECRET is not configured' },
+      { status: 500 }
+    )
+  }
+
+  const provided = request.headers.get(WEBHOOK_SECRET_HEADER)
+  if (provided !== expected) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return null
+}
+
+export async function POST(request: Request) {
+  const authError = validateWebhookSecret(request)
+  if (authError) {
+    return authError
+  }
+
   try {
-    const body = await request.json()
+    const body = (await request.json()) as WebhookBody
 
     if (body?._type && typeToRoute[body._type]) {
       const routeBase = `/${typeToRoute[body._type]}`
@@ -24,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ revalidated: true })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Revalidation failed' },
       { status: 500 }

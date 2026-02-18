@@ -88,7 +88,8 @@
 /* Slides */
 :global(.hero-fs-slide) {
   position: absolute;
-  inset: 0;
+  /* Overscan: enlarge slide bounds so horizontal drift never reveals stage background */
+  inset: -3%;
   opacity: 0;
   transform: scale(1.08);
   transition: opacity 1.2s ease, transform 6s ease-out;
@@ -96,7 +97,7 @@
 }
 :global(.hero-fs-slide--active) {
   opacity: calc(1 - var(--hero-fade));
-  transform: scale(1);
+  transform: scale(1.02);
   z-index: 1;
 }
 :global(.hero-fs-slide--exit) {
@@ -133,6 +134,105 @@
   box-shadow: inset 0 0 100px 16px rgba(0,0,0,0.18);
   pointer-events: none;
   opacity: calc(1 - var(--hero-fade));
+}
+
+:global(.hero-fs-welcome) {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+:global(.hero-fs-welcome)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 72% 56% at 50% 44%,
+      rgba(0, 0, 0, 0.12) 0%,
+      rgba(0, 0, 0, 0.34) 64%,
+      rgba(0, 0, 0, 0.56) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.22) 0%,
+      rgba(0, 0, 0, 0.08) 42%,
+      rgba(0, 0, 0, 0.38) 100%
+    );
+  opacity: calc(1 - var(--hero-fade));
+}
+
+:global(.hero-fs-welcome-lockup) {
+  position: relative;
+  z-index: 1;
+  width: min(94vw, 1240px);
+  text-align: center;
+  color: #fff;
+  padding: 8px 16px;
+  animation: hero-fs-welcome-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:global(.hero-fs-welcome-lockup)::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -6px;
+  width: min(72vw, 540px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.52),
+    transparent
+  );
+}
+
+:global(.hero-fs-welcome-kicker) {
+  margin: 0 0 clamp(6px, 1vw, 10px);
+  font-size: clamp(0.64rem, 1vw, 0.84rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+:global(.hero-fs-welcome-title) {
+  margin: 0;
+  font-size: clamp(3rem, 10.5vw, 9rem);
+  line-height: 0.92;
+  letter-spacing: 0.04em;
+  text-wrap: balance;
+  text-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.45),
+    0 2px 10px rgba(0, 0, 0, 0.38);
+}
+
+:global(.hero-fs-welcome-subtitle) {
+  margin: clamp(12px, 1.9vw, 20px) 0 0;
+  font-size: clamp(0.9rem, 1.75vw, 1.22rem);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: min(88vw, 760px);
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.42);
+}
+
+@keyframes hero-fs-welcome-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Bottom area — transparent, positioned at bottom-left */
@@ -289,6 +389,29 @@
     height: 100svh;
     min-height: 480px;
   }
+  :global(.hero-fs-welcome) {
+    padding: 16px;
+  }
+  :global(.hero-fs-welcome-lockup) {
+    width: 100%;
+    padding: 6px 10px;
+  }
+  :global(.hero-fs-welcome-lockup)::after {
+    width: min(78vw, 340px);
+    bottom: -4px;
+  }
+  :global(.hero-fs-welcome-kicker) {
+    letter-spacing: 0.16em;
+  }
+  :global(.hero-fs-welcome-title) {
+    font-size: clamp(2.6rem, 17vw, 4.7rem);
+    letter-spacing: 0.03em;
+  }
+  :global(.hero-fs-welcome-subtitle) {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
   :global(.hero-fs-scroll) {
     display: none;
   }
@@ -329,6 +452,9 @@
   :global(.hero-fs-slide) {
     transition: opacity 0.3s ease;
     transform: none !important;
+  }
+  :global(.hero-fs-welcome-lockup) {
+    animation: none;
   }
   :global(.hero-fs-scroll-thumb) {
     animation: none;

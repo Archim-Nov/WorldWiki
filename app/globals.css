@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -50,7 +50,7 @@
 :root {
   --radius: 0.625rem;
 
-  /* Light theme — parchment warm white */
+  /* Light theme 鈥?parchment warm white */
   --background: oklch(0.97 0.01 85);
   --foreground: oklch(0.20 0.015 60);
   --card: oklch(0.99 0.008 85);
@@ -83,7 +83,7 @@
   --sidebar-border: oklch(0 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.10 85);
 
-  /* Section accent colors — vivid for light bg */
+  /* Section accent colors 鈥?vivid for light bg */
   --section-countries: oklch(0.58 0.18 75);
   --section-countries-dim: oklch(0.58 0.18 75 / 25%);
   --section-countries-glow: oklch(0.58 0.18 75 / 12%);
@@ -142,7 +142,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.75 0.08 85);
 
-  /* Section accent colors — gemstone palette */
+  /* Section accent colors 鈥?gemstone palette */
   --section-countries: oklch(0.70 0.10 80);
   --section-countries-dim: oklch(0.70 0.10 80 / 25%);
   --section-countries-glow: oklch(0.70 0.10 80 / 12%);
@@ -183,7 +183,7 @@
   }
 }
 
-/* ── Atmosphere Layer ── */
+/* 鈹€鈹€ Atmosphere Layer 鈹€鈹€ */
 @keyframes ambient-drift {
   0%   { transform: translate(0, 0) scale(1); }
   33%  { transform: translate(4%, -3%) scale(1.05); }
@@ -219,7 +219,7 @@
   mix-blend-mode: overlay;
 }
 
-/* ── Page Transition ── */
+/* 鈹€鈹€ Page Transition 鈹€鈹€ */
 @keyframes page-fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -235,7 +235,40 @@
   }
 }
 
-/* ── Region Visual Identity ── */
+/* Progressive View Transitions */
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-4px); }
+}
+
+:root[data-view-transition='enabled']::view-transition-old(root),
+:root[data-view-transition='enabled']::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  mix-blend-mode: normal;
+}
+
+:root[data-view-transition='enabled']::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+
+:root[data-view-transition='enabled']::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-view-transition='enabled']::view-transition-old(root),
+  :root[data-view-transition='enabled']::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}
+
+/* 鈹€鈹€ Region Visual Identity 鈹€鈹€ */
 .hero-detail[style*="--theme-hue"],
 .country-detail[style*="--theme-hue"],
 .region-detail[style*="--theme-hue"],
@@ -257,7 +290,7 @@
   );
 }
 
-/* ── Nav Link Hover Underline ── */
+/* 鈹€鈹€ Nav Link Hover Underline 鈹€鈹€ */
 .nav-link {
   position: relative;
   padding-bottom: 2px;
@@ -278,7 +311,7 @@
   width: 100%;
 }
 
-/* ── Button Micro-interactions ── */
+/* 鈹€鈹€ Button Micro-interactions 鈹€鈹€ */
 .btn-glow {
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -294,7 +327,7 @@
   box-shadow: none;
 }
 
-/* ── Ornamental Divider ── */
+/* 鈹€鈹€ Ornamental Divider 鈹€鈹€ */
 .ornament {
   display: flex;
   align-items: center;
@@ -326,7 +359,7 @@
   line-height: 1;
 }
 
-/* ── Scroll Reveal ── */
+/* 鈹€鈹€ Scroll Reveal 鈹€鈹€ */
 .sr {
   opacity: 0;
   transform: translateY(16px);
@@ -355,3 +388,4 @@
 .creature-detail[style*="--theme-hue"] .rounded-2xl {
   border-color: var(--theme-dim);
 }
+

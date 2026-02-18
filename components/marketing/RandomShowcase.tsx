@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { RecommendationItem } from '@/lib/recommendations'
 
 function shuffle<T>(items: T[]): T[] {
@@ -109,11 +110,13 @@ function ShowcaseCard({
       className={`group relative overflow-hidden border border-border/30 ${tall ? 'rounded-2xl' : 'rounded-lg'} ${className ?? ''}`}
     >
       <div className={tall ? 'h-full' : 'h-full'}>
-        <img
+        <Image
           src={card.image}
           alt={card.title}
+          width={1200}
+          height={800}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-          loading="lazy"
+          sizes={tall ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />

@@ -24,7 +24,7 @@ describe("POST /api/newsletter", () => {
   })
 
   it("returns 400 when email is missing", async () => {
-    const response = await POST(createJsonRequest({}) as any)
+    const response = await POST(createJsonRequest({}))
     const json = await response.json()
 
     expect(response.status).toBe(400)
@@ -38,7 +38,7 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" }) as any
+      createJsonRequest({ email: "alice@example.com" })
     )
     const json = await response.json()
 
@@ -55,7 +55,7 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" }) as any
+      createJsonRequest({ email: "alice@example.com" })
     )
     const json = await response.json()
 
@@ -71,7 +71,7 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" }) as any
+      createJsonRequest({ email: "alice@example.com" })
     )
     const json = await response.json()
 

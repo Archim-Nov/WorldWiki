@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
 import { heroBySlugQuery } from '@/lib/sanity/queries'
@@ -120,10 +121,14 @@ export default async function HeroDetailPage({
     <div className="hero-detail" style={(hero.region?.themeColor || hero.country?.themeColor) ? { '--theme-hue': hero.region?.themeColor ?? hero.country?.themeColor } as React.CSSProperties : undefined}>
       <section className="hero-hero">
         <div className="hero-hero-bleed">
-          <img
+          <Image
             src={hero.portrait ?? placeholders.hero}
             alt={hero.name}
+            width={1920}
+            height={1080}
             className="hero-hero-image"
+            sizes="100vw"
+            priority
           />
           <div className="hero-hero-overlay" />
         </div>
@@ -154,11 +159,13 @@ export default async function HeroDetailPage({
                     className="flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition hover:border-primary"
                   >
                     <div className="h-12 w-12 overflow-hidden rounded-full bg-muted">
-                      <img
+                      <Image
                         src={related.portrait ?? placeholders.hero}
                         alt={related.name}
+                        width={96}
+                        height={96}
                         className="h-full w-full object-cover"
-                        loading="lazy"
+                        sizes="48px"
                       />
                     </div>
                     <span>{related.name}</span>
@@ -176,10 +183,13 @@ export default async function HeroDetailPage({
         <div className="order-1 space-y-6 lg:order-2">
           <div className="rounded-3xl border bg-card overflow-hidden hero-portrait-card">
             <div className="aspect-[3/4] bg-muted">
-              <img
+              <Image
                 src={hero.portrait ?? placeholders.hero}
                 alt={hero.name}
+                width={960}
+                height={1280}
                 className="hero-portrait-img h-full w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
@@ -325,11 +335,13 @@ export default async function HeroDetailPage({
                 className="group relative block overflow-hidden rounded-3xl border bg-card"
               >
                 <div className="aspect-[21/6] bg-muted">
-                  <img
+                  <Image
                     src={story.coverImage ?? placeholders.story}
                     alt={story.title}
+                    width={2100}
+                    height={600}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    loading="lazy"
+                    sizes="100vw"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/20 to-transparent" />
@@ -367,11 +379,13 @@ export default async function HeroDetailPage({
                 className="rounded-2xl border bg-card overflow-hidden"
               >
                 <div className="aspect-[4/3] bg-muted">
-                  <img
+                  <Image
                     src={placeholders.region}
                     alt={label}
+                    width={960}
+                    height={720}
                     className="h-full w-full object-cover"
-                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                 </div>
                 <div className="p-4 text-sm text-muted-foreground">
@@ -398,11 +412,13 @@ export default async function HeroDetailPage({
                   className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div className="aspect-[4/5] bg-muted">
-                    <img
+                    <Image
                       src={related.portrait ?? placeholders.hero}
                       alt={related.name}
+                      width={960}
+                      height={1200}
                       className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                      loading="lazy"
+                      sizes="(max-width: 1024px) 100vw, 33vw"
                     />
                   </div>
                   <div className="p-4">

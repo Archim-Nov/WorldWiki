@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { client } from '@/lib/sanity/client'
 import { magicBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
@@ -85,10 +86,14 @@ export default async function MagicDetailPage({
     <div className="container mx-auto px-4 py-12 sm:py-16">
       <section className="rounded-3xl border bg-card overflow-hidden">
         <div className="aspect-[16/7] bg-muted">
-          <img
+          <Image
             src={magic.coverImage ?? placeholders.magic}
             alt={magic.name}
+            width={1920}
+            height={840}
             className="h-full w-full object-cover"
+            sizes="100vw"
+            priority
           />
         </div>
         <div className="p-6 sm:p-8">

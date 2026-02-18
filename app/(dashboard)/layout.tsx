@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+import { Footer, Header, PageTransition } from "@/components/layout";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardLayout({
@@ -17,7 +17,9 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
     </div>
   );

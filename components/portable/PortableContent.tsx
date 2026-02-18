@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
 import clsx from 'clsx'
 
@@ -19,7 +20,14 @@ const components: PortableTextComponents = {
       const alt = value?.alt ?? ''
       return (
         <figure className="portable-image-bleed">
-          <img src={url} alt={alt} loading="lazy" />
+          <Image
+            src={url}
+            alt={alt}
+            width={1600}
+            height={900}
+            className="h-auto w-full"
+            sizes="(max-width: 1024px) 100vw, 900px"
+          />
           {value?.caption && (
             <figcaption>{value.caption}</figcaption>
           )}

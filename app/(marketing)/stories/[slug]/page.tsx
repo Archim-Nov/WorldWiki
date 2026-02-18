@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { client } from '@/lib/sanity/client'
 import { storyBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
@@ -202,10 +203,14 @@ export default async function StoryDetailPage({
       <StoryScrollFade />
       <section className="story-hero">
         <div className="story-hero-bleed">
-          <img
+          <Image
             src={story.coverImage ?? placeholders.story}
             alt={story.title}
+            width={1920}
+            height={1080}
             className="story-hero-image"
+            sizes="100vw"
+            priority
           />
           <div className="story-hero-overlay" />
         </div>

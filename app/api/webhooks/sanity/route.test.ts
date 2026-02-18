@@ -10,17 +10,23 @@ vi.mock("next/cache", () => ({
 
 import { POST } from "./route"
 
-function createJsonRequest(body: unknown) {
+const WEBHOOK_SECRET = "test-webhook-secret"
+
+function createJsonRequest(body: unknown, secret = WEBHOOK_SECRET) {
   return new Request("http://localhost/api/webhooks/sanity", {
     method: "POST",
     body: JSON.stringify(body),
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-sanity-webhook-secret": secret,
+    },
   })
 }
 
 describe("POST /api/webhooks/sanity", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    process.env.SANITY_WEBHOOK_SECRET = WEBHOOK_SECRET
   })
 
   it("revalidates list page, detail page, and home when type and slug exist", async () => {
@@ -28,7 +34,7 @@ describe("POST /api/webhooks/sanity", () => {
       createJsonRequest({
         _type: "country",
         slug: { current: "avalon" },
-      }) as any
+      })
     )
     const json = await response.json()
 
@@ -44,7 +50,7 @@ describe("POST /api/webhooks/sanity", () => {
     const response = await POST(
       createJsonRequest({
         _type: "region",
-      }) as any
+      })
     )
     const json = await response.json()
 
@@ -60,7 +66,7 @@ describe("POST /api/webhooks/sanity", () => {
       createJsonRequest({
         _type: "magic",
         slug: { current: "arcane-bolt" },
-      }) as any
+      })
     )
     const json = await response.json()
 
@@ -76,7 +82,7 @@ describe("POST /api/webhooks/sanity", () => {
       createJsonRequest({
         _type: "unknown",
         slug: { current: "x" },
-      }) as any
+      })
     )
     const json = await response.json()
 
@@ -85,13 +91,35 @@ describe("POST /api/webhooks/sanity", () => {
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
+  it("returns 401 when secret header is invalid", async () => {
+    const response = await POST(createJsonRequest({ _type: "country" }, "wrong-secret"))
+    const json = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(json).toEqual({ error: "Unauthorized" })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
+  it("returns 500 when webhook secret is missing in server env", async () => {
+    delete process.env.SANITY_WEBHOOK_SECRET
+    const response = await POST(createJsonRequest({ _type: "country" }))
+    const json = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(json).toEqual({ error: "SANITY_WEBHOOK_SECRET is not configured" })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
   it("returns 500 when request json parsing fails", async () => {
     const response = await POST(
-      {
-        json: async () => {
-          throw new Error("invalid")
+      new Request("http://localhost/api/webhooks/sanity", {
+        method: "POST",
+        body: "{",
+        headers: {
+          "content-type": "application/json",
+          "x-sanity-webhook-secret": WEBHOOK_SECRET,
         },
-      } as any
+      })
     )
     const json = await response.json()
 

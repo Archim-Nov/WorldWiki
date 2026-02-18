@@ -83,7 +83,11 @@ describe("seed-org-magic-content data", () => {
     }
 
     const doc = { ...organizations[0] }
-    await attachImage(client as any, doc as any, "mapImage")
+    await attachImage(
+      client as unknown as Parameters<typeof attachImage>[0],
+      doc as unknown as Parameters<typeof attachImage>[1],
+      "mapImage"
+    )
 
     expect(client.assets.upload).toHaveBeenCalledTimes(1)
     expect(doc).toHaveProperty("mapImage.asset._ref", "image-1")
@@ -107,7 +111,11 @@ describe("seed-org-magic-content data", () => {
     const doc = { ...spells[0] }
 
     await expect(
-      attachImage(client as any, doc as any, "coverImage")
+      attachImage(
+        client as unknown as Parameters<typeof attachImage>[0],
+        doc as unknown as Parameters<typeof attachImage>[1],
+        "coverImage"
+      )
     ).rejects.toThrow(/Failed to fetch image/)
     expect(client.assets.upload).not.toHaveBeenCalled()
   })
@@ -134,7 +142,10 @@ describe("seed-org-magic-content data", () => {
     docs.principles = docs.principles.slice(0, 1)
     docs.spells = docs.spells.slice(0, 1)
 
-    await runSeed(client as any, docs as any)
+    await runSeed(
+      client as unknown as Parameters<typeof runSeed>[0],
+      docs as unknown as Parameters<typeof runSeed>[1]
+    )
 
     expect(client.assets.upload).toHaveBeenCalledTimes(3)
     expect(client.createOrReplace).toHaveBeenCalledTimes(3)

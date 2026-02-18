@@ -12,9 +12,7 @@ function createJsonRequest(body: unknown) {
 
 describe("POST /api/contact", () => {
   it("returns 400 when required fields are missing", async () => {
-    const response = await POST(
-      createJsonRequest({ name: "Alice", email: "" }) as any
-    )
+    const response = await POST(createJsonRequest({ name: "Alice", email: "" }))
     const json = await response.json()
 
     expect(response.status).toBe(400)
@@ -29,7 +27,7 @@ describe("POST /api/contact", () => {
         name: "Alice",
         email: "alice@example.com",
         message: "hello",
-      }) as any
+      })
     )
     const json = await response.json()
 
@@ -42,11 +40,11 @@ describe("POST /api/contact", () => {
 
   it("returns 500 when parsing body fails", async () => {
     const response = await POST(
-      {
-        json: async () => {
-          throw new Error("broken body")
-        },
-      } as any
+      new Request("http://localhost/api/contact", {
+        method: "POST",
+        body: "{",
+        headers: { "content-type": "application/json" },
+      })
     )
     const json = await response.json()
 

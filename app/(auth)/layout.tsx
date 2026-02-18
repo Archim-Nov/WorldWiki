@@ -1,4 +1,4 @@
-import { Header, Footer } from "@/components/layout";
+import { Footer, Header, PageTransition } from "@/components/layout";
 
 export default function AuthLayout({
   children,
@@ -8,7 +8,9 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
     </div>
   );
