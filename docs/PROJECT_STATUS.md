@@ -10,13 +10,13 @@
 
 - 视觉入口优先：用画廊与大图块引导探索
 - 网状连接优先：内链与相关推荐替代目录与搜索
-- 轻导航：仅 5 个入口 + 返回
+- 轻导航：仅 6 个入口 + 返回
 
 明确不做：树形目录、面包屑、营销落地页（搜索仅作辅助入口）。
 
 ---
 
-## 二、信息架构（5 个入口）
+## 二、信息架构（6 个入口）
 
 | 入口 | 路由 | 说明 |
 |---|---|---|
@@ -24,9 +24,10 @@
 | 区域 Regions | `/regions` | 区域列表 + 详情 |
 | 生物 Creatures | `/creatures` | 生物画廊 + 分类筛选 |
 | 英雄 Champions | `/champions` | 英雄画廊 + 国家/区域筛选 |
+| 魔法 Magics | `/magics` | 原理/法术列表 + 详情 |
 | 故事 Stories | `/stories` | 故事列表 + 详情 |
 
-内容模型核心实体：`country / region / creature / hero / story`，以"关联关系"组织内容，而非层级分类。
+内容模型核心实体：`country / region / creature / hero / story / magic`，以"关联关系"组织内容，而非层级分类。
 
 ---
 
@@ -45,10 +46,10 @@
 
 ### M1 — 内容模型与基础骨架 ✅
 
-- [x] Sanity schema 替换为 country/region/creature/hero/story
+- [x] Sanity schema 替换为 country/region/creature/hero/story/magic
 - [x] 移除旧 post/page schema
-- [x] 五入口路由骨架 + 详情页 `/[slug]`
-- [x] 导航切换为五入口
+- [x] 六入口路由骨架 + 详情页 `/[slug]`
+- [x] 导航切换为六入口
 - [x] 样例内容种子数据（`sanity/seed/sample-data.ndjson`）
 
 ### M2 — 画廊体验与视觉入口 ✅
@@ -57,7 +58,7 @@
 - [x] 英雄画廊网格 + 筛选器（国家/区域标签）
 - [x] 生物画廊 + 分类筛选（动物/植物/元素）
 - [x] 区域/国家/生物画廊基础网格
-- [x] 首页改为"视觉大厅"：五入口大图块
+- [x] 首页改为"视觉大厅"：六入口大图块
 
 ### M3 — 网状连接与关联探索 ✅
 
@@ -67,12 +68,12 @@
 
 ### M4 — 详情页形态统一 ✅
 
-- [x] 五类详情页各有差异化布局
+- [x] 六类详情页各有差异化布局
 - [x] 移动端适配与阅读排版优化（详情页 + 列表页 + Header/Footer）
 
 ### M5 — 轻量 SEO 与发布准备 ✅
 
-- [x] 动态 Sitemap 覆盖五类内容
+- [x] 动态 Sitemap 覆盖六类内容
 - [x] 基础 metadata（title/description）
 - [x] baseUrl 读取部署环境变量
 - [x] robots.txt（`app/robots.ts`）
@@ -120,6 +121,7 @@
 ### 详情页视觉
 - [ ] Hero/Creature 以画像为主视觉
 - [ ] Country/Region 以地图或场景为主视觉
+- [ ] Magic 以封面与元数据卡片为主视觉
 - [ ] Story 以封面为主视觉
 - [ ] 底部"相关推荐"统一样式且展示 3 项
 

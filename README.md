@@ -6,7 +6,7 @@
 
 - **视觉入口优先** — 画廊大图块引导探索，不依赖文字列表
 - **网状连接** — 内链与自动推荐替代层级分类，每个页面都有 2-3 个自然出口
-- **轻导航** — 仅 5 个顶级入口，保持简洁
+- **轻导航** — 仅 6 个顶级入口，保持简洁
 
 ## 架构
 
@@ -17,12 +17,12 @@
 Vercel Edge（缓存 / 中间件）
   │
   ├── Next.js 16 App Router ── SSR / SSG / ISR
-  │     ├── (marketing)  五入口画廊 + 详情页
+  │     ├── (marketing)  六入口画廊 + 详情页
   │     ├── (auth)       登录 / 注册
   │     ├── (dashboard)  用户面板
   │     └── /studio      Sanity Studio（嵌入式）
   │
-  ├── Sanity ─── 内容管理（country / region / creature / hero / story）
+  ├── Sanity ─── 内容管理（country / region / creature / hero / story / magic）
   ├── Supabase ─ 认证 + 用户数据（profiles + 角色控制）
   └── Resend ─── 邮件通知
 ```
@@ -43,7 +43,7 @@ Vercel Edge（缓存 / 中间件）
 ```
 WorldWiki/
 ├── app/
-│   ├── (marketing)/     # 五入口：countries/regions/creatures/champions/stories
+│   ├── (marketing)/     # 六入口：countries/regions/creatures/champions/stories/magics
 │   ├── (auth)/          # login / register
 │   ├── (dashboard)/     # 用户面板
 │   ├── api/             # contact / newsletter / webhooks
@@ -56,7 +56,7 @@ WorldWiki/
 │   ├── sanity/          # client + queries
 │   └── supabase/        # client (browser) + server
 ├── sanity/
-│   ├── schemas/         # country / region / creature / hero / story
+│   ├── schemas/         # country / region / creature / hero / story / magic
 │   ├── scripts/         # 种子数据脚本
 │   └── sanity.config.ts
 ├── docs/                # 项目文档
@@ -120,13 +120,14 @@ npx sanity exec sanity/scripts/seed-org-magic-content.js --dataset production
 
 ## 内容模型
 
-五类核心实体以**关联关系**组织，而非层级分类：
+六类核心实体以**关联关系**组织，而非层级分类：
 
 ```
 country ←── region ←── hero
                   ←── creature
-                           ↕
-                        story ──→ hero / region / creature
+
+magic ──→ hero / story
+story ──→ hero / region / creature / magic
 ```
 
 - **Country** — 国家，包含精选地区
@@ -134,6 +135,7 @@ country ←── region ←── hero
 - **Hero** — 英雄，关联地区/国家/阵营，传记支持富文本内链
 - **Creature** — 生物，分类为动物/植物/元素
 - **Story** — 故事，关联英雄/地区/生物，正文支持富文本内链
+- **Magic** — 魔法，区分原理/法术，关联英雄/故事，详情支持富文本内链
 
 详情页底部自动生成混合类型推荐（内链 + 同类兜底），保证每页至少 3 条出口。
 

@@ -19,7 +19,7 @@
 > 如果看不到 Studio 或无法登录，请联系管理员确认账号权限或项目 ID。
 
 ## 在线创作与修改流程
-1. 在左侧导航选择内容类型（Country / Region / Hero / Creature / Story）
+1. 在左侧导航选择内容类型（Country / Region / Hero / Creature / Story / Magic）
 2. 点击 **Create new** 新建条目，或打开现有条目进行编辑
 3. 按下面字段说明填写内容并上传图片
 4. 点击 **Publish** 发布（未发布内容仅你可见）
@@ -29,7 +29,8 @@
 1. 先建 `country`
 2. 再建 `region`
 3. 再建 `hero` / `creature`
-4. 最后写 `story`
+4. 再建 `magic`（原理/法术）
+5. 最后写 `story`
 
 这样可以保证引用关系与推荐逻辑更完整。
 
@@ -40,8 +41,17 @@
 ```text
 name*             名称（必填）
 slug*             路径标识（必填）
+kind              类型（nation / organization，推荐）
 mapImage          地图/场景图（推荐）
 summary           简短概述（推荐）
+capital           首都/总部（可选）
+governance        政体/治理结构（可选）
+population        人口/规模（可选）
+currency          货币/资源体系（可选）
+languages         语言（可选，多值）
+motto             格言（可选）
+customs           习俗与礼仪（可选）
+themeColor        主题色相（可选，0-360）
 featuredRegions   精选地区（可选）
 ```
 说明：
@@ -54,6 +64,12 @@ name*             名称（必填）
 slug*             路径标识（必填）
 mapImage          地图/场景图（推荐）
 summary           简短概述（推荐）
+climate           气候（可选）
+terrain           地形（可选）
+dangerLevel       危险等级（low / medium / high）
+landmarks         地标（可选，多值）
+travelAdvice      行进建议（可选）
+themeColor        主题色相（可选，0-360）
 country           归属国家（推荐）
 featuredHeroes    精选英雄（可选）
 ```
@@ -66,11 +82,16 @@ featuredHeroes    精选英雄（可选）
 name*             名称（必填）
 slug*             路径标识（必填）
 title             称号（可选）
+alias             别名（可选）
+age               年龄/时代（可选）
+status            状态（active / missing / deceased）
 portrait          画像（推荐）
 region            所属地区（推荐）
 country           所属国家（推荐）
 roles             职业/职责（可选）
 faction           阵营/组织（可选）
+signatureWeapon   标志性武器（可选）
+motto             格言（可选）
 bio               传记正文（推荐）
 relatedHeroes     相关英雄（可选）
 ```
@@ -86,6 +107,12 @@ slug*             路径标识（必填）
 portrait          画像（推荐）
 species           生物学种类（推荐）
 category          分类（推荐）
+temperament       习性（可选）
+habitat           栖息地（可选）
+diet              食性（可选）
+activityCycle     活动周期（可选）
+threatLevel       威胁等级（low / medium / high）
+abilities         能力标签（可选，多值）
 region            所属地区（推荐）
 country           所属国家（推荐）
 bio               生态描述（推荐）
@@ -97,6 +124,30 @@ animal / plant / element
 ```
 说明：
 - `relatedStories` 为空时，会基于引用该生物的故事自动补位。
+
+### Magic（魔法）
+字段清单：
+```text
+name*             名称（必填）
+slug*             路径标识（必填）
+kind              类型（principle / spell，推荐）
+school            学派（可选）
+element           元素（spell 必填：fire / wind / earth / water）
+summary           简短概述（可选）
+difficulty        难度（beginner / intermediate / advanced / master）
+castType          施放类型（instant / channel / ritual）
+manaCost          法力消耗（可选）
+cooldown          冷却（可选）
+requirements      前置条件（可选，多值）
+risks             风险说明（可选）
+coverImage        封面图（推荐）
+details           详情正文（推荐，富文本）
+relatedHeroes     相关英雄（可选）
+relatedStories    相关故事（可选）
+```
+说明：
+- `kind=spell` 时必须填写 `element`，`kind=principle` 时可留空。
+- `details` 支持内部链接与外部链接，参与相关推荐补位。
 
 ### Story（故事）
 字段清单：
@@ -118,8 +169,8 @@ relatedCreatures  相关生物（可选）
 - Country/Region 地图：宽图（16:9 或 3:2），以地形或场景为主
 
 ## 富文本与内链
-在 `bio` / `content` 中选中文字后可添加：
-- `Internal Link`：指向其他条目（country / region / hero / creature / story）
+在 `bio` / `content` / `details` 中选中文字后可添加：
+- `Internal Link`：指向其他条目（country / region / hero / creature / story / magic）
 - `External Link`：指向外部 URL
 
 内链不仅用于阅读跳转，也会参与“相关推荐”的自动补位。
@@ -134,6 +185,7 @@ relatedCreatures  相关生物（可选）
 - 图片已上传（特别是封面/画像）
 - 地区/国家引用一致
 - 生物已填写 `category`
+- 魔法条目已设置 `kind`，法术已选择 `element`
 - 相关推荐至少 1–3 条（可手动也可依赖自动兜底）
 
 ## 常见问题
