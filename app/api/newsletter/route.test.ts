@@ -10,11 +10,14 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { POST } from "./route"
 
-function createJsonRequest(body: unknown) {
+function createJsonRequest(body: unknown, ip = "198.51.100.31") {
   return new Request("http://localhost/api/newsletter", {
     method: "POST",
     body: JSON.stringify(body),
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-forwarded-for": ip,
+    },
   })
 }
 
@@ -24,7 +27,18 @@ describe("POST /api/newsletter", () => {
   })
 
   it("returns 400 when email is missing", async () => {
-    const response = await POST(createJsonRequest({}))
+    const response = await POST(createJsonRequest({}, "198.51.100.32"))
+    const json = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(json).toHaveProperty("error")
+    expect(createClientMock).not.toHaveBeenCalled()
+  })
+
+  it("returns 400 when email format is invalid", async () => {
+    const response = await POST(
+      createJsonRequest({ email: "alice-at-example.com" }, "198.51.100.33")
+    )
     const json = await response.json()
 
     expect(response.status).toBe(400)
@@ -38,7 +52,7 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" })
+      createJsonRequest({ email: " Alice@Example.com " }, "198.51.100.34")
     )
     const json = await response.json()
 
@@ -55,7 +69,7 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" })
+      createJsonRequest({ email: "alice@example.com" }, "198.51.100.35")
     )
     const json = await response.json()
 
@@ -71,11 +85,29 @@ describe("POST /api/newsletter", () => {
     createClientMock.mockResolvedValue({ from: fromMock })
 
     const response = await POST(
-      createJsonRequest({ email: "alice@example.com" })
+      createJsonRequest({ email: "alice@example.com" }, "198.51.100.36")
     )
     const json = await response.json()
 
     expect(response.status).toBe(500)
     expect(json).toHaveProperty("error")
+  })
+
+  it("returns 400 when parsing body fails", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/newsletter", {
+        method: "POST",
+        body: "{",
+        headers: {
+          "content-type": "application/json",
+          "x-forwarded-for": "198.51.100.37",
+        },
+      })
+    )
+    const json = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(json).toHaveProperty("error")
+    expect(createClientMock).not.toHaveBeenCalled()
   })
 })

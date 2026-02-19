@@ -85,6 +85,12 @@ NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
+RESEND_API_KEY=re_xxx
+CONTACT_FROM_EMAIL=WorldWiki <noreply@your-domain.com>
+CONTACT_TO_EMAIL=owner@your-domain.com
+# 可选：跨实例限流（推荐生产开启）
+# UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+# UPSTASH_REDIS_REST_TOKEN=xxxx
 ```
 
 ### 3. 启动开发服务器
