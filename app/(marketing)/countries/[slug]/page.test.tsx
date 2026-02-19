@@ -81,8 +81,8 @@ describe("CountryDetailPage", () => {
     expect(
       screen.getByRole("heading", { name: "Order of Dawn" })
     ).toBeInTheDocument()
-    expect(screen.getByText("Organization Profile")).toBeInTheDocument()
-    expect(screen.getByText("Branches")).toBeInTheDocument()
+    expect(screen.getByText("组织档案")).toBeInTheDocument()
+    expect(screen.getByText("分支")).toBeInTheDocument()
     const harborLinks = screen.getAllByRole("link", { name: /Harbor District/i })
     expect(harborLinks[0]).toHaveAttribute("href", "/regions/harbor-district")
   })
@@ -115,8 +115,8 @@ describe("CountryDetailPage", () => {
     })
     render(page)
 
-    expect(screen.getByText("Country Atlas")).toBeInTheDocument()
-    expect(screen.getByText("Regions")).toBeInTheDocument()
+    expect(screen.getByText("国家图鉴")).toBeInTheDocument()
+    expect(screen.getAllByText("区域").length).toBeGreaterThan(0)
   })
 
   it("calls notFound when country does not exist", async () => {

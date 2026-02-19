@@ -118,7 +118,7 @@ describe("RegionDetailPage", () => {
     expect(
       screen.queryByRole("heading", { name: "所属英雄" })
     ).not.toBeInTheDocument()
-    expect(screen.getByText("Region Notes")).toBeInTheDocument()
+    expect(screen.getByText("区域概览")).toBeInTheDocument()
   })
 
   it("calls notFound when region does not exist", async () => {

@@ -111,6 +111,30 @@ describe("MagicDetailPage", () => {
     expect(screen.queryByText(/元素：/)).not.toBeInTheDocument()
   })
 
+  it("renders unified fallback copy when optional fields are missing", async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        _id: "magic-3",
+        name: "Unnamed Spell",
+        kind: "spell",
+        element: "wind",
+        details: [],
+        relatedHeroes: [],
+        relatedStories: [],
+        linkedRefs: [],
+      })
+      .mockResolvedValueOnce([])
+
+    const page = await MagicDetailPage({
+      params: Promise.resolve({ slug: "unnamed-spell" }),
+    })
+    render(page)
+
+    expect(screen.getAllByText("未记录").length).toBeGreaterThanOrEqual(5)
+    expect(screen.getByText("暂无风险记录。")).toBeInTheDocument()
+    expect(screen.getByText("法术：暂无详细设定。")).toBeInTheDocument()
+  })
+
   it("calls notFound when magic does not exist", async () => {
     fetchMock.mockResolvedValueOnce(null)
 

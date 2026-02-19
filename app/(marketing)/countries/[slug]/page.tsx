@@ -33,6 +33,9 @@ type Country = {
   }>
 }
 
+const EMPTY_VALUE_TEXT = '未记录'
+const EMPTY_CUSTOMS_TEXT = '暂无习俗记录。'
+
 export default async function CountryDetailPage({
   params,
 }: {
@@ -52,7 +55,7 @@ export default async function CountryDetailPage({
   const languages =
     country.languages && country.languages.length > 0
       ? country.languages.join(' / ')
-      : '未记录'
+      : EMPTY_VALUE_TEXT
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
 
@@ -139,7 +142,7 @@ export default async function CountryDetailPage({
         <div className="country-hero-content">
           <div className="country-hero-lockup">
             <span className="country-hero-tag">
-              {isOrganization ? 'Organization Profile' : 'Country Atlas'}
+              {isOrganization ? '组织档案' : '国家图鉴'}
             </span>
             <h1 className="country-hero-title">{country.name}</h1>
             {country.summary && (
@@ -153,48 +156,48 @@ export default async function CountryDetailPage({
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {isOrganization ? 'Branches' : 'Regions'}
+            {isOrganization ? '分支' : '区域'}
           </p>
           <p className="text-2xl font-semibold mt-3">{regionCount}</p>
           <p className="text-sm text-muted-foreground mt-2">已记录区域数量</p>
         </div>
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Profile
+            概况
           </p>
           <div className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Capital</span>
-              <span>{country.capital ?? '未记录'}</span>
+              <span className="text-muted-foreground">首都/总部</span>
+              <span>{country.capital ?? EMPTY_VALUE_TEXT}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Governance</span>
-              <span>{country.governance ?? '未记录'}</span>
+              <span className="text-muted-foreground">治理结构</span>
+              <span>{country.governance ?? EMPTY_VALUE_TEXT}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Population</span>
-              <span>{country.population ?? '未记录'}</span>
+              <span className="text-muted-foreground">人口/规模</span>
+              <span>{country.population ?? EMPTY_VALUE_TEXT}</span>
             </div>
           </div>
         </div>
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Culture
+            文化
           </p>
           <div className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Currency</span>
-              <span>{country.currency ?? '未记录'}</span>
+              <span className="text-muted-foreground">货币</span>
+              <span>{country.currency ?? EMPTY_VALUE_TEXT}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Languages</span>
+              <span className="text-muted-foreground">语言</span>
               <span>{languages}</span>
             </div>
             {country.motto ? (
               <p className="text-muted-foreground pt-1">“{country.motto}”</p>
             ) : null}
             <p className="text-muted-foreground">
-              {country.customs ?? '可在此补充习俗、礼仪、节庆与禁忌。'}
+              {country.customs ?? EMPTY_CUSTOMS_TEXT}
             </p>
           </div>
         </div>
@@ -205,7 +208,7 @@ export default async function CountryDetailPage({
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">相关区域</h2>
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Entry Points
+              探索入口
             </span>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -50,25 +50,29 @@ function elementLabel(element?: MagicDetail['element']) {
 }
 
 const difficultyLabels: Record<NonNullable<MagicDetail['difficulty']>, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  master: 'Master',
+  beginner: '入门',
+  intermediate: '进阶',
+  advanced: '高级',
+  master: '大师',
 }
 
 const castTypeLabels: Record<NonNullable<MagicDetail['castType']>, string> = {
-  instant: 'Instant',
-  channel: 'Channel',
-  ritual: 'Ritual',
+  instant: '瞬发',
+  channel: '引导',
+  ritual: '仪式',
 }
 
+const EMPTY_VALUE_TEXT = '未记录'
+const EMPTY_RISK_TEXT = '暂无风险记录。'
+const EMPTY_MAGIC_DETAILS_TEXT = '暂无详细设定。'
+
 function labelForDifficulty(value?: MagicDetail['difficulty']) {
-  if (!value) return 'Not set'
+  if (!value) return EMPTY_VALUE_TEXT
   return difficultyLabels[value] ?? value
 }
 
 function labelForCastType(value?: MagicDetail['castType']) {
-  if (!value) return 'Not set'
+  if (!value) return EMPTY_VALUE_TEXT
   return castTypeLabels[value] ?? value
 }
 
@@ -91,7 +95,7 @@ export default async function MagicDetailPage({
   const requirements =
     magic.requirements && magic.requirements.length > 0
       ? magic.requirements.join(' / ')
-      : 'Not set'
+      : EMPTY_VALUE_TEXT
 
   addRecommendations(recommendations, seen, magic.relatedHeroes ?? [], 'hero')
   addRecommendations(recommendations, seen, magic.relatedStories ?? [], 'story')
@@ -148,35 +152,35 @@ export default async function MagicDetailPage({
 
       <section className="mt-10 rounded-3xl border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Casting Profile</h2>
+          <h2 className="text-xl font-semibold">施放档案</h2>
           <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Metadata
+            参数
           </span>
         </div>
         <div className="grid gap-3 text-sm sm:grid-cols-2">
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <span className="text-muted-foreground">Difficulty</span>
+            <span className="text-muted-foreground">难度</span>
             <span>{labelForDifficulty(magic.difficulty)}</span>
           </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <span className="text-muted-foreground">Cast Type</span>
+            <span className="text-muted-foreground">施放方式</span>
             <span>{labelForCastType(magic.castType)}</span>
           </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <span className="text-muted-foreground">Mana Cost</span>
-            <span>{magic.manaCost ?? 'Not set'}</span>
+            <span className="text-muted-foreground">法力消耗</span>
+            <span>{magic.manaCost ?? EMPTY_VALUE_TEXT}</span>
           </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <span className="text-muted-foreground">Cooldown</span>
-            <span>{magic.cooldown ?? 'Not set'}</span>
+            <span className="text-muted-foreground">冷却时间</span>
+            <span>{magic.cooldown ?? EMPTY_VALUE_TEXT}</span>
           </div>
           <div className="rounded-xl border p-3 sm:col-span-2">
-            <p className="text-muted-foreground">Requirements</p>
+            <p className="text-muted-foreground">前置条件</p>
             <p className="mt-1">{requirements}</p>
           </div>
           <div className="rounded-xl border p-3 sm:col-span-2">
-            <p className="text-muted-foreground">Risks</p>
-            <p className="mt-1">{magic.risks ?? 'No major risks recorded.'}</p>
+            <p className="text-muted-foreground">风险说明</p>
+            <p className="mt-1">{magic.risks ?? EMPTY_RISK_TEXT}</p>
           </div>
         </div>
       </section>
@@ -186,7 +190,7 @@ export default async function MagicDetailPage({
           <div className="h-10 w-1 rounded-full bg-primary/70" />
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Details
+              详情
             </p>
             <h2 className="text-xl font-semibold">
               {isPrinciple ? '原理设定' : '法术设定'}
@@ -200,8 +204,8 @@ export default async function MagicDetailPage({
         ) : (
           <p className="text-sm text-muted-foreground mt-4">
             {isPrinciple
-              ? '该原理的详细设定将在后续补充。'
-              : '该法术的详细设定将在后续补充。'}
+              ? `原理：${EMPTY_MAGIC_DETAILS_TEXT}`
+              : `法术：${EMPTY_MAGIC_DETAILS_TEXT}`}
           </p>
         )}
       </section>

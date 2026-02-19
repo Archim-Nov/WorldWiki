@@ -33,14 +33,18 @@ type Region = {
 }
 
 const dangerLevelLabels: Record<NonNullable<Region['dangerLevel']>, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
+  low: '低',
+  medium: '中',
+  high: '高',
 }
+
+const EMPTY_VALUE_TEXT = '未记录'
+const EMPTY_REGION_SUMMARY_TEXT = '暂无区域概述。'
+const EMPTY_TRAVEL_ADVICE_TEXT = '暂无行进建议记录。'
 
 function labelForDangerLevel(level?: Region['dangerLevel']) {
   if (!level) {
-    return 'Not set'
+    return EMPTY_VALUE_TEXT
   }
   return dangerLevelLabels[level] ?? level
 }
@@ -64,7 +68,7 @@ export default async function RegionDetailPage({
   const landmarks =
     region.landmarks && region.landmarks.length > 0
       ? region.landmarks.join(' / ')
-      : 'Not set'
+      : EMPTY_VALUE_TEXT
 
   addRecommendations(recommendations, seen, region.featuredHeroes ?? [], 'hero')
   if (region.country) {
@@ -141,7 +145,7 @@ export default async function RegionDetailPage({
         </div>
         <div className="region-hero-content">
           <div className="region-hero-lockup">
-            <span className="region-hero-tag">Region Stage</span>
+            <span className="region-hero-tag">区域舞台</span>
             <h1 className="region-hero-title">{region.name}</h1>
             {region.country?.name && (
               <p className="region-hero-country">{region.country.name}</p>
@@ -157,31 +161,29 @@ export default async function RegionDetailPage({
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
   <div className="rounded-2xl border bg-card p-5 sm:p-6">
     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-      Region Notes
+      区域概览
     </p>
     <div className="mt-4 space-y-3 text-sm text-muted-foreground">
       <p>
-        {region.summary ??
-          '这里是故事的舞台，记录地貌、气候与传说线索。'}
+        {region.summary ?? EMPTY_REGION_SUMMARY_TEXT}
       </p>
       <p>
-        {region.travelAdvice ??
-          '后续可补充行进路线、旅行建议与剧情触发点。'}
+        {region.travelAdvice ?? EMPTY_TRAVEL_ADVICE_TEXT}
       </p>
     </div>
   </div>
   <div className="rounded-2xl border bg-card p-5 sm:p-6">
     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-      Exploration
+      探索信息
     </p>
     <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
       <div className="flex items-center justify-between">
         <span>地形</span>
-        <span>{region.terrain ?? '可补充'}</span>
+        <span>{region.terrain ?? EMPTY_VALUE_TEXT}</span>
       </div>
       <div className="flex items-center justify-between">
         <span>气候</span>
-        <span>{region.climate ?? '可补充'}</span>
+        <span>{region.climate ?? EMPTY_VALUE_TEXT}</span>
       </div>
       <div className="flex items-center justify-between">
         <span>危险等级</span>
@@ -200,7 +202,7 @@ export default async function RegionDetailPage({
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">所属英雄</h2>
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Cast
+              角色
             </span>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-2">

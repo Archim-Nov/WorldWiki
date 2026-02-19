@@ -61,13 +61,16 @@ type Creature = {
 }
 
 const threatLabels: Record<NonNullable<Creature['threatLevel']>, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
+  low: '低',
+  medium: '中',
+  high: '高',
 }
 
+const EMPTY_VALUE_TEXT = '未记录'
+const EMPTY_BIO_TEXT = '暂无生态描述。'
+
 function labelForThreatLevel(value?: Creature['threatLevel']) {
-  if (!value) return 'Not set'
+  if (!value) return EMPTY_VALUE_TEXT
   return threatLabels[value] ?? value
 }
 
@@ -90,7 +93,7 @@ export default async function CreatureDetailPage({
   const abilities =
     creature.abilities && creature.abilities.length > 0
       ? creature.abilities.join(' / ')
-      : 'Not set'
+      : EMPTY_VALUE_TEXT
 
   addRecommendations(recommendations, seen, creature.relatedStories ?? [], 'story')
   addRecommendations(
@@ -165,7 +168,7 @@ export default async function CreatureDetailPage({
         </div>
         <div className="creature-hero-content">
           <div className="creature-hero-lockup">
-            <span className="creature-hero-tag">Specimen Sheet</span>
+            <span className="creature-hero-tag">生物档案</span>
             <h1 className="creature-hero-title">{creature.name}</h1>
             <div className="creature-hero-tags">
               {creature.category && (
@@ -182,7 +185,7 @@ export default async function CreatureDetailPage({
   <div className="rounded-2xl border p-4 text-sm">
     <div className="flex items-center justify-between">
       <span className="text-muted-foreground">分类</span>
-      <span>{labelForCategory(creature.category) ?? 'Not set'}</span>
+      <span>{labelForCategory(creature.category) ?? EMPTY_VALUE_TEXT}</span>
     </div>
     <div className="mt-3 flex items-center justify-between">
       <span className="text-muted-foreground">区域</span>
@@ -194,7 +197,7 @@ export default async function CreatureDetailPage({
           {creature.region.name}
         </Link>
       ) : (
-        <span className="text-muted-foreground">Not set</span>
+        <span className="text-muted-foreground">{EMPTY_VALUE_TEXT}</span>
       )}
     </div>
     <div className="mt-3 flex items-center justify-between">
@@ -207,24 +210,24 @@ export default async function CreatureDetailPage({
           {creature.country.name}
         </Link>
       ) : (
-        <span className="text-muted-foreground">Not set</span>
+        <span className="text-muted-foreground">{EMPTY_VALUE_TEXT}</span>
       )}
     </div>
     <div className="mt-3 flex items-center justify-between gap-3">
       <span className="text-muted-foreground">栖息地</span>
-      <span>{creature.habitat ?? 'Not set'}</span>
+      <span>{creature.habitat ?? EMPTY_VALUE_TEXT}</span>
     </div>
     <div className="mt-3 flex items-center justify-between gap-3">
       <span className="text-muted-foreground">食性</span>
-      <span>{creature.diet ?? 'Not set'}</span>
+      <span>{creature.diet ?? EMPTY_VALUE_TEXT}</span>
     </div>
     <div className="mt-3 flex items-center justify-between gap-3">
       <span className="text-muted-foreground">习性</span>
-      <span>{creature.temperament ?? 'Not set'}</span>
+      <span>{creature.temperament ?? EMPTY_VALUE_TEXT}</span>
     </div>
     <div className="mt-3 flex items-center justify-between gap-3">
       <span className="text-muted-foreground">活动周期</span>
-      <span>{creature.activityCycle ?? 'Not set'}</span>
+      <span>{creature.activityCycle ?? EMPTY_VALUE_TEXT}</span>
     </div>
     <div className="mt-3 flex items-center justify-between gap-3">
       <span className="text-muted-foreground">威胁等级</span>
@@ -242,7 +245,7 @@ export default async function CreatureDetailPage({
           <div className="h-10 w-1 rounded-full bg-primary/70" />
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Ecology
+              生态
             </p>
             <h2 className="text-xl font-semibold">生态描述</h2>
           </div>
@@ -253,7 +256,7 @@ export default async function CreatureDetailPage({
           </div>
         ) : (
           <p className="text-sm text-muted-foreground mt-4">
-            生物描述将在后续阶段完成富文本渲染与段落排版。
+            {EMPTY_BIO_TEXT}
           </p>
         )}
       </section>

@@ -114,7 +114,7 @@ describe("CreatureDetailPage", () => {
     render(page)
 
     expect(
-      screen.getByText("生物描述将在后续阶段完成富文本渲染与段落排版。")
+      screen.getByText("暂无生态描述。")
     ).toBeInTheDocument()
   })
 
