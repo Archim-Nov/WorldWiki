@@ -80,6 +80,17 @@ describe("StoriesPage", () => {
         _id: "story-1",
         title: "Ashes at Dawn",
         slug: { current: "ashes-at-dawn" },
+        content: [
+          {
+            _type: "block",
+            children: [
+              {
+                _type: "span",
+                text: "The city bells shattered the fog before dawn.",
+              },
+            ],
+          },
+        ],
       },
       {
         _id: "story-2",
@@ -100,6 +111,12 @@ describe("StoriesPage", () => {
       "href",
       "/stories/the-last-beacon"
     )
+    expect(
+      screen.getByText("The city bells shattered the fog before dawn.")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("进入故事章节，沿着线索连接世界的其他入口。")
+    ).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })

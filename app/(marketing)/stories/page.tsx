@@ -11,6 +11,39 @@ type Story = {
   title: string
   slug: { current: string }
   coverImage?: string
+  content?: Array<{
+    _type?: string
+    children?: Array<{
+      _type?: string
+      text?: string
+    }>
+  }>
+}
+
+const DEFAULT_STORY_SUMMARY = '进入故事章节，沿着线索连接世界的其他入口。'
+
+function extractStorySummary(story: Story): string {
+  if (!story.content) {
+    return DEFAULT_STORY_SUMMARY
+  }
+
+  for (const block of story.content) {
+    if (block?._type !== 'block' || !block.children) {
+      continue
+    }
+
+    const text = block.children
+      .map((child) => (typeof child.text === 'string' ? child.text : ''))
+      .join('')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    if (text.length > 0) {
+      return text.length > 68 ? `${text.slice(0, 68)}...` : text
+    }
+  }
+
+  return DEFAULT_STORY_SUMMARY
 }
 
 export default async function StoriesPage() {
@@ -48,7 +81,7 @@ export default async function StoriesPage() {
               <div className={styles.cardBody}>
                 <div>
                   <h2 className={styles.cardTitle}>{story.title}</h2>
-                  <p className={styles.cardSummary}>进入故事章节，沿着线索连接世界的其他入口。</p>
+                  <p className={styles.cardSummary}>{extractStorySummary(story)}</p>
                 </div>
                 <div className={styles.cardCta}>开始阅读 {'>'}</div>
               </div>

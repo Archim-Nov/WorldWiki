@@ -261,7 +261,14 @@ export const storiesQuery = groq`
     _id,
     title,
     slug,
-    "coverImage": coverImage.asset->url
+    "coverImage": coverImage.asset->url,
+    "content": content[]{
+      _type,
+      children[]{
+        _type,
+        text
+      }
+    }
   }
 `
 
