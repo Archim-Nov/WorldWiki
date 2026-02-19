@@ -88,6 +88,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 RESEND_API_KEY=re_xxx
 CONTACT_FROM_EMAIL=WorldWiki <noreply@your-domain.com>
 CONTACT_TO_EMAIL=owner@your-domain.com
+SANITY_WEBHOOK_SECRET=replace_with_random_secret
 # 可选：跨实例限流（推荐生产开启）
 # UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
 # UPSTASH_REDIS_REST_TOKEN=xxxx
