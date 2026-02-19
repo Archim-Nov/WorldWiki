@@ -44,6 +44,43 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'capital',
+      title: 'Capital',
+      type: 'string',
+    }),
+    defineField({
+      name: 'governance',
+      title: 'Governance',
+      type: 'string',
+    }),
+    defineField({
+      name: 'population',
+      title: 'Population',
+      type: 'string',
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+    }),
+    defineField({
+      name: 'languages',
+      title: 'Languages',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'motto',
+      title: 'Motto',
+      type: 'string',
+    }),
+    defineField({
+      name: 'customs',
+      title: 'Customs',
+      type: 'text',
+      rows: 4,
+    }),
+    defineField({
       name: 'themeColor',
       title: 'Theme Color',
       type: 'string',

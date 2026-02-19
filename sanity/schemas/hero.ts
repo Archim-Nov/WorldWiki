@@ -17,6 +17,29 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'alias',
+      title: 'Alias',
+      type: 'string',
+    }),
+    defineField({
+      name: 'age',
+      title: 'Age',
+      type: 'string',
+    }),
+    defineField({
+      name: 'status',
+      title: 'Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Active', value: 'active' },
+          { title: 'Missing', value: 'missing' },
+          { title: 'Deceased', value: 'deceased' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -50,6 +73,16 @@ export default defineType({
     defineField({
       name: 'faction',
       title: 'Faction',
+      type: 'string',
+    }),
+    defineField({
+      name: 'signatureWeapon',
+      title: 'Signature Weapon',
+      type: 'string',
+    }),
+    defineField({
+      name: 'motto',
+      title: 'Motto',
       type: 'string',
     }),
     defineField({

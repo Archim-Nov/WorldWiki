@@ -18,6 +18,12 @@ type MagicDetail = {
   element?: 'fire' | 'wind' | 'earth' | 'water'
   school?: string
   summary?: string
+  difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'master'
+  castType?: 'instant' | 'channel' | 'ritual'
+  manaCost?: string
+  cooldown?: string
+  requirements?: string[]
+  risks?: string
   coverImage?: string
   details?: unknown[]
   relatedHeroes?: Array<{
@@ -43,6 +49,29 @@ function elementLabel(element?: MagicDetail['element']) {
   return null
 }
 
+const difficultyLabels: Record<NonNullable<MagicDetail['difficulty']>, string> = {
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+  master: 'Master',
+}
+
+const castTypeLabels: Record<NonNullable<MagicDetail['castType']>, string> = {
+  instant: 'Instant',
+  channel: 'Channel',
+  ritual: 'Ritual',
+}
+
+function labelForDifficulty(value?: MagicDetail['difficulty']) {
+  if (!value) return 'Not set'
+  return difficultyLabels[value] ?? value
+}
+
+function labelForCastType(value?: MagicDetail['castType']) {
+  if (!value) return 'Not set'
+  return castTypeLabels[value] ?? value
+}
+
 export default async function MagicDetailPage({
   params,
 }: {
@@ -59,6 +88,10 @@ export default async function MagicDetailPage({
   const seen = new Set<string>()
   const isPrinciple = magic.kind === 'principle'
   const element = elementLabel(magic.element)
+  const requirements =
+    magic.requirements && magic.requirements.length > 0
+      ? magic.requirements.join(' / ')
+      : 'Not set'
 
   addRecommendations(recommendations, seen, magic.relatedHeroes ?? [], 'hero')
   addRecommendations(recommendations, seen, magic.relatedStories ?? [], 'story')
@@ -110,6 +143,41 @@ export default async function MagicDetailPage({
           {magic.summary ? (
             <p className="text-muted-foreground mt-4">{magic.summary}</p>
           ) : null}
+        </div>
+      </section>
+
+      <section className="mt-10 rounded-3xl border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Casting Profile</h2>
+          <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Metadata
+          </span>
+        </div>
+        <div className="grid gap-3 text-sm sm:grid-cols-2">
+          <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
+            <span className="text-muted-foreground">Difficulty</span>
+            <span>{labelForDifficulty(magic.difficulty)}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
+            <span className="text-muted-foreground">Cast Type</span>
+            <span>{labelForCastType(magic.castType)}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
+            <span className="text-muted-foreground">Mana Cost</span>
+            <span>{magic.manaCost ?? 'Not set'}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
+            <span className="text-muted-foreground">Cooldown</span>
+            <span>{magic.cooldown ?? 'Not set'}</span>
+          </div>
+          <div className="rounded-xl border p-3 sm:col-span-2">
+            <p className="text-muted-foreground">Requirements</p>
+            <p className="mt-1">{requirements}</p>
+          </div>
+          <div className="rounded-xl border p-3 sm:col-span-2">
+            <p className="text-muted-foreground">Risks</p>
+            <p className="mt-1">{magic.risks ?? 'No major risks recorded.'}</p>
+          </div>
         </div>
       </section>
 

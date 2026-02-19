@@ -42,6 +42,45 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'temperament',
+      title: 'Temperament',
+      type: 'string',
+    }),
+    defineField({
+      name: 'habitat',
+      title: 'Habitat',
+      type: 'string',
+    }),
+    defineField({
+      name: 'diet',
+      title: 'Diet',
+      type: 'string',
+    }),
+    defineField({
+      name: 'activityCycle',
+      title: 'Activity Cycle',
+      type: 'string',
+    }),
+    defineField({
+      name: 'threatLevel',
+      title: 'Threat Level',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Low', value: 'low' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'High', value: 'high' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'abilities',
+      title: 'Abilities',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
       name: 'region',
       title: 'Region',
       type: 'reference',

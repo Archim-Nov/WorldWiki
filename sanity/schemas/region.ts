@@ -31,6 +31,41 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'climate',
+      title: 'Climate',
+      type: 'string',
+    }),
+    defineField({
+      name: 'terrain',
+      title: 'Terrain',
+      type: 'string',
+    }),
+    defineField({
+      name: 'dangerLevel',
+      title: 'Danger Level',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Low', value: 'low' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'High', value: 'high' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'landmarks',
+      title: 'Landmarks',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'travelAdvice',
+      title: 'Travel Advice',
+      type: 'text',
+      rows: 4,
+    }),
+    defineField({
       name: 'themeColor',
       title: 'Theme Color',
       type: 'string',

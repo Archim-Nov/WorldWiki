@@ -67,6 +67,53 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'difficulty',
+      title: 'Difficulty',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Beginner', value: 'beginner' },
+          { title: 'Intermediate', value: 'intermediate' },
+          { title: 'Advanced', value: 'advanced' },
+          { title: 'Master', value: 'master' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'castType',
+      title: 'Cast Type',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Instant', value: 'instant' },
+          { title: 'Channel', value: 'channel' },
+          { title: 'Ritual', value: 'ritual' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'manaCost',
+      title: 'Mana Cost',
+      type: 'string',
+    }),
+    defineField({
+      name: 'cooldown',
+      title: 'Cooldown',
+      type: 'string',
+    }),
+    defineField({
+      name: 'requirements',
+      title: 'Requirements',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'risks',
+      title: 'Risks',
+      type: 'text',
+      rows: 3,
+    }),
+    defineField({
       name: 'coverImage',
       title: 'Cover Image',
       type: 'image',

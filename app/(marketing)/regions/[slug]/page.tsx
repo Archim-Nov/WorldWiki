@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
@@ -15,6 +15,11 @@ type Region = {
   _id: string
   name: string
   summary?: string
+  climate?: string
+  terrain?: string
+  dangerLevel?: 'low' | 'medium' | 'high'
+  landmarks?: string[]
+  travelAdvice?: string
   mapImage?: string
   themeColor?: string
   country?: { name: string; slug: { current: string }; mapImage?: string }
@@ -25,6 +30,19 @@ type Region = {
     slug: { current: string }
     portrait?: string
   }>
+}
+
+const dangerLevelLabels: Record<NonNullable<Region['dangerLevel']>, string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+}
+
+function labelForDangerLevel(level?: Region['dangerLevel']) {
+  if (!level) {
+    return 'Not set'
+  }
+  return dangerLevelLabels[level] ?? level
 }
 
 export default async function RegionDetailPage({
@@ -43,6 +61,10 @@ export default async function RegionDetailPage({
 
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
+  const landmarks =
+    region.landmarks && region.landmarks.length > 0
+      ? region.landmarks.join(' / ')
+      : 'Not set'
 
   addRecommendations(recommendations, seen, region.featuredHeroes ?? [], 'hero')
   if (region.country) {
@@ -133,35 +155,45 @@ export default async function RegionDetailPage({
 
       <div className="container mx-auto px-4 detail-body">
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Region Notes
-          </p>
-          <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <p>这里是故事的舞台，记录地貌、气候与传说线索。</p>
-            <p>后续可以补充地图坐标、关键地点与事件时间线。</p>
-          </div>
-        </div>
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Exploration
-          </p>
-          <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-            <div className="flex items-center justify-between">
-              <span>地理特征</span>
-              <span>场景/遗迹/边境</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>气候</span>
-              <span>可补充</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>故事线索</span>
-              <span>可补充</span>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div className="rounded-2xl border bg-card p-5 sm:p-6">
+    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+      Region Notes
+    </p>
+    <div className="mt-4 space-y-3 text-sm text-muted-foreground">
+      <p>
+        {region.summary ??
+          '这里是故事的舞台，记录地貌、气候与传说线索。'}
+      </p>
+      <p>
+        {region.travelAdvice ??
+          '后续可补充行进路线、旅行建议与剧情触发点。'}
+      </p>
+    </div>
+  </div>
+  <div className="rounded-2xl border bg-card p-5 sm:p-6">
+    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+      Exploration
+    </p>
+    <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between">
+        <span>地形</span>
+        <span>{region.terrain ?? '可补充'}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>气候</span>
+        <span>{region.climate ?? '可补充'}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>危险等级</span>
+        <span>{labelForDangerLevel(region.dangerLevel)}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>地标</span>
+        <span className="text-right">{landmarks}</span>
+      </div>
+    </div>
+  </div>
+</section>
 
       {region.featuredHeroes && region.featuredHeroes.length > 0 && (
         <section className="mt-12">
@@ -207,3 +239,4 @@ export default async function RegionDetailPage({
     </div>
   )
 }
+

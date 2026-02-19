@@ -16,6 +16,13 @@ type Country = {
   name: string
   kind?: 'nation' | 'organization'
   summary?: string
+  capital?: string
+  governance?: string
+  population?: string
+  currency?: string
+  languages?: string[]
+  motto?: string
+  customs?: string
   mapImage?: string
   themeColor?: string
   featuredRegions?: Array<{
@@ -42,6 +49,10 @@ export default async function CountryDetailPage({
 
   const regionCount = country.featuredRegions?.length ?? 0
   const isOrganization = country.kind === 'organization'
+  const languages =
+    country.languages && country.languages.length > 0
+      ? country.languages.join(' / ')
+      : '未记录'
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
 
@@ -149,19 +160,43 @@ export default async function CountryDetailPage({
         </div>
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Culture
+            Profile
           </p>
-          <p className="text-sm text-muted-foreground mt-3">
-            海岸、灯塔、航路与迁徙
-          </p>
+          <div className="mt-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Capital</span>
+              <span>{country.capital ?? '未记录'}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Governance</span>
+              <span>{country.governance ?? '未记录'}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Population</span>
+              <span>{country.population ?? '未记录'}</span>
+            </div>
+          </div>
         </div>
         <div className="rounded-2xl border bg-card p-4 sm:p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Notes
+            Culture
           </p>
-          <p className="text-sm text-muted-foreground mt-3">
-            可在此补充国家级世界观摘要与关键词。
-          </p>
+          <div className="mt-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Currency</span>
+              <span>{country.currency ?? '未记录'}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Languages</span>
+              <span>{languages}</span>
+            </div>
+            {country.motto ? (
+              <p className="text-muted-foreground pt-1">“{country.motto}”</p>
+            ) : null}
+            <p className="text-muted-foreground">
+              {country.customs ?? '可在此补充习俗、礼仪、节庆与禁忌。'}
+            </p>
+          </div>
         </div>
       </section>
 

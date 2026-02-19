@@ -1,4 +1,4 @@
-/** @vitest-environment jsdom */
+﻿/** @vitest-environment jsdom */
 
 import "@testing-library/jest-dom/vitest"
 import { cleanup, render, screen } from "@testing-library/react"
@@ -87,8 +87,8 @@ describe("RegionDetailPage", () => {
       screen.getByRole("heading", { name: "Emerald Coast" })
     ).toBeInTheDocument()
     expect(
-      screen.getByText("A trade shoreline with floating markets.")
-    ).toBeInTheDocument()
+      screen.getAllByText("A trade shoreline with floating markets.").length
+    ).toBeGreaterThan(0)
     expect(
       screen.getByRole("heading", { name: "所属英雄" })
     ).toBeInTheDocument()

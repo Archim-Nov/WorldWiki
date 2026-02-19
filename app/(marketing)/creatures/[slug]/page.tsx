@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
@@ -29,6 +29,12 @@ type Creature = {
   species?: string
   portrait?: string
   category?: string
+  temperament?: string
+  habitat?: string
+  diet?: string
+  activityCycle?: string
+  threatLevel?: 'low' | 'medium' | 'high'
+  abilities?: string[]
   region?: {
     name: string
     slug: { current: string }
@@ -54,6 +60,17 @@ type Creature = {
   }>
 }
 
+const threatLabels: Record<NonNullable<Creature['threatLevel']>, string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+}
+
+function labelForThreatLevel(value?: Creature['threatLevel']) {
+  if (!value) return 'Not set'
+  return threatLabels[value] ?? value
+}
+
 export default async function CreatureDetailPage({
   params,
 }: {
@@ -70,6 +87,10 @@ export default async function CreatureDetailPage({
 
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
+  const abilities =
+    creature.abilities && creature.abilities.length > 0
+      ? creature.abilities.join(' / ')
+      : 'Not set'
 
   addRecommendations(recommendations, seen, creature.relatedStories ?? [], 'story')
   addRecommendations(
@@ -158,39 +179,63 @@ export default async function CreatureDetailPage({
 
       <div className="container mx-auto px-4 detail-body">
       <section className="rounded-3xl border bg-card p-6">
-        <div className="rounded-2xl border p-4 text-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">分类</span>
-            <span>{labelForCategory(creature.category) ?? '未记录'}</span>
-          </div>
-          <div className="mt-3 flex items-center justify-between">
-            <span className="text-muted-foreground">区域</span>
-            {creature.region?.name ? (
-              <Link
-                href={`/regions/${creature.region.slug.current}`}
-                className="text-primary"
-              >
-                {creature.region.name}
-              </Link>
-            ) : (
-              <span className="text-muted-foreground">未记录</span>
-            )}
-          </div>
-          <div className="mt-3 flex items-center justify-between">
-            <span className="text-muted-foreground">国家</span>
-            {creature.country?.name ? (
-              <Link
-                href={`/countries/${creature.country.slug.current}`}
-                className="text-primary"
-              >
-                {creature.country.name}
-              </Link>
-            ) : (
-              <span className="text-muted-foreground">未记录</span>
-            )}
-          </div>
-        </div>
-      </section>
+  <div className="rounded-2xl border p-4 text-sm">
+    <div className="flex items-center justify-between">
+      <span className="text-muted-foreground">分类</span>
+      <span>{labelForCategory(creature.category) ?? 'Not set'}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between">
+      <span className="text-muted-foreground">区域</span>
+      {creature.region?.name ? (
+        <Link
+          href={`/regions/${creature.region.slug.current}`}
+          className="text-primary"
+        >
+          {creature.region.name}
+        </Link>
+      ) : (
+        <span className="text-muted-foreground">Not set</span>
+      )}
+    </div>
+    <div className="mt-3 flex items-center justify-between">
+      <span className="text-muted-foreground">国家</span>
+      {creature.country?.name ? (
+        <Link
+          href={`/countries/${creature.country.slug.current}`}
+          className="text-primary"
+        >
+          {creature.country.name}
+        </Link>
+      ) : (
+        <span className="text-muted-foreground">Not set</span>
+      )}
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">栖息地</span>
+      <span>{creature.habitat ?? 'Not set'}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">食性</span>
+      <span>{creature.diet ?? 'Not set'}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">习性</span>
+      <span>{creature.temperament ?? 'Not set'}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">活动周期</span>
+      <span>{creature.activityCycle ?? 'Not set'}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">威胁等级</span>
+      <span>{labelForThreatLevel(creature.threatLevel)}</span>
+    </div>
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">能力标签</span>
+      <span className="text-right">{abilities}</span>
+    </div>
+  </div>
+</section>
 
       <section className="mt-10 rounded-3xl border bg-card p-6">
         <div className="flex items-center gap-4">
@@ -218,3 +263,5 @@ export default async function CreatureDetailPage({
     </div>
   )
 }
+
+

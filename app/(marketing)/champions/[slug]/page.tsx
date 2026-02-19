@@ -16,10 +16,15 @@ type Hero = {
   _id: string
   name: string
   title?: string
+  alias?: string
+  age?: string
+  status?: 'active' | 'missing' | 'deceased'
   slug: { current: string }
   portrait?: string
   faction?: string
   roles?: string[]
+  signatureWeapon?: string
+  motto?: string
   region?: {
     name: string
     slug: { current: string }
@@ -57,6 +62,19 @@ type Hero = {
   }>
 }
 
+const heroStatusLabels: Record<NonNullable<Hero['status']>, string> = {
+  active: 'Active',
+  missing: 'Missing',
+  deceased: 'Deceased',
+}
+
+function labelForHeroStatus(status?: Hero['status']) {
+  if (!status) {
+    return null
+  }
+  return heroStatusLabels[status] ?? status
+}
+
 export default async function HeroDetailPage({
   params,
 }: {
@@ -73,6 +91,7 @@ export default async function HeroDetailPage({
 
   const relatedHeroes = hero.relatedHeroes ?? []
   const relatedStories = hero.relatedStories ?? []
+  const statusLabel = labelForHeroStatus(hero.status)
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
 
@@ -196,7 +215,9 @@ export default async function HeroDetailPage({
 
           <div className="rounded-3xl border bg-card p-6 text-center hero-panel hero-quote">
             <p className="text-sm text-muted-foreground hero-quote-text">
-              “如果我连规则都不知道，那我所做的一切又怎能被说是破坏规则？”
+              {hero.motto
+                ? `“${hero.motto}”`
+                : '“如果我连规则都不知道，那我所做的一切又怎能被说是破坏规则？”'}
             </p>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mt-4 hero-quote-meta">
               — Champion Quote
@@ -271,6 +292,24 @@ export default async function HeroDetailPage({
               角色档案
             </p>
             <div className="mt-4 space-y-3 text-sm">
+              {hero.alias && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">别名</span>
+                  <span>{hero.alias}</span>
+                </div>
+              )}
+              {hero.age && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">年龄</span>
+                  <span>{hero.age}</span>
+                </div>
+              )}
+              {statusLabel && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">状态</span>
+                  <span>{statusLabel}</span>
+                </div>
+              )}
               {hero.faction && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">阵营</span>
@@ -281,6 +320,18 @@ export default async function HeroDetailPage({
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">职业</span>
                   <span>{hero.roles.join(' / ')}</span>
+                </div>
+              )}
+              {hero.signatureWeapon && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">武器</span>
+                  <span>{hero.signatureWeapon}</span>
+                </div>
+              )}
+              {hero.motto && (
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-muted-foreground">箴言</span>
+                  <span className="text-right">{hero.motto}</span>
                 </div>
               )}
               {hero.region?.name && (
