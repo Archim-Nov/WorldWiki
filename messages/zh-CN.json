@@ -293,98 +293,98 @@
     "next": "下一张"
   },
   "CountryDetailPage": {
-    "emptyValue": "???",
-    "emptyCustoms": "???????",
-    "organizationTag": "????",
-    "nationTag": "????",
-    "countLabelOrganization": "??",
-    "countLabelNation": "??",
-    "recordedRegions": "??????",
-    "overviewTitle": "??",
-    "cultureTitle": "??",
+    "emptyValue": "未记录",
+    "emptyCustoms": "暂无风俗记录。",
+    "organizationTag": "组织档案",
+    "nationTag": "国家图鉴",
+    "countLabelOrganization": "分支数",
+    "countLabelNation": "区域数",
+    "recordedRegions": "已收录区域数量",
+    "overviewTitle": "概览",
+    "cultureTitle": "文化",
     "fields": {
-      "capitalHQ": "?? / ??",
-      "governance": "????",
-      "populationScale": "?? / ??",
-      "currency": "??",
-      "languages": "??"
+      "capitalHQ": "首都 / 总部",
+      "governance": "治理结构",
+      "populationScale": "人口 / 规模",
+      "currency": "货币",
+      "languages": "语言"
     },
-    "relatedRegionsTitle": "????",
-    "relatedRegionsSubtitle": "????"
+    "relatedRegionsTitle": "相关区域",
+    "relatedRegionsSubtitle": "探索入口"
   },
   "RegionDetailPage": {
-    "heroTag": "????",
-    "emptyValue": "???",
-    "emptySummary": "???????",
-    "emptyTravelAdvice": "???????",
-    "emptyCountry": "??????",
-    "overviewTitle": "????",
+    "heroTag": "区域舞台",
+    "emptyValue": "未记录",
+    "emptySummary": "暂无区域简介。",
+    "emptyTravelAdvice": "暂无旅行建议。",
+    "emptyCountry": "暂无关联国家",
+    "overviewTitle": "区域概览",
     "fields": {
-      "climate": "??",
-      "terrain": "??",
-      "dangerLevel": "????",
-      "relatedHeroes": "????"
+      "climate": "气候",
+      "terrain": "地形",
+      "dangerLevel": "危险等级",
+      "relatedHeroes": "关联英雄"
     },
     "dangerLevels": {
-      "low": "?",
-      "medium": "?",
-      "high": "?"
+      "low": "低",
+      "medium": "中",
+      "high": "高"
     },
-    "travelAdviceTitle": "????",
-    "countryTitle": "????",
-    "countryArchive": "????",
-    "landmarksTitle": "??",
-    "landmarksSubtitle": "??",
-    "featuredHeroesTitle": "????",
-    "featuredHeroesSubtitle": "??"
+    "travelAdviceTitle": "旅行建议",
+    "countryTitle": "关联国家",
+    "countryArchive": "国家档案",
+    "landmarksTitle": "地标",
+    "landmarksSubtitle": "地标列表",
+    "featuredHeroesTitle": "代表英雄",
+    "featuredHeroesSubtitle": "角色"
   },
   "HeroDetailPage": {
-    "heroTag": "????",
-    "relatedHeroesTitle": "????",
-    "emptyRelatedHeroes": "???????",
-    "quoteFallback": "????????????????????",
-    "quoteMeta": "????",
-    "bioTitle": "??",
-    "bioExpand": "????",
-    "close": "??",
-    "bioEmpty": "???????????",
-    "profileTitle": "????",
+    "heroTag": "英雄档案",
+    "relatedHeroesTitle": "相关英雄",
+    "emptyRelatedHeroes": "暂无相关英雄。",
+    "quoteFallback": "如果我连规则都不懂，打破它又如何定义我？",
+    "quoteMeta": "英雄语录",
+    "bioTitle": "生平",
+    "bioExpand": "点击展开",
+    "close": "关闭",
+    "bioEmpty": "生平内容将在后续补充。",
+    "profileTitle": "角色档案",
     "fields": {
-      "alias": "??",
-      "age": "??",
-      "status": "??",
-      "faction": "??",
-      "roles": "??",
-      "weapon": "??",
-      "motto": "??",
-      "region": "??",
-      "country": "??"
+      "alias": "别名",
+      "age": "年龄",
+      "status": "状态",
+      "faction": "阵营",
+      "roles": "职责",
+      "weapon": "武器",
+      "motto": "格言",
+      "region": "区域",
+      "country": "国家"
     },
     "statusLabels": {
-      "active": "??",
-      "missing": "??",
-      "deceased": "??"
+      "active": "在役",
+      "missing": "失踪",
+      "deceased": "已故"
     },
-    "crestTitle": "??",
-    "storiesTitle": "????",
-    "storiesSubtitle": "????",
-    "storyCardTag": "????",
-    "readStory": "???? ->",
-    "emptyRelatedStories": "?????????",
-    "miscTitle": "??",
-    "miscSubtitle": "??",
+    "crestTitle": "徽记",
+    "storiesTitle": "短篇故事",
+    "storiesSubtitle": "故事链接",
+    "storyCardTag": "短篇",
+    "readStory": "阅读故事 ->",
+    "emptyRelatedStories": "暂无相关短篇故事。",
+    "miscTitle": "其他",
+    "miscSubtitle": "其他",
     "misc": {
-      "conceptArt": "????",
-      "equipmentBadges": "?????"
+      "conceptArt": "概念草图",
+      "equipmentBadges": "装备与徽章"
     },
-    "otherHeroesTitle": "????",
-    "otherHeroesSubtitle": "??",
-    "emptyOtherHeroes": "??????????"
+    "otherHeroesTitle": "其他英雄",
+    "otherHeroesSubtitle": "其他",
+    "emptyOtherHeroes": "暂无可推荐的其他英雄。"
   },
   "StoryDetailPage": {
-    "heroTag": "????",
-    "scrollToStart": "??????",
-    "articleTag": "????",
-    "emptyContent": "?????????????????????????"
+    "heroTag": "短篇故事",
+    "scrollToStart": "下滑开始阅读",
+    "articleTag": "故事正文",
+    "emptyContent": "故事正文将在后续迭代补充更丰富的排版与叙事结构。"
   }
 }
