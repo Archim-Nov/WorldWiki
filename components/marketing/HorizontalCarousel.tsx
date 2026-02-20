@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 
 type CarouselItem = {
   _id: string
@@ -53,7 +53,7 @@ export function HorizontalCarousel({ items }: { items: CarouselItem[] }) {
         className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
       >
         {items.map((item) => (
-          <Link
+          <LocalizedLink
             key={item._id}
             href={item.href}
             className="group min-w-[220px] sm:min-w-[260px] rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
@@ -76,7 +76,7 @@ export function HorizontalCarousel({ items }: { items: CarouselItem[] }) {
               ) : null}
               <h4 className="text-lg font-semibold mt-2">{item.title}</h4>
             </div>
-          </Link>
+          </LocalizedLink>
         ))}
       </div>
 

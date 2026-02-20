@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 import styles from './page.module.css'
 
 type CountryKind = 'nation' | 'organization'
@@ -18,10 +19,6 @@ type Country = {
   mapImage?: string
 }
 
-function sectionTitle(kind: CountryKind) {
-  return kind === 'organization' ? '组织' : '国家'
-}
-
 function filterButtonClass(active: boolean) {
   return [
     'inline-flex items-center justify-center rounded-full border px-4 py-1.5 text-sm transition',
@@ -31,66 +28,58 @@ function filterButtonClass(active: boolean) {
   ].join(' ')
 }
 
-function renderCountrySection(kind: CountryKind, items: Country[]) {
+function renderCountrySection(kind: CountryKind, items: Country[], t: ReturnType<typeof useTranslations>) {
+  const isOrganization = kind === 'organization'
+
   if (items.length === 0) {
     return (
       <section>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-2xl font-semibold">{sectionTitle(kind)}</h2>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold">{isOrganization ? t('organization') : t('nation')}</h2>
           <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {kind === 'organization' ? 'Organizations' : 'Nations'}
+            {isOrganization ? t('subtitleOrganization') : t('subtitleNation')}
           </span>
         </div>
-        <p className={styles.empty}>
-          {kind === 'organization' ? '暂无组织内容。' : '暂无国家内容。'}
-        </p>
+        <p className={styles.empty}>{isOrganization ? t('emptyOrganization') : t('emptyNation')}</p>
       </section>
     )
   }
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-2xl font-semibold">{sectionTitle(kind)}</h2>
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">{isOrganization ? t('organization') : t('nation')}</h2>
         <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          {kind === 'organization' ? 'Organizations' : 'Nations'}
+          {isOrganization ? t('subtitleOrganization') : t('subtitleNation')}
         </span>
       </div>
       <div className="space-y-6">
         {items.map((country, i) => (
-          <Link
-            key={country._id}
-            href={`/countries/${country.slug.current}`}
-            className={styles.card}
-            >
-              <div className={styles.cardInner}>
-                <div className={styles.cardBg}>
-                  <Image
-                    src={country.mapImage ?? placeholders.country}
-                    alt={country.name}
-                    width={1400}
-                    height={900}
-                    className={styles.cardImage}
-                    sizes="(max-width: 1024px) 100vw, 1200px"
-                  />
-                </div>
+          <LocalizedLink key={country._id} href={`/countries/${country.slug.current}`} className={styles.card}>
+            <div className={styles.cardInner}>
+              <div className={styles.cardBg}>
+                <Image
+                  src={country.mapImage ?? placeholders.country}
+                  alt={country.name}
+                  width={1400}
+                  height={900}
+                  className={styles.cardImage}
+                  sizes="(max-width: 1024px) 100vw, 1200px"
+                />
+              </div>
               <div className={styles.cardOverlay} />
-              <span className={styles.cardIndex}>
-                {String(i + 1).padStart(2, '0')}
-              </span>
+              <span className={styles.cardIndex}>{String(i + 1).padStart(2, '0')}</span>
               <div className={styles.cardContent}>
                 <h2 className={styles.cardName}>{country.name}</h2>
-                {country.summary ? (
-                  <p className={styles.cardSummary}>{country.summary}</p>
-                ) : null}
+                {country.summary ? <p className={styles.cardSummary}>{country.summary}</p> : null}
                 <div className={styles.cardFooter}>
                   <span className={styles.cardCta}>
-                    {kind === 'organization' ? '探索组织' : '探索国家'}
+                    {isOrganization ? t('ctaOrganization') : t('ctaNation')}
                   </span>
                 </div>
               </div>
             </div>
-          </Link>
+          </LocalizedLink>
         ))}
       </div>
     </section>
@@ -104,6 +93,7 @@ export function CountriesFilterSection({
   countries: Country[]
   initialFilter: CountryFilter
 }) {
+  const t = useTranslations('CountriesFilter')
   const [currentFilter, setCurrentFilter] = useState<CountryFilter>(initialFilter)
 
   const nations = useMemo(
@@ -129,14 +119,14 @@ export function CountriesFilterSection({
 
   return (
     <div className="space-y-10">
-      <nav className="flex flex-wrap items-center gap-2" aria-label="国家和组织切换">
+      <nav className="flex flex-wrap items-center gap-2" aria-label={t('navAria')}>
         <button
           type="button"
           aria-pressed={currentFilter === 'all'}
           onClick={() => setCurrentFilter('all')}
           className={filterButtonClass(currentFilter === 'all')}
         >
-          全部
+          {t('all')}
         </button>
         <button
           type="button"
@@ -144,7 +134,7 @@ export function CountriesFilterSection({
           onClick={() => setCurrentFilter('nation')}
           className={filterButtonClass(currentFilter === 'nation')}
         >
-          国家
+          {t('nation')}
         </button>
         <button
           type="button"
@@ -152,12 +142,12 @@ export function CountriesFilterSection({
           onClick={() => setCurrentFilter('organization')}
           className={filterButtonClass(currentFilter === 'organization')}
         >
-          组织
+          {t('organization')}
         </button>
       </nav>
       <div className="space-y-14">
         {sections.map((section) => (
-          <div key={section.key}>{renderCountrySection(section.key, section.items)}</div>
+          <div key={section.key}>{renderCountrySection(section.key, section.items, t)}</div>
         ))}
       </div>
     </div>

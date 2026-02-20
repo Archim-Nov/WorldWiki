@@ -1,28 +1,68 @@
 /** @vitest-environment jsdom */
 
-import "@testing-library/jest-dom/vitest"
-import { cleanup, render, screen } from "@testing-library/react"
-import type { ReactNode } from "react"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import '@testing-library/jest-dom/vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { fetchMock, notFoundMock } = vi.hoisted(() => ({
   fetchMock: vi.fn(),
   notFoundMock: vi.fn(() => {
-    throw new Error("not-found")
+    throw new Error('not-found')
   }),
 }))
 
-vi.mock("@/lib/sanity/client", () => ({
+const countryMessages = {
+  emptyValue: 'Not recorded',
+  emptyCustoms: 'No customs notes yet.',
+  organizationTag: 'Organization Archive',
+  nationTag: 'Nation Atlas',
+  countLabelOrganization: 'Branches',
+  countLabelNation: 'Regions',
+  recordedRegions: 'Recorded region count',
+  overviewTitle: 'Overview',
+  cultureTitle: 'Culture',
+  fields: {
+    capitalHQ: 'Capital / HQ',
+    governance: 'Governance',
+    populationScale: 'Population / Scale',
+    currency: 'Currency',
+    languages: 'Languages',
+  },
+  relatedRegionsTitle: 'Related Regions',
+  relatedRegionsSubtitle: 'Exploration Entrances',
+}
+
+function getByPath(source: Record<string, unknown>, key: string): unknown {
+  return key.split('.').reduce<unknown>((acc, part) => {
+    if (acc && typeof acc === 'object' && part in (acc as Record<string, unknown>)) {
+      return (acc as Record<string, unknown>)[part]
+    }
+    return undefined
+  }, source)
+}
+
+vi.mock('@/lib/sanity/client', () => ({
   client: {
     fetch: fetchMock,
   },
 }))
 
-vi.mock("next/navigation", () => ({
+vi.mock('next-intl/server', () => ({
+  getLocale: async () => 'en',
+  getTranslations: async () => {
+    return (key: string) => {
+      const value = getByPath(countryMessages as unknown as Record<string, unknown>, key)
+      return typeof value === 'string' ? value : key
+    }
+  },
+}))
+
+vi.mock('next/navigation', () => ({
   notFound: notFoundMock,
 }))
 
-vi.mock("next/link", () => ({
+vi.mock('next/link', () => ({
   default: ({
     href,
     children,
@@ -38,9 +78,25 @@ vi.mock("next/link", () => ({
   ),
 }))
 
-import CountryDetailPage from "./page"
+vi.mock('@/components/marketing/RecommendationGrid', () => ({
+  RecommendationGrid: ({
+    items,
+  }: {
+    items: Array<{ _id: string; title: string; href: string }>
+  }) => (
+    <div data-testid="recommendation-grid">
+      {items.map((item) => (
+        <a key={item._id} href={`/en${item.href}`}>
+          {item.title}
+        </a>
+      ))}
+    </div>
+  ),
+}))
 
-describe("CountryDetailPage", () => {
+import CountryDetailPage from './page'
+
+describe('CountryDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -49,82 +105,80 @@ describe("CountryDetailPage", () => {
     cleanup()
   })
 
-  it("renders organization labels for organization entries", async () => {
+  it('renders organization labels for organization entries', async () => {
     fetchMock.mockResolvedValueOnce({
-      _id: "country-1",
-      name: "Order of Dawn",
-      kind: "organization",
+      _id: 'country-1',
+      name: 'Order of Dawn',
+      kind: 'organization',
       featuredRegions: [
         {
-          _id: "region-1",
-          name: "Harbor District",
-          slug: { current: "harbor-district" },
+          _id: 'region-1',
+          name: 'Harbor District',
+          slug: { current: 'harbor-district' },
         },
         {
-          _id: "region-2",
-          name: "Cathedral Ward",
-          slug: { current: "cathedral-ward" },
+          _id: 'region-2',
+          name: 'Cathedral Ward',
+          slug: { current: 'cathedral-ward' },
         },
         {
-          _id: "region-3",
-          name: "Iron Docks",
-          slug: { current: "iron-docks" },
+          _id: 'region-3',
+          name: 'Iron Docks',
+          slug: { current: 'iron-docks' },
         },
       ],
     })
 
     const page = await CountryDetailPage({
-      params: Promise.resolve({ slug: "order-of-dawn" }),
+      params: Promise.resolve({ slug: 'order-of-dawn' }),
     })
     render(page)
 
-    expect(
-      screen.getByRole("heading", { name: "Order of Dawn" })
-    ).toBeInTheDocument()
-    expect(screen.getByText("组织档案")).toBeInTheDocument()
-    expect(screen.getByText("分支")).toBeInTheDocument()
-    const harborLinks = screen.getAllByRole("link", { name: /Harbor District/i })
-    expect(harborLinks[0]).toHaveAttribute("href", "/regions/harbor-district")
+    expect(screen.getByRole('heading', { name: 'Order of Dawn' })).toBeInTheDocument()
+    expect(screen.getByText('Organization Archive')).toBeInTheDocument()
+    expect(screen.getByText('Branches')).toBeInTheDocument()
+    const harborLinks = screen.getAllByRole('link', { name: /Harbor District/i })
+    expect(harborLinks[0]).toHaveAttribute('href', '/en/regions/harbor-district')
   })
 
-  it("falls back to nation labels when kind is missing", async () => {
+  it('falls back to nation labels when kind is missing', async () => {
     fetchMock.mockResolvedValueOnce({
-      _id: "country-2",
-      name: "Avalon",
+      _id: 'country-2',
+      name: 'Avalon',
       featuredRegions: [
         {
-          _id: "region-9",
-          name: "Capital Ring",
-          slug: { current: "capital-ring" },
+          _id: 'region-9',
+          name: 'Capital Ring',
+          slug: { current: 'capital-ring' },
         },
         {
-          _id: "region-10",
-          name: "Old Harbor",
-          slug: { current: "old-harbor" },
+          _id: 'region-10',
+          name: 'Old Harbor',
+          slug: { current: 'old-harbor' },
         },
         {
-          _id: "region-11",
-          name: "Sky Market",
-          slug: { current: "sky-market" },
+          _id: 'region-11',
+          name: 'Sky Market',
+          slug: { current: 'sky-market' },
         },
       ],
     })
 
     const page = await CountryDetailPage({
-      params: Promise.resolve({ slug: "avalon" }),
+      params: Promise.resolve({ slug: 'avalon' }),
     })
     render(page)
 
-    expect(screen.getByText("国家图鉴")).toBeInTheDocument()
-    expect(screen.getAllByText("区域").length).toBeGreaterThan(0)
+    expect(screen.getByText('Nation Atlas')).toBeInTheDocument()
+    expect(screen.getByText('Regions')).toBeInTheDocument()
   })
 
-  it("calls notFound when country does not exist", async () => {
+  it('calls notFound when country does not exist', async () => {
     fetchMock.mockResolvedValueOnce(null)
 
     await expect(
-      CountryDetailPage({ params: Promise.resolve({ slug: "missing" }) })
-    ).rejects.toThrow("not-found")
+      CountryDetailPage({ params: Promise.resolve({ slug: 'missing' }) })
+    ).rejects.toThrow('not-found')
     expect(notFoundMock).toHaveBeenCalledOnce()
   })
 })

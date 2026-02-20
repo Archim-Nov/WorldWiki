@@ -2,12 +2,17 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { withLocalePrefix } from '@/i18n/path'
+import { defaultLocale, isValidLocale } from '@/i18n/routing'
 import type { User } from '@supabase/supabase-js'
 import type { UserRole } from '@/types/profile'
 
 export default function DashboardPage() {
+  const locale = useLocale()
+  const activeLocale = isValidLocale(locale) ? locale : defaultLocale
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<UserRole | null>(null)
   const router = useRouter()
@@ -31,7 +36,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/')
+    router.push(withLocalePrefix('/', activeLocale))
     router.refresh()
   }
 

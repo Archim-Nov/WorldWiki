@@ -27,6 +27,29 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
+vi.mock('next-intl', () => ({
+  useLocale: () => 'zh-CN',
+  useTranslations: () => {
+    const messages: Record<string, string> = {
+      title: 'µÇÂ¼',
+      email: 'ÓÊÏä',
+      password: 'ÃÜÂë',
+      submit: 'µÇÂ¼',
+      loading: 'µÇÂ¼ÖÐ...',
+      registerPrompt: 'Ã»ÓÐÕËºÅ£¿',
+      registerLink: '×¢²á',
+    }
+
+    return (key: string) => messages[key] ?? key
+  },
+}))
+
+vi.mock('@/components/i18n/LocalizedLink', () => ({
+  LocalizedLink: ({ href, children, ...props }: { href: unknown; children: React.ReactNode; [key: string]: unknown }) => (
+    <a href={typeof href === 'string' ? href : '/mock'} {...props}>{children}</a>
+  ),
+}))
+
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     auth: {
@@ -56,7 +79,7 @@ function getPasswordInput() {
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    searchParamGetMock.mockReturnValue('/stories')
+    searchParamGetMock.mockReturnValue('/zh-CN/stories')
     signInWithPasswordMock.mockResolvedValue({ error: null })
   })
 
@@ -70,17 +93,17 @@ describe('LoginPage', () => {
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'secret-123')
-    await user.click(screen.getByRole('button', { name: 'ç™»å½•' }))
+    await user.click(screen.getByRole('button', { name: 'µÇÂ¼' }))
 
     expect(signInWithPasswordMock).toHaveBeenCalledWith({
       email: 'alice@example.com',
       password: 'secret-123',
     })
-    expect(routerPushMock).toHaveBeenCalledWith('/stories')
+    expect(routerPushMock).toHaveBeenCalledWith('/zh-CN/stories')
     expect(routerRefreshMock).toHaveBeenCalledOnce()
   })
 
-  it('falls back to /dashboard when redirect param is unsafe', async () => {
+  it('falls back to localized /dashboard when redirect param is unsafe', async () => {
     searchParamGetMock.mockReturnValue('https://evil.example')
 
     const user = userEvent.setup()
@@ -88,9 +111,9 @@ describe('LoginPage', () => {
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'secret-123')
-    await user.click(screen.getByRole('button', { name: 'ç™»å½•' }))
+    await user.click(screen.getByRole('button', { name: 'µÇÂ¼' }))
 
-    expect(routerPushMock).toHaveBeenCalledWith('/dashboard')
+    expect(routerPushMock).toHaveBeenCalledWith('/zh-CN/dashboard')
   })
 
   it('renders auth error message when sign-in fails', async () => {
@@ -103,7 +126,7 @@ describe('LoginPage', () => {
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'wrong-password')
-    await user.click(screen.getByRole('button', { name: 'ç™»å½•' }))
+    await user.click(screen.getByRole('button', { name: 'µÇÂ¼' }))
 
     expect(screen.getByText('Invalid login credentials')).toBeInTheDocument()
     expect(routerPushMock).not.toHaveBeenCalled()

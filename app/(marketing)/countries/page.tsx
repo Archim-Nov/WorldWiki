@@ -1,3 +1,4 @@
+﻿import { getTranslations } from 'next-intl/server'
 import { client } from '@/lib/sanity/client'
 import { countriesQuery } from '@/lib/sanity/queries'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
@@ -28,6 +29,7 @@ export default async function CountriesPage({
 }: {
   searchParams?: Promise<{ kind?: string }>
 } = {}) {
+  const t = await getTranslations('CountriesPage')
   const countries: Country[] = await client.fetch(countriesQuery)
   const resolvedSearchParams = (await searchParams) ?? {}
   const initialFilter = normalizeCountryFilter(resolvedSearchParams.kind)
@@ -35,17 +37,13 @@ export default async function CountriesPage({
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
       <ScrollReveal as="header" className="max-w-2xl mb-14">
-        <p className={styles.eyebrow}>Countries</p>
-        <h1 className={styles.title}>国家与组织</h1>
-        <p className={styles.lead}>
-          按政治实体与组织体系两条路径，进入世界的版块与文明。
-        </p>
+        <p className={styles.eyebrow}>{t('eyebrow')}</p>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <p className={styles.lead}>{t('lead')}</p>
       </ScrollReveal>
 
       {countries.length === 0 ? (
-        <p className={styles.empty}>
-          暂无国家或组织内容，请先在 Studio 中创建。
-        </p>
+        <p className={styles.empty}>{t('empty')}</p>
       ) : (
         <CountriesFilterSection countries={countries} initialFilter={initialFilter} />
       )}

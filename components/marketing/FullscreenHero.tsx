@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { HeroFade } from './HeroFade'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 
 type HeroItem = {
   _id: string
@@ -14,6 +15,7 @@ type HeroItem = {
 }
 
 export function FullscreenHero({ items }: { items: HeroItem[] }) {
+  const t = useTranslations('FullscreenHero')
   const [active, setActive] = useState(0)
   const [direction, setDirection] = useState<'next' | 'prev'>('next')
   const total = items.length
@@ -34,7 +36,7 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
       setDirection(index > active ? 'next' : 'prev')
       setActive(index)
     },
-    [active],
+    [active]
   )
 
   useEffect(() => {
@@ -77,36 +79,30 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
 
         <div className="hero-fs-welcome" aria-hidden="true">
           <div className="hero-fs-welcome-lockup">
-            <p className="hero-fs-welcome-kicker">Museum Universe Archive</p>
-            <p
-              className="hero-fs-welcome-title"
-              style={{ fontFamily: 'var(--font-cinzel), serif' }}
-            >
+            <p className="hero-fs-welcome-kicker">{t('welcomeKicker')}</p>
+            <p className="hero-fs-welcome-title" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
               WorldWiki
             </p>
-            <p className="hero-fs-welcome-subtitle">
-              一个以详情为入口的世界观档案馆
-            </p>
+            <p className="hero-fs-welcome-subtitle">{t('welcomeSubtitle')}</p>
           </div>
         </div>
 
         <div className="hero-fs-overlay" />
         <div className="hero-fs-vignette" />
 
-        {/* Bottom bar — inside stage for absolute positioning */}
         <div className="hero-fs-bottom">
           <div className="hero-fs-content">
             <div className="hero-fs-meta">
               <span className="hero-fs-tag">{current.typeLabel}</span>
               <h1 className="hero-fs-title" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
-                <Link href={current.href} className="hero-fs-title-link">
+                <LocalizedLink href={current.href} className="hero-fs-title-link">
                   {current.title}
-                </Link>
+                </LocalizedLink>
               </h1>
             </div>
 
             <div className="hero-fs-scroll">
-              <span>Scroll</span>
+              <span>{t('scroll')}</span>
               <div className="hero-fs-scroll-track">
                 <div className="hero-fs-scroll-thumb" />
               </div>
@@ -115,12 +111,17 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
         </div>
       </div>
 
-      {/* Nav — outside Link to avoid nested interactive elements */}
       {total > 1 ? (
         <div className="hero-fs-nav">
-          <button type="button" onClick={goPrev} className="hero-fs-arrow" aria-label="Previous">
+          <button type="button" onClick={goPrev} className="hero-fs-arrow" aria-label={t('prev')}>
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M12.5 15L7.5 10L12.5 5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <div className="hero-fs-dots">
@@ -134,9 +135,15 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
               />
             ))}
           </div>
-          <button type="button" onClick={goNext} className="hero-fs-arrow" aria-label="Next">
+          <button type="button" onClick={goNext} className="hero-fs-arrow" aria-label={t('next')}>
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-              <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M7.5 5L12.5 10L7.5 15"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>

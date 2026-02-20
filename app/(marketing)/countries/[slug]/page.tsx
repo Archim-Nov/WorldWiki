@@ -1,10 +1,12 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/sanity/client'
 import { countryBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
 import { RecommendationGrid } from '@/components/marketing/RecommendationGrid'
+import { withLocalePrefix } from '@/i18n/path'
 import {
   addRecommendations,
   RecommendationItem,
@@ -33,14 +35,13 @@ type Country = {
   }>
 }
 
-const EMPTY_VALUE_TEXT = '未记录'
-const EMPTY_CUSTOMS_TEXT = '暂无习俗记录。'
-
 export default async function CountryDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
+  const locale = await getLocale()
+  const t = await getTranslations('CountryDetailPage')
   const { slug } = await params
   const country: Country | null = await client.fetch(countryBySlugQuery, {
     slug,
@@ -50,12 +51,14 @@ export default async function CountryDetailPage({
     notFound()
   }
 
+  const emptyValue = t('emptyValue')
   const regionCount = country.featuredRegions?.length ?? 0
   const isOrganization = country.kind === 'organization'
   const languages =
     country.languages && country.languages.length > 0
       ? country.languages.join(' / ')
-      : EMPTY_VALUE_TEXT
+      : emptyValue
+
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
 
@@ -125,7 +128,14 @@ export default async function CountryDetailPage({
   }
 
   return (
-    <div className="country-detail" style={country.themeColor ? { '--theme-hue': country.themeColor } as React.CSSProperties : undefined}>
+    <div
+      className="country-detail"
+      style={
+        country.themeColor
+          ? ({ '--theme-hue': country.themeColor } as React.CSSProperties)
+          : undefined
+      }
+    >
       <section className="country-hero">
         <div className="country-hero-bleed">
           <Image
@@ -142,102 +152,94 @@ export default async function CountryDetailPage({
         <div className="country-hero-content">
           <div className="country-hero-lockup">
             <span className="country-hero-tag">
-              {isOrganization ? '组织档案' : '国家图鉴'}
+              {isOrganization ? t('organizationTag') : t('nationTag')}
             </span>
             <h1 className="country-hero-title">{country.name}</h1>
-            {country.summary && (
-              <p className="country-hero-summary">{country.summary}</p>
-            )}
+            {country.summary ? <p className="country-hero-summary">{country.summary}</p> : null}
           </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4 detail-body">
-      <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border bg-card p-4 sm:p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {isOrganization ? '分支' : '区域'}
-          </p>
-          <p className="text-2xl font-semibold mt-3">{regionCount}</p>
-          <p className="text-sm text-muted-foreground mt-2">已记录区域数量</p>
-        </div>
-        <div className="rounded-2xl border bg-card p-4 sm:p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            概况
-          </p>
-          <div className="mt-3 space-y-2 text-sm">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">首都/总部</span>
-              <span>{country.capital ?? EMPTY_VALUE_TEXT}</span>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">治理结构</span>
-              <span>{country.governance ?? EMPTY_VALUE_TEXT}</span>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">人口/规模</span>
-              <span>{country.population ?? EMPTY_VALUE_TEXT}</span>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border bg-card p-4 sm:p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            文化
-          </p>
-          <div className="mt-3 space-y-2 text-sm">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">货币</span>
-              <span>{country.currency ?? EMPTY_VALUE_TEXT}</span>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">语言</span>
-              <span>{languages}</span>
-            </div>
-            {country.motto ? (
-              <p className="text-muted-foreground pt-1">“{country.motto}”</p>
-            ) : null}
-            <p className="text-muted-foreground">
-              {country.customs ?? EMPTY_CUSTOMS_TEXT}
+        <section className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border bg-card p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {isOrganization ? t('countLabelOrganization') : t('countLabelNation')}
             </p>
+            <p className="mt-3 text-2xl font-semibold">{regionCount}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('recordedRegions')}</p>
           </div>
-        </div>
-      </section>
 
-      {country.featuredRegions && country.featuredRegions.length > 0 && (
-        <section className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">相关区域</h2>
-            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              探索入口
-            </span>
+          <div className="rounded-2xl border bg-card p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('overviewTitle')}</p>
+            <div className="mt-3 space-y-2 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{t('fields.capitalHQ')}</span>
+                <span>{country.capital ?? emptyValue}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{t('fields.governance')}</span>
+                <span>{country.governance ?? emptyValue}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{t('fields.populationScale')}</span>
+                <span>{country.population ?? emptyValue}</span>
+              </div>
+            </div>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {country.featuredRegions.map((region) => (
-              <Link
-                key={region._id}
-                href={`/regions/${region.slug.current}`}
-                className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                <div className="aspect-[4/5] bg-muted">
-                  <Image
-                    src={region.mapImage ?? placeholders.region}
-                    alt={region.name}
-                    width={960}
-                    height={1200}
-                    className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold">{region.name}</h3>
-                </div>
-              </Link>
-            ))}
+
+          <div className="rounded-2xl border bg-card p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('cultureTitle')}</p>
+            <div className="mt-3 space-y-2 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{t('fields.currency')}</span>
+                <span>{country.currency ?? emptyValue}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{t('fields.languages')}</span>
+                <span>{languages}</span>
+              </div>
+              {country.motto ? <p className="pt-1 text-muted-foreground">“{country.motto}”</p> : null}
+              <p className="text-muted-foreground">{country.customs ?? t('emptyCustoms')}</p>
+            </div>
           </div>
         </section>
-      )}
 
-      <RecommendationGrid items={recommendations} />
+        {country.featuredRegions && country.featuredRegions.length > 0 ? (
+          <section className="mt-12">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">{t('relatedRegionsTitle')}</h2>
+              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                {t('relatedRegionsSubtitle')}
+              </span>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {country.featuredRegions.map((region) => (
+                <Link
+                  key={region._id}
+                  href={withLocalePrefix(`/regions/${region.slug.current}`, locale)}
+                  className="group overflow-hidden rounded-2xl border bg-card transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className="aspect-[4/5] bg-muted">
+                    <Image
+                      src={region.mapImage ?? placeholders.region}
+                      alt={region.name}
+                      width={960}
+                      height={1200}
+                      className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{region.name}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <RecommendationGrid items={recommendations} />
       </div>
     </div>
   )

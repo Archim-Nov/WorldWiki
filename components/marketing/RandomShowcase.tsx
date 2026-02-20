@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { RecommendationItem } from '@/lib/recommendations'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 
 function shuffle<T>(items: T[]): T[] {
   const array = [...items]
@@ -23,9 +24,8 @@ type Props = {
 }
 
 export function RandomShowcase({ items }: Props) {
-  const [displayed, setDisplayed] = useState<RecommendationItem[]>(() =>
-    items.slice(0, 5)
-  )
+  const t = useTranslations('RandomShowcase')
+  const [displayed, setDisplayed] = useState<RecommendationItem[]>(() => items.slice(0, 5))
   const [spinning, setSpinning] = useState(false)
 
   useEffect(() => {
@@ -51,12 +51,12 @@ export function RandomShowcase({ items }: Props) {
           className="text-xs uppercase tracking-[0.3em] text-muted-foreground"
           style={{ fontFamily: 'var(--font-cinzel), serif' }}
         >
-          Random Details
+          {t('kicker')}
         </span>
-        <h2 className="text-2xl font-semibold mt-2">随机展柜</h2>
+        <h2 className="text-2xl font-semibold mt-2">{t('title')}</h2>
         <button
           onClick={handleShuffle}
-          aria-label="随机刷新"
+          aria-label={t('shuffleAria')}
           className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary transition-colors cursor-pointer"
         >
           <svg
@@ -80,16 +80,21 @@ export function RandomShowcase({ items }: Props) {
       </div>
 
       {displayed.length > 0 ? (
-        <div className="grid gap-3" style={{ gridTemplateRows: '1fr 1fr', gridTemplateColumns: '3fr 2fr 2fr', aspectRatio: '2 / 1' }}>
-          {big && (
-            <ShowcaseCard card={big} className="row-span-2 h-full" tall />
-          )}
+        <div
+          className="grid gap-3"
+          style={{
+            gridTemplateRows: '1fr 1fr',
+            gridTemplateColumns: '3fr 2fr 2fr',
+            aspectRatio: '2 / 1',
+          }}
+        >
+          {big ? <ShowcaseCard card={big} className="row-span-2 h-full" tall /> : null}
           {smalls.map((card) => (
             <ShowcaseCard key={card._id} card={card} />
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">暂无内容可展示。</p>
+        <p className="text-sm text-muted-foreground">{t('empty')}</p>
       )}
     </section>
   )
@@ -105,7 +110,7 @@ function ShowcaseCard({
   className?: string
 }) {
   return (
-    <Link
+    <LocalizedLink
       href={card.href}
       className={`group relative overflow-hidden border border-border/30 ${tall ? 'rounded-2xl' : 'rounded-lg'} ${className ?? ''}`}
     >
@@ -116,7 +121,7 @@ function ShowcaseCard({
           width={1200}
           height={800}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-          sizes={tall ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
+          sizes={tall ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 100vw, 33vw'}
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -134,6 +139,6 @@ function ShowcaseCard({
           {card.title}
         </h3>
       </div>
-    </Link>
+    </LocalizedLink>
   )
 }

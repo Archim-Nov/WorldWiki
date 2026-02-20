@@ -1,7 +1,9 @@
 import Link from "next/link"
 import Image from "next/image"
+import { getLocale } from "next-intl/server"
 import { client } from "@/lib/sanity/client"
 import { globalSearchQuery } from "@/lib/sanity/queries"
+import { withLocalePrefix } from "@/i18n/path"
 import {
   buildSearchTerm,
   normalizeSearchKeyword,
@@ -15,6 +17,7 @@ type SearchPageProps = {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const locale = await getLocale()
   const params = await searchParams
   const rawQuery = Array.isArray(params.q) ? params.q[0] : params.q
   const keyword = normalizeSearchKeyword(rawQuery)
@@ -58,7 +61,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             return (
               <Link
                 key={item._id}
-                href={item.href}
+                href={withLocalePrefix(item.href, locale)}
                 className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="aspect-[16/10] bg-muted">

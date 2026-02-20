@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 import styles from '@/app/(marketing)/champions/page.module.css'
 
 type HeroCard = {
@@ -27,12 +28,11 @@ function uniqueOptions(options: Option[]) {
       unique.set(option.value, option)
     }
   }
-  return Array.from(unique.values()).sort((a, b) =>
-    a.label.localeCompare(b.label)
-  )
+  return Array.from(unique.values()).sort((a, b) => a.label.localeCompare(b.label))
 }
 
 export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
+  const t = useTranslations('ChampionsFilter')
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
 
@@ -61,10 +61,7 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
   const filteredHeroes = useMemo(
     () =>
       heroes.filter((hero) => {
-        if (
-          selectedCountry &&
-          hero.country?.slug.current !== selectedCountry
-        ) {
+        if (selectedCountry && hero.country?.slug.current !== selectedCountry) {
           return false
         }
         if (selectedRegion && hero.region?.slug.current !== selectedRegion) {
@@ -82,11 +79,9 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
       <section className="rounded-2xl border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Filters
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Showing {filteredHeroes.length} of {heroes.length}
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{t('filters')}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('showing', { current: filteredHeroes.length, total: heroes.length })}
             </p>
           </div>
           {hasFilters ? (
@@ -98,16 +93,14 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
               }}
               className="text-xs uppercase tracking-[0.2em] text-primary"
             >
-              Clear filters
+              {t('clearFilters')}
             </button>
           ) : null}
         </div>
 
         <div className="mt-5 space-y-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
-              Country
-            </p>
+            <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('country')}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -118,7 +111,7 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
                     : 'text-muted-foreground hover:border-primary'
                 }`}
               >
-                All
+                {t('all')}
               </button>
               {countries.map((country) => (
                 <button
@@ -142,9 +135,7 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
-              Region
-            </p>
+            <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('region')}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -155,7 +146,7 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
                     : 'text-muted-foreground hover:border-primary'
                 }`}
               >
-                All
+                {t('all')}
               </button>
               {regions.map((region) => (
                 <button
@@ -181,14 +172,11 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
       </section>
 
       {filteredHeroes.length === 0 ? (
-        <div className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground">
-          No champions match the selected filters. Try clearing filters to see
-          everything.
-        </div>
+        <div className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground">{t('empty')}</div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredHeroes.map((hero) => (
-            <Link
+            <LocalizedLink
               key={hero._id}
               href={`/champions/${hero.slug.current}`}
               className={`group ${styles.card}`}
@@ -206,19 +194,15 @@ export function ChampionsFilter({ heroes }: { heroes: HeroCard[] }) {
               <div className={styles.cardOverlay} />
               <div className={styles.cardContent}>
                 <h2 className={styles.cardName}>{hero.name}</h2>
-                {hero.title ? (
-                  <p className={styles.cardTitle}>{hero.title}</p>
-                ) : null}
+                {hero.title ? <p className={styles.cardTitle}>{hero.title}</p> : null}
                 <div className={styles.cardTags}>
-                  {hero.faction ? (
-                    <span className={styles.cardTag}>{hero.faction}</span>
-                  ) : null}
+                  {hero.faction ? <span className={styles.cardTag}>{hero.faction}</span> : null}
                   {hero.roles && hero.roles.length > 0 ? (
                     <span className={styles.cardTag}>{hero.roles[0]}</span>
                   ) : null}
                 </div>
               </div>
-            </Link>
+            </LocalizedLink>
           ))}
         </div>
       )}

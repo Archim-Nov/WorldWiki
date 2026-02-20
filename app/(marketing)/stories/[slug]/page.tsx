@@ -1,5 +1,6 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 import { client } from '@/lib/sanity/client'
 import { storyBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
@@ -53,6 +54,7 @@ export default async function StoryDetailPage({
 }: {
   params: Promise<{ slug: string }>
 }) {
+  const t = await getTranslations('StoryDetailPage')
   const { slug } = await params
   const story: Story | null = await client.fetch(storyBySlugQuery, {
     slug,
@@ -94,17 +96,8 @@ export default async function StoryDetailPage({
 
   addRecommendations(recommendations, seen, story.relatedHeroes ?? [], 'hero')
   addRecommendations(recommendations, seen, story.relatedRegions ?? [], 'region')
-  addRecommendations(
-    recommendations,
-    seen,
-    story.relatedCreatures ?? [],
-    'creature'
-  )
-  addRecommendations(
-    recommendations,
-    seen,
-    linkedRefs as RecommendationSource[]
-  )
+  addRecommendations(recommendations, seen, story.relatedCreatures ?? [], 'creature')
+  addRecommendations(recommendations, seen, linkedRefs as RecommendationSource[])
 
   const regionIds = Array.from(
     new Set(
@@ -216,19 +209,19 @@ export default async function StoryDetailPage({
         </div>
         <div className="story-hero-content">
           <div className="story-hero-lockup">
-            <span className="story-hero-tag">Short Story</span>
+            <span className="story-hero-tag">{t('heroTag')}</span>
             <h1 className="story-hero-title">{story.title}</h1>
           </div>
         </div>
         <div className="story-scroll-cta">
-          <span>滚屏以开始</span>
+          <span>{t('scrollToStart')}</span>
           <i className="story-scroll-arrow" />
         </div>
       </section>
 
-      <div className="container mx-auto px-4 story-body-wrap">
+      <div className="story-body-wrap container mx-auto px-4">
         <header className="story-article-header">
-          <span className="story-article-tag">Short Story</span>
+          <span className="story-article-tag">{t('articleTag')}</span>
           <h2 className="story-article-title">{story.title}</h2>
           <span className="story-article-divider" />
         </header>
@@ -240,10 +233,7 @@ export default async function StoryDetailPage({
                 <PortableContent value={story.content} />
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground leading-7">
-                故事正文将在后续阶段完成富文本排版与渲染。这里将承载更具沉浸感的
-                叙事段落、章节标题与引文。
-              </p>
+              <p className="text-sm leading-7 text-muted-foreground">{t('emptyContent')}</p>
             )}
           </article>
         </section>

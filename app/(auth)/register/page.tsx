@@ -2,10 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
+import { withLocalePrefix } from '@/i18n/path'
+import { defaultLocale, isValidLocale } from '@/i18n/routing'
 
 export default function RegisterPage() {
+  const t = useTranslations('AuthRegister')
+  const locale = useLocale()
+  const activeLocale = isValidLocale(locale) ? locale : defaultLocale
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,36 +20,37 @@ export default function RegisterPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
+
+  const defaultRedirect = withLocalePrefix('/dashboard', activeLocale)
   const redirectParam = searchParams.get('redirect')
   const redirectTo =
-    redirectParam && redirectParam.startsWith('/') ? redirectParam : '/dashboard'
+    redirectParam && redirectParam.startsWith('/') ? redirectParam : defaultRedirect
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signUp({
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
     })
 
-    if (error) {
-      setError(error.message)
+    if (signUpError) {
+      setError(signUpError.message)
       setLoading(false)
     } else {
-      router.push(
-        `/login?registered=true&redirect=${encodeURIComponent(redirectTo)}`
-      )
+      const loginPath = withLocalePrefix('/login', activeLocale)
+      router.push(`${loginPath}?registered=true&redirect=${encodeURIComponent(redirectTo)}`)
     }
   }
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-md">
-      <h1 className="text-2xl font-bold mb-8 text-center">注册</h1>
+      <h1 className="text-2xl font-bold mb-8 text-center">{t('title')}</h1>
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
-          <label className="block text-sm mb-1">邮箱</label>
+          <label className="block text-sm mb-1">{t('email')}</label>
           <input
             type="email"
             value={email}
@@ -52,7 +60,7 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label className="block text-sm mb-1">密码</label>
+          <label className="block text-sm mb-1">{t('password')}</label>
           <input
             type="password"
             value={password}
@@ -68,17 +76,20 @@ export default function RegisterPage() {
           disabled={loading}
           className="w-full bg-primary text-primary-foreground py-2 rounded-md"
         >
-          {loading ? '注册中...' : '注册'}
+          {loading ? t('loading') : t('submit')}
         </button>
       </form>
       <p className="text-center mt-4 text-sm">
-        已有账号？{' '}
-        <Link
-          href={`/login?redirect=${encodeURIComponent(redirectTo)}`}
+        {t('loginPrompt')}{' '}
+        <LocalizedLink
+          href={{
+            pathname: '/login',
+            query: { redirect: redirectTo },
+          }}
           className="underline"
         >
-          登录
-        </Link>
+          {t('loginLink')}
+        </LocalizedLink>
       </p>
     </div>
   )

@@ -21,12 +21,35 @@ vi.mock("next/link", () => ({
   ),
 }))
 
+vi.mock("next-intl", () => ({
+  useLocale: () => "zh-CN",
+  useTranslations: () => {
+    const messages: Record<string, string> = {
+      "nav.countries": "Countries",
+      "nav.regions": "Regions",
+      "nav.creatures": "Creatures",
+      "nav.champions": "Champions",
+      "nav.magics": "Magics",
+      "nav.stories": "Stories",
+      "search.placeholder": "Search",
+      "search.aria": "Search site",
+      "search.submit": "Submit search",
+    }
+
+    return (key: string) => messages[key] ?? key
+  },
+}))
+
 vi.mock("./UserNav", () => ({
   UserNav: () => <span data-testid="user-nav" />,
 }))
 
 vi.mock("./ThemeToggle", () => ({
   ThemeToggle: () => <span data-testid="theme-toggle" />,
+}))
+
+vi.mock("./LanguageSwitcher", () => ({
+  LanguageSwitcher: () => <span data-testid="language-switcher" />,
 }))
 
 vi.mock("./ScrollHeader", () => ({
@@ -42,17 +65,28 @@ describe("Header", () => {
     cleanup()
   })
 
-  it("renders search form targeting /search with query field", () => {
+  it("renders localized links and right utility controls", () => {
     const { container } = render(<Header />)
 
-    const form = container.querySelector("form")
-    const input = screen.getByRole("searchbox", { name: "搜索" })
-    const submit = screen.getByRole("button", { name: "提交搜索" })
+    expect(screen.getByRole("link", { name: "WorldWiki" })).toHaveAttribute("href", "/zh-CN")
+    expect(screen.getByRole("link", { name: "Countries" })).toHaveAttribute("href", "/zh-CN/countries")
+    expect(screen.getByRole("link", { name: "Regions" })).toHaveAttribute("href", "/zh-CN/regions")
+    expect(screen.getByRole("link", { name: "Creatures" })).toHaveAttribute("href", "/zh-CN/creatures")
+    expect(screen.getByRole("link", { name: "Champions" })).toHaveAttribute("href", "/zh-CN/champions")
+    expect(screen.getByRole("link", { name: "Magics" })).toHaveAttribute("href", "/zh-CN/magics")
+    expect(screen.getByRole("link", { name: "Stories" })).toHaveAttribute("href", "/zh-CN/stories")
 
-    expect(form).toBeInTheDocument()
-    expect(form?.getAttribute("action")).toContain("/search")
-    expect(form?.getAttribute("method")).toBe("get")
-    expect(input).toHaveAttribute("name", "q")
+    const search = screen.getByRole("searchbox", { name: "Search site" })
+    const submit = screen.getByRole("button", { name: "Submit search" })
+    const form = container.querySelector("form")
+
+    expect(search).toBeInTheDocument()
+    expect(search).toHaveAttribute("name", "q")
     expect(submit).toBeInTheDocument()
+    expect(form?.getAttribute("action")).toContain("/zh-CN/search")
+
+    expect(screen.getByTestId("language-switcher")).toBeInTheDocument()
+    expect(screen.getByTestId("theme-toggle")).toBeInTheDocument()
+    expect(screen.getByTestId("user-nav")).toBeInTheDocument()
   })
 })

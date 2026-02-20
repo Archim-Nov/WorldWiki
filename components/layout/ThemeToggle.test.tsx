@@ -14,6 +14,19 @@ vi.mock("next-themes", () => ({
   useTheme: mockUseTheme,
 }))
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => {
+    const messages: Record<string, string> = {
+      buttonAria: "Toggle theme",
+      "options.light": "Light",
+      "options.dark": "Dark",
+      "options.system": "System",
+    }
+
+    return (key: string) => messages[key] ?? key
+  },
+}))
+
 import { ThemeToggle } from "./ThemeToggle"
 
 describe("ThemeToggle", () => {
@@ -31,42 +44,34 @@ describe("ThemeToggle", () => {
 
   it("opens menu and selects a theme option", async () => {
     const user = userEvent.setup()
-    const { container } = render(<ThemeToggle />)
+    render(<ThemeToggle />)
 
-    let toggleButton: HTMLButtonElement | null = null
-    await waitFor(() => {
-      toggleButton = container.querySelector("button[aria-label]")
-      expect(toggleButton).not.toBeNull()
-    })
+    const toggleButton = await screen.findByRole("button", { name: "Toggle theme" })
+    await user.click(toggleButton)
 
-    await user.click(toggleButton!)
-    expect(container.querySelectorAll("button")).toHaveLength(4)
+    const darkOption = screen.getByRole("button", { name: "Dark" })
+    await user.click(darkOption)
 
-    const buttons = Array.from(container.querySelectorAll("button"))
-    await user.click(buttons[2])
     expect(setThemeMock).toHaveBeenCalledWith("dark")
-    expect(container.querySelectorAll("button")).toHaveLength(1)
+    expect(screen.queryByRole("button", { name: "Dark" })).toBeNull()
   })
 
   it("closes menu when clicking outside", async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <div>
         <ThemeToggle />
         <button type="button">outside</button>
       </div>
     )
 
-    let toggleButton: HTMLButtonElement | null = null
-    await waitFor(() => {
-      toggleButton = container.querySelector("button[aria-label]")
-      expect(toggleButton).not.toBeNull()
-    })
-
-    await user.click(toggleButton!)
-    expect(container.querySelectorAll("button")).toHaveLength(5)
+    const toggleButton = await screen.findByRole("button", { name: "Toggle theme" })
+    await user.click(toggleButton)
+    expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "outside" }))
-    expect(container.querySelectorAll("button")).toHaveLength(2)
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Dark" })).toBeNull()
+    })
   })
 })

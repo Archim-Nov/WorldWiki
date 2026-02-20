@@ -1,5 +1,7 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
+import { getLocale, getTranslations } from 'next-intl/server'
+import { withLocalePrefix } from '@/i18n/path'
 
 type RecommendationItem = {
   _id: string
@@ -9,23 +11,37 @@ type RecommendationItem = {
   typeLabel: string
 }
 
-export function RecommendationGrid({
-  title = '相关推荐',
-  subtitle = 'Related Picks',
+export async function RecommendationGrid({
+  title,
+  subtitle,
   items,
 }: {
   title?: string
   subtitle?: string
   items: RecommendationItem[]
 }) {
+  const locale = await getLocale()
+  const t = await getTranslations('RecommendationGrid')
+  const resolvedTitle = title ?? t('title')
+  const resolvedSubtitle = subtitle ?? t('subtitle')
   const displayItems = items.slice(0, 3)
+
+  const localizeTypeLabel = (href: string, fallback: string) => {
+    if (href.startsWith('/champions/')) return t('types.hero')
+    if (href.startsWith('/regions/')) return t('types.region')
+    if (href.startsWith('/countries/')) return t('types.country')
+    if (href.startsWith('/creatures/')) return t('types.creature')
+    if (href.startsWith('/stories/')) return t('types.story')
+    if (href.startsWith('/magics/')) return t('types.magic')
+    return fallback
+  }
 
   return (
     <section className="mt-14">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold">{title}</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">{resolvedTitle}</h2>
         <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          {subtitle}
+          {resolvedSubtitle}
         </span>
       </div>
       {displayItems.length > 0 ? (
@@ -33,8 +49,8 @@ export function RecommendationGrid({
           {displayItems.map((item) => (
             <Link
               key={item._id}
-              href={item.href}
-              className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
+              href={withLocalePrefix(item.href, locale)}
+              className="group overflow-hidden rounded-2xl border bg-card transition hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="aspect-[4/3] bg-muted">
                 <Image
@@ -47,16 +63,16 @@ export function RecommendationGrid({
                 />
               </div>
               <div className="p-4">
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.2em]">
-                  {item.typeLabel}
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  {localizeTypeLabel(item.href, item.typeLabel)}
                 </div>
-                <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+                <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
               </div>
             </Link>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">暂无相关推荐内容。</p>
+        <p className="text-sm text-muted-foreground">{t('empty')}</p>
       )}
     </section>
   )

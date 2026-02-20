@@ -1,22 +1,34 @@
-/** @vitest-environment jsdom */
+﻿/** @vitest-environment jsdom */
 /* eslint-disable @next/next/no-img-element */
 
-import "@testing-library/jest-dom/vitest"
-import { cleanup, render, screen } from "@testing-library/react"
-import type { ElementType, ReactNode } from "react"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import '@testing-library/jest-dom/vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import type { ElementType, ReactNode } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { fetchMock } = vi.hoisted(() => ({
   fetchMock: vi.fn(),
 }))
 
-vi.mock("@/lib/sanity/client", () => ({
+const regionMessages = {
+  eyebrow: 'Regions',
+  title: 'Region Gallery',
+  lead: 'Use maps and environments as clues to enter each fragment of the world.',
+  empty: 'No region entries yet. Create entries in Studio first.',
+}
+
+vi.mock('@/lib/sanity/client', () => ({
   client: {
     fetch: fetchMock,
   },
 }))
 
-vi.mock("next/link", () => ({
+vi.mock('next-intl/server', () => ({
+  getLocale: async () => 'en',
+  getTranslations: async () => (key: string) => regionMessages[key as keyof typeof regionMessages] ?? key,
+}))
+
+vi.mock('next/link', () => ({
   default: ({
     href,
     children,
@@ -32,7 +44,7 @@ vi.mock("next/link", () => ({
   ),
 }))
 
-vi.mock("next/image", () => ({
+vi.mock('next/image', () => ({
   default: ({
     src,
     alt,
@@ -44,19 +56,19 @@ vi.mock("next/image", () => ({
   }) => <img src={src} alt={alt} {...props} />,
 }))
 
-vi.mock("@/components/marketing/ScrollReveal", () => ({
+vi.mock('@/components/marketing/ScrollReveal', () => ({
   ScrollReveal: ({
     children,
-    as: Tag = "div",
+    as: Tag = 'div',
   }: {
     children: ReactNode
     as?: ElementType
   }) => <Tag>{children}</Tag>,
 }))
 
-import RegionsPage from "./page"
+import RegionsPage from './page'
 
-describe("RegionsPage", () => {
+describe('RegionsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -65,36 +77,34 @@ describe("RegionsPage", () => {
     cleanup()
   })
 
-  it("renders empty state when there are no regions", async () => {
+  it('renders empty state when there are no regions', async () => {
     fetchMock.mockResolvedValue([])
     const page = await RegionsPage()
     render(page)
 
-    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: regionMessages.title })).toBeInTheDocument()
+    expect(screen.getByText(regionMessages.empty)).toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 
-  it("renders region cards and links", async () => {
+  it('renders region cards and links', async () => {
     fetchMock.mockResolvedValue([
       {
-        _id: "region-1",
-        name: "Frost Vale",
-        slug: { current: "frost-vale" },
-        summary: "Frozen frontier",
-        country: { name: "Avalon", slug: { current: "avalon" } },
+        _id: 'region-1',
+        name: 'Frost Vale',
+        slug: { current: 'frost-vale' },
+        summary: 'Frozen frontier',
+        country: { name: 'Avalon', slug: { current: 'avalon' } },
       },
     ])
 
     const page = await RegionsPage()
     render(page)
 
-    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /Frost Vale/i })).toHaveAttribute(
-      "href",
-      "/regions/frost-vale"
-    )
-    expect(screen.getByText("Avalon")).toBeInTheDocument()
-    expect(screen.getByText("Frozen frontier")).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: regionMessages.title })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Frost Vale/i })).toHaveAttribute('href', '/en/regions/frost-vale')
+    expect(screen.getByText('Avalon')).toBeInTheDocument()
+    expect(screen.getByText('Frozen frontier')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })

@@ -1,0 +1,390 @@
+{
+  "Header": {
+    "nav": {
+      "countries": "Countries",
+      "regions": "Regions",
+      "creatures": "Creatures",
+      "champions": "Champions",
+      "magics": "Magics",
+      "stories": "Stories"
+    },
+    "search": {
+      "placeholder": "Search",
+      "aria": "Search site",
+      "submit": "Submit search"
+    }
+  },
+  "LanguageSwitcher": {
+    "buttonAria": "Select language",
+    "options": {
+      "en": "English",
+      "zh-CN": "Chinese"
+    }
+  },
+  "ThemeToggle": {
+    "buttonAria": "Toggle theme",
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "Footer": {
+    "about": "About",
+    "contact": "Contact",
+    "copyright": "© {year} WorldWiki. All rights reserved."
+  },
+  "UserNav": {
+    "login": "Login"
+  },
+  "NotFound": {
+    "description": "Page not found.",
+    "backHome": "Back to home"
+  },
+  "AuthLogin": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "loading": "Logging in...",
+    "registerPrompt": "No account yet?",
+    "registerLink": "Register"
+  },
+  "AuthRegister": {
+    "title": "Register",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Register",
+    "loading": "Registering...",
+    "loginPrompt": "Already have an account?",
+    "loginLink": "Login"
+  },
+  "HomePage": {
+    "kicker": "Museum Universe",
+    "title": "Start from details, then explore the world.",
+    "description": "Random showcases present slices of content, while latest champions and countries stay pinned as curated entrances.",
+    "randomEmpty": "No content available yet.",
+    "championsKicker": "Champions",
+    "championsTitle": "Champions",
+    "championsEmpty": "No champion entries yet.",
+    "countriesKicker": "Countries",
+    "countriesTitle": "Countries",
+    "countriesEmpty": "No country entries yet.",
+    "types": {
+      "hero": "Champion",
+      "region": "Region",
+      "country": "Country",
+      "creature": "Creature",
+      "story": "Story",
+      "magic": "Magic"
+    }
+  },
+  "AboutPage": {
+    "eyebrow": "About",
+    "title": "About this museum universe",
+    "intro": "This is not a showcase site, but an explorable game universe archive connected by characters, regions, creatures and stories.",
+    "exploreTitle": "How to explore",
+    "exploreDesc": "Enter from visual gateways and follow internal links to roam through connected entries.",
+    "structureTitle": "Content structure",
+    "structureDesc": "Countries, regions, creatures, champions and stories reference each other as a network rather than a strict hierarchy."
+  },
+  "ContactPage": {
+    "eyebrow": "Contact",
+    "title": "Contact us",
+    "description": "Share suggestions, collaboration ideas, or worldbuilding additions here.",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "success": "Submitted successfully. We will reply soon.",
+    "error": "Submission failed. Please try again later.",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "notesTitle": "Museum Notes",
+    "notesBody": "If you have character settings or worldbuilding materials, feel free to contact us.",
+    "tipsTitle": "Contact tip",
+    "tipsBody": "Please include a clear topic and context so we can integrate your idea efficiently."
+  },
+  "CountriesPage": {
+    "eyebrow": "Countries",
+    "title": "Countries & Organizations",
+    "lead": "Enter the world through political entities and organizations.",
+    "empty": "No countries or organizations yet. Create entries in Studio first."
+  },
+  "CountriesFilter": {
+    "navAria": "Switch between countries and organizations",
+    "all": "All",
+    "nation": "Countries",
+    "organization": "Organizations",
+    "emptyNation": "No country entries yet.",
+    "emptyOrganization": "No organization entries yet.",
+    "ctaNation": "Explore country",
+    "ctaOrganization": "Explore organization",
+    "subtitleNation": "Nations",
+    "subtitleOrganization": "Organizations"
+  },
+  "RegionsPage": {
+    "eyebrow": "Regions",
+    "title": "Region Gallery",
+    "lead": "Use maps and environments as clues to enter each fragment of the world.",
+    "empty": "No region entries yet. Create entries in Studio first."
+  },
+  "StoriesPage": {
+    "eyebrow": "Stories",
+    "title": "Story Gallery",
+    "lead": "Connect emotions and clues of the world through stories.",
+    "empty": "No stories yet. Create entries in Studio first.",
+    "defaultSummary": "Enter a chapter and follow clues to other world entries.",
+    "read": "Start reading"
+  },
+  "ChampionsPage": {
+    "eyebrow": "Champions",
+    "title": "Champion Gallery",
+    "lead": "Every champion is an exhibit. Pick one and enter their legend.",
+    "empty": "No champion entries yet. Create entries in Studio first."
+  },
+  "ChampionsFilter": {
+    "filters": "Filters",
+    "showing": "Showing {current} of {total}",
+    "clearFilters": "Clear filters",
+    "country": "Country",
+    "region": "Region",
+    "all": "All",
+    "empty": "No champions match the selected filters. Try clearing filters."
+  },
+  "CreaturesPage": {
+    "eyebrow": "Creatures",
+    "title": "Creature Gallery",
+    "lead": "Catalog species and ecology slices across the world.",
+    "empty": "No creature entries yet. Create entries in Studio first."
+  },
+  "CreaturesFilter": {
+    "filters": "Filters",
+    "showing": "Showing {current} of {total}",
+    "clearFilters": "Clear filters",
+    "resetFilters": "Reset filters",
+    "category": "Category",
+    "all": "All",
+    "empty": "No creatures match the selected filters.",
+    "categories": {
+      "animal": "Animal",
+      "plant": "Plant",
+      "element": "Element"
+    }
+  },
+  "MagicsPage": {
+    "eyebrow": "Magic",
+    "title": "Magic Atlas",
+    "lead": "Split magic into principles and spells to understand world rules and practical usage.",
+    "empty": "No magic entries yet. Create entries in Studio first."
+  },
+  "MagicsFilter": {
+    "switchAria": "Switch between principles and spells",
+    "all": "All",
+    "principle": "Principles",
+    "spell": "Spells",
+    "subtitlePrinciple": "Principles",
+    "subtitleSpell": "Spells",
+    "emptyPrinciple": "No principle entries yet.",
+    "emptySpell": "No spell entries yet.",
+    "summaryFallback": "Open this magic entry to view full details and linked content.",
+    "filters": "Filters",
+    "showing": "Showing {current} of {total}",
+    "clearFilters": "Clear filters",
+    "elementFilter": "Element filter",
+    "elementFilterAria": "Spell element filters",
+    "elements": {
+      "fire": "Fire",
+      "wind": "Wind",
+      "earth": "Earth",
+      "water": "Water"
+    }
+  },
+  "RecommendationGrid": {
+    "title": "Related Picks",
+    "subtitle": "Related Picks",
+    "empty": "No related content yet.",
+    "types": {
+      "hero": "Champion",
+      "region": "Region",
+      "country": "Country",
+      "creature": "Creature",
+      "story": "Story",
+      "magic": "Magic"
+    }
+  },
+  "CreatureDetailPage": {
+    "heroTag": "Creature Record",
+    "fields": {
+      "category": "Category",
+      "region": "Region",
+      "country": "Country",
+      "habitat": "Habitat",
+      "diet": "Diet",
+      "temperament": "Temperament",
+      "activityCycle": "Activity Cycle",
+      "threatLevel": "Threat Level",
+      "abilities": "Ability Tags"
+    },
+    "ecologyKicker": "Ecology",
+    "ecologyTitle": "Ecology Description",
+    "emptyValue": "Not recorded",
+    "emptyBio": "No ecology description yet.",
+    "categories": {
+      "animal": "Animal",
+      "plant": "Plant",
+      "element": "Element"
+    },
+    "threatLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "MagicDetailPage": {
+    "principle": "Principle",
+    "spell": "Spell",
+    "elements": {
+      "fire": "Fire",
+      "wind": "Wind",
+      "earth": "Earth",
+      "water": "Water"
+    },
+    "elementWithValue": "Element: {element}",
+    "archiveTitle": "Casting Archive",
+    "params": "Parameters",
+    "fields": {
+      "difficulty": "Difficulty",
+      "castType": "Cast Type",
+      "manaCost": "Mana Cost",
+      "cooldown": "Cooldown",
+      "requirements": "Requirements",
+      "risks": "Risk Notes"
+    },
+    "difficultyLabels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "master": "Master"
+    },
+    "castTypeLabels": {
+      "instant": "Instant",
+      "channel": "Channel",
+      "ritual": "Ritual"
+    },
+    "detailKicker": "Details",
+    "principleDetailTitle": "Principle Notes",
+    "spellDetailTitle": "Spell Notes",
+    "emptyValue": "Not recorded",
+    "emptyRisk": "No risk notes yet.",
+    "emptyDetailsPrinciple": "Principle: No detailed notes yet.",
+    "emptyDetailsSpell": "Spell: No detailed notes yet."
+  },
+  "CountryDetailPage": {
+    "emptyValue": "Not recorded",
+    "emptyCustoms": "No customs notes yet.",
+    "organizationTag": "Organization Archive",
+    "nationTag": "Nation Atlas",
+    "countLabelOrganization": "Branches",
+    "countLabelNation": "Regions",
+    "recordedRegions": "Recorded region count",
+    "overviewTitle": "Overview",
+    "cultureTitle": "Culture",
+    "fields": {
+      "capitalHQ": "Capital / HQ",
+      "governance": "Governance",
+      "populationScale": "Population / Scale",
+      "currency": "Currency",
+      "languages": "Languages"
+    },
+    "relatedRegionsTitle": "Related Regions",
+    "relatedRegionsSubtitle": "Exploration Entrances"
+  },
+  "RegionDetailPage": {
+    "heroTag": "Region Stage",
+    "emptyValue": "Not recorded",
+    "emptySummary": "No region summary yet.",
+    "emptyTravelAdvice": "No travel advice yet.",
+    "emptyCountry": "No linked country",
+    "overviewTitle": "Region Overview",
+    "fields": {
+      "climate": "Climate",
+      "terrain": "Terrain",
+      "dangerLevel": "Danger Level",
+      "relatedHeroes": "Linked Heroes"
+    },
+    "dangerLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "travelAdviceTitle": "Travel Advice",
+    "countryTitle": "Linked Country",
+    "countryArchive": "Country Archive",
+    "landmarksTitle": "Landmarks",
+    "landmarksSubtitle": "Landmarks",
+    "featuredHeroesTitle": "Featured Heroes",
+    "featuredHeroesSubtitle": "Characters"
+  },
+  "HeroDetailPage": {
+    "heroTag": "Champion Archive",
+    "relatedHeroesTitle": "Related Champions",
+    "emptyRelatedHeroes": "No related champions yet.",
+    "quoteFallback": "If I do not even know the rules, how can breaking them define me?",
+    "quoteMeta": "Champion Quote",
+    "bioTitle": "Biography",
+    "bioExpand": "Click to expand",
+    "close": "Close",
+    "bioEmpty": "Biography content will be added later.",
+    "profileTitle": "Character Profile",
+    "fields": {
+      "alias": "Alias",
+      "age": "Age",
+      "status": "Status",
+      "faction": "Faction",
+      "roles": "Roles",
+      "weapon": "Weapon",
+      "motto": "Motto",
+      "region": "Region",
+      "country": "Country"
+    },
+    "statusLabels": {
+      "active": "Active",
+      "missing": "Missing",
+      "deceased": "Deceased"
+    },
+    "crestTitle": "Crest",
+    "storiesTitle": "Short Stories",
+    "storiesSubtitle": "Story Links",
+    "storyCardTag": "Short Story",
+    "readStory": "Read Story ->",
+    "emptyRelatedStories": "No related short stories yet.",
+    "miscTitle": "Misc",
+    "miscSubtitle": "Misc",
+    "misc": {
+      "conceptArt": "Concept Sketches",
+      "equipmentBadges": "Equipment and Badges"
+    },
+    "otherHeroesTitle": "Other Champions",
+    "otherHeroesSubtitle": "Others",
+    "emptyOtherHeroes": "No other champions to recommend."
+  },
+  "StoryDetailPage": {
+    "heroTag": "Short Story",
+    "scrollToStart": "Scroll to begin",
+    "articleTag": "Short Story",
+    "emptyContent": "Story body content will be added in later iterations with richer layout and narrative structure."
+  },
+  "RandomShowcase": {
+    "kicker": "Random Details",
+    "title": "Random Showcase",
+    "shuffleAria": "Shuffle showcase",
+    "empty": "No content to display yet."
+  },
+  "FullscreenHero": {
+    "welcomeKicker": "Museum Universe Archive",
+    "welcomeSubtitle": "A worldbuilding archive entered through details",
+    "scroll": "Scroll",
+    "prev": "Previous",
+    "next": "Next"
+  }
+}

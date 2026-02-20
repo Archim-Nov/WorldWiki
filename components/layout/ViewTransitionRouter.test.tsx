@@ -25,6 +25,7 @@ describe("ViewTransitionRouter", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     window.history.pushState({}, "", "/countries")
+    document.cookie = "worldwiki-locale=zh-CN; path=/"
   })
 
   afterEach(() => {
@@ -55,7 +56,7 @@ describe("ViewTransitionRouter", () => {
 
     expect(document.documentElement.dataset.viewTransition).toBe("enabled")
     expect(startViewTransitionMock).toHaveBeenCalledTimes(1)
-    expect(pushMock).toHaveBeenCalledWith("/stories")
+    expect(pushMock).toHaveBeenCalledWith("/zh-CN/stories")
   })
 
   it("skips external links", () => {
@@ -102,5 +103,17 @@ describe("ViewTransitionRouter", () => {
 
     expect(startViewTransitionMock).not.toHaveBeenCalled()
     expect(pushMock).not.toHaveBeenCalled()
+  })
+
+  it("routes with locale prefix even when view transitions are unavailable", () => {
+    render(
+      <>
+        <ViewTransitionRouter />
+        <a href="/regions">Go regions</a>
+      </>
+    )
+
+    fireEvent.click(screen.getByRole("link", { name: "Go regions" }))
+    expect(pushMock).toHaveBeenCalledWith("/zh-CN/regions")
   })
 })

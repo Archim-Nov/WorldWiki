@@ -1,8 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 export default function ContactPage() {
+  const t = useTranslations('ContactPage')
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
@@ -27,22 +29,15 @@ export default function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <header className="max-w-2xl mb-10">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Contact
-        </p>
-        <h1 className="text-3xl font-semibold mt-4">联系我们</h1>
-        <p className="text-muted-foreground mt-3">
-          任何建议、合作或世界观补充，都欢迎在这里留下信息。
-        </p>
+        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{t('eyebrow')}</p>
+        <h1 className="text-3xl font-semibold mt-4">{t('title')}</h1>
+        <p className="text-muted-foreground mt-3">{t('description')}</p>
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border bg-card p-6 space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="rounded-2xl border bg-card p-6 space-y-4">
           <div>
-            <label className="block text-sm mb-1">姓名</label>
+            <label className="block text-sm mb-1">{t('name')}</label>
             <input
               type="text"
               value={form.name}
@@ -52,7 +47,7 @@ export default function ContactPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1">邮箱</label>
+            <label className="block text-sm mb-1">{t('email')}</label>
             <input
               type="email"
               value={form.email}
@@ -62,7 +57,7 @@ export default function ContactPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1">消息</label>
+            <label className="block text-sm mb-1">{t('message')}</label>
             <textarea
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -71,35 +66,25 @@ export default function ContactPage() {
               required
             />
           </div>
-          {status === 'success' && (
-            <p className="text-green-600">提交成功，我们会尽快回复。</p>
-          )}
-          {status === 'error' && (
-            <p className="text-red-600">提交失败，请稍后再试。</p>
-          )}
+          {status === 'success' && <p className="text-green-600">{t('success')}</p>}
+          {status === 'error' && <p className="text-red-600">{t('error')}</p>}
           <button
             type="submit"
             disabled={status === 'loading'}
             className="w-full bg-primary text-primary-foreground py-2 rounded-md"
           >
-            {status === 'loading' ? '提交中...' : '提交'}
+            {status === 'loading' ? t('submitting') : t('submit')}
           </button>
         </form>
 
         <aside className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground space-y-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Museum Notes
-            </p>
-            <p className="mt-3">
-              如果你有角色设定或世界观素材，欢迎联系我们一起完善宇宙。
-            </p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('notesTitle')}</p>
+            <p className="mt-3">{t('notesBody')}</p>
           </div>
           <div>
-            <p className="font-medium text-foreground">联系建议</p>
-            <p className="mt-2">
-              留下清晰的主题与背景，便于我们将内容融入到故事线中。
-            </p>
+            <p className="font-medium text-foreground">{t('tipsTitle')}</p>
+            <p className="mt-2">{t('tipsBody')}</p>
           </div>
         </aside>
       </div>

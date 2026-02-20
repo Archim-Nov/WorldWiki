@@ -1,3 +1,4 @@
+﻿import { getTranslations } from 'next-intl/server'
 import { client } from '@/lib/sanity/client'
 import { heroesQuery } from '@/lib/sanity/queries'
 import { ChampionsFilter } from '@/components/marketing/ChampionsFilter'
@@ -17,24 +18,19 @@ type Hero = {
 }
 
 export default async function ChampionsPage() {
+  const t = await getTranslations('ChampionsPage')
   const heroes: Hero[] = await client.fetch(heroesQuery)
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
       <ScrollReveal as="header" className="max-w-2xl mb-12">
-        <p className={styles.eyebrow}>
-          Champions
-        </p>
-        <h1 className={styles.title}>英雄画廊</h1>
-        <p className={styles.lead}>
-          每一位英雄都是一幅展品，选择你感兴趣的角色进入传记。
-        </p>
+        <p className={styles.eyebrow}>{t('eyebrow')}</p>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <p className={styles.lead}>{t('lead')}</p>
       </ScrollReveal>
 
       {heroes.length === 0 ? (
-        <p className={styles.empty}>
-          暂无英雄内容，请先在 Studio 中创建。
-        </p>
+        <p className={styles.empty}>{t('empty')}</p>
       ) : (
         <ChampionsFilter heroes={heroes} />
       )}

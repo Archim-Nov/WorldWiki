@@ -24,6 +24,29 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
+vi.mock('next-intl', () => ({
+  useLocale: () => 'zh-CN',
+  useTranslations: () => {
+    const messages: Record<string, string> = {
+      title: '×¢²á',
+      email: 'ÓÊÏä',
+      password: 'ÃÜÂë',
+      submit: '×¢²á',
+      loading: '×¢²áÖÐ...',
+      loginPrompt: 'ÒÑÓÐÕËºÅ£¿',
+      loginLink: 'µÇÂ¼',
+    }
+
+    return (key: string) => messages[key] ?? key
+  },
+}))
+
+vi.mock('@/components/i18n/LocalizedLink', () => ({
+  LocalizedLink: ({ href, children, ...props }: { href: unknown; children: React.ReactNode; [key: string]: unknown }) => (
+    <a href={typeof href === 'string' ? href : '/mock'} {...props}>{children}</a>
+  ),
+}))
+
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     auth: {
@@ -53,7 +76,7 @@ function getPasswordInput() {
 describe('RegisterPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    searchParamGetMock.mockReturnValue('/stories')
+    searchParamGetMock.mockReturnValue('/zh-CN/stories')
     signUpMock.mockResolvedValue({ error: null })
   })
 
@@ -61,24 +84,24 @@ describe('RegisterPage', () => {
     cleanup()
   })
 
-  it('submits credentials and redirects to login page', async () => {
+  it('submits credentials and redirects to localized login page', async () => {
     const user = userEvent.setup()
     render(<RegisterPage />)
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'secret-123')
-    await user.click(screen.getByRole('button', { name: 'æ³¨å†Œ' }))
+    await user.click(screen.getByRole('button', { name: '×¢²á' }))
 
     expect(signUpMock).toHaveBeenCalledWith({
       email: 'alice@example.com',
       password: 'secret-123',
     })
     expect(routerPushMock).toHaveBeenCalledWith(
-      '/login?registered=true&redirect=%2Fstories'
+      '/zh-CN/login?registered=true&redirect=%2Fzh-CN%2Fstories'
     )
   })
 
-  it('falls back to /dashboard when redirect param is unsafe', async () => {
+  it('falls back to localized /dashboard when redirect param is unsafe', async () => {
     searchParamGetMock.mockReturnValue('javascript:alert(1)')
 
     const user = userEvent.setup()
@@ -86,10 +109,10 @@ describe('RegisterPage', () => {
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'secret-123')
-    await user.click(screen.getByRole('button', { name: 'æ³¨å†Œ' }))
+    await user.click(screen.getByRole('button', { name: '×¢²á' }))
 
     expect(routerPushMock).toHaveBeenCalledWith(
-      '/login?registered=true&redirect=%2Fdashboard'
+      '/zh-CN/login?registered=true&redirect=%2Fzh-CN%2Fdashboard'
     )
   })
 
@@ -103,7 +126,7 @@ describe('RegisterPage', () => {
 
     await user.type(getEmailInput(), 'alice@example.com')
     await user.type(getPasswordInput(), 'secret-123')
-    await user.click(screen.getByRole('button', { name: 'æ³¨å†Œ' }))
+    await user.click(screen.getByRole('button', { name: '×¢²á' }))
 
     expect(screen.getByText('User already registered')).toBeInTheDocument()
     expect(routerPushMock).not.toHaveBeenCalled()

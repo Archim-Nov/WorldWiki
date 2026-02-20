@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 
 type CarouselItem = {
   _id: string
@@ -203,7 +203,7 @@ export function CenteredCarousel({
           onTransitionEnd={handleTransitionEnd}
         >
           {trackItems.map((entry, trackIndex) => (
-            <Link
+            <LocalizedLink
               key={entry.key}
               href={entry.item.href}
               data-active={entry.itemIndex === activeIndex}
@@ -224,7 +224,7 @@ export function CenteredCarousel({
                 {cardLabel(entry.item)}
                 <h3 className="text-2xl font-semibold mt-2">{entry.item.title}</h3>
               </div>
-            </Link>
+            </LocalizedLink>
           ))}
         </div>
       </div>

@@ -1,9 +1,10 @@
 ﻿'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 import styles from './page.module.css'
 
 type MagicKind = 'principle' | 'spell'
@@ -20,22 +21,6 @@ type Magic = {
   school?: string
   summary?: string
   coverImage?: string
-}
-
-function sectionTitle(kind: MagicKind) {
-  return kind === 'principle' ? '原理' : '法术'
-}
-
-function sectionSubtitle(kind: MagicKind) {
-  return kind === 'principle' ? 'Principles' : 'Spells'
-}
-
-function elementLabel(element?: MagicElement) {
-  if (element === 'fire') return '火'
-  if (element === 'wind') return '风'
-  if (element === 'earth') return '土'
-  if (element === 'water') return '水'
-  return null
 }
 
 function filterButtonClass(active: boolean) {
@@ -56,18 +41,22 @@ function elementFilterButtonClass(active: boolean) {
   ].join(' ')
 }
 
-function renderMagicSection(kind: MagicKind, items: Magic[]) {
+function renderMagicSection(kind: MagicKind, items: Magic[], t: ReturnType<typeof useTranslations>) {
+  const isPrinciple = kind === 'principle'
+
   if (items.length === 0) {
     return (
       <section>
         <div className="mb-6 flex items-center justify-between">
-          <h2 className={styles.sectionTitle}>{sectionTitle(kind)}</h2>
+          <h2 className={styles.sectionTitle}>
+            {isPrinciple ? t('principle') : t('spell')}
+          </h2>
           <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {sectionSubtitle(kind)}
+            {isPrinciple ? t('subtitlePrinciple') : t('subtitleSpell')}
           </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          {kind === 'principle' ? '暂无原理内容。' : '暂无法术内容。'}
+          {isPrinciple ? t('emptyPrinciple') : t('emptySpell')}
         </p>
       </section>
     )
@@ -76,18 +65,14 @@ function renderMagicSection(kind: MagicKind, items: Magic[]) {
   return (
     <section>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className={styles.sectionTitle}>{sectionTitle(kind)}</h2>
+        <h2 className={styles.sectionTitle}>{isPrinciple ? t('principle') : t('spell')}</h2>
         <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          {sectionSubtitle(kind)}
+          {isPrinciple ? t('subtitlePrinciple') : t('subtitleSpell')}
         </span>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((magic) => (
-          <Link
-            key={magic._id}
-            href={`/magics/${magic.slug.current}`}
-            className={`group ${styles.card}`}
-          >
+          <LocalizedLink key={magic._id} href={`/magics/${magic.slug.current}`} className={`group ${styles.card}`}>
             <div className={`aspect-[16/10] ${styles.cardMedia}`}>
               <Image
                 src={magic.coverImage ?? placeholders.magic}
@@ -102,15 +87,15 @@ function renderMagicSection(kind: MagicKind, items: Magic[]) {
               <div className={styles.cardMeta}>
                 {magic.school ? <span>{magic.school}</span> : null}
                 {magic.kind === 'spell' && magic.element ? (
-                  <span className={styles.spellBadge}>{elementLabel(magic.element)}</span>
+                  <span className={styles.spellBadge}>{t(`elements.${magic.element}`)}</span>
                 ) : null}
               </div>
               <h2 className={styles.cardName}>{magic.name}</h2>
               <p className={`line-clamp-2 ${styles.cardSummary}`}>
-                {magic.summary ?? '查看这条魔法的完整设定与关联内容。'}
+                {magic.summary ?? t('summaryFallback')}
               </p>
             </div>
-          </Link>
+          </LocalizedLink>
         ))}
       </div>
     </section>
@@ -124,9 +109,9 @@ export function MagicsFilterSection({
   magics: Magic[]
   initialFilter: MagicFilter
 }) {
+  const t = useTranslations('MagicsFilter')
   const [currentFilter, setCurrentFilter] = useState<MagicFilter>(initialFilter)
-  const [spellElementFilter, setSpellElementFilter] =
-    useState<SpellElementFilter>('all')
+  const [spellElementFilter, setSpellElementFilter] = useState<SpellElementFilter>('all')
 
   const principles = useMemo(
     () => magics.filter((item) => (item.kind ?? 'spell') === 'principle'),
@@ -164,7 +149,7 @@ export function MagicsFilterSection({
 
   return (
     <div className="space-y-10">
-      <nav className="flex flex-wrap items-center gap-2" aria-label="原理和法术切换">
+      <nav className="flex flex-wrap items-center gap-2" aria-label={t('switchAria')}>
         <button
           type="button"
           aria-pressed={currentFilter === 'all'}
@@ -174,7 +159,7 @@ export function MagicsFilterSection({
           }}
           className={filterButtonClass(currentFilter === 'all')}
         >
-          全部
+          {t('all')}
         </button>
         <button
           type="button"
@@ -182,7 +167,7 @@ export function MagicsFilterSection({
           onClick={() => setCurrentFilter('principle')}
           className={filterButtonClass(currentFilter === 'principle')}
         >
-          原理
+          {t('principle')}
         </button>
         <button
           type="button"
@@ -190,7 +175,7 @@ export function MagicsFilterSection({
           onClick={() => setCurrentFilter('spell')}
           className={filterButtonClass(currentFilter === 'spell')}
         >
-          法术
+          {t('spell')}
         </button>
       </nav>
 
@@ -198,11 +183,9 @@ export function MagicsFilterSection({
         <section className="rounded-2xl border bg-card p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                Filters
-              </p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{t('filters')}</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Showing {filteredSpells.length} of {spells.length}
+                {t('showing', { current: filteredSpells.length, total: spells.length })}
               </p>
             </div>
             {hasSpellElementFilter ? (
@@ -211,15 +194,13 @@ export function MagicsFilterSection({
                 onClick={() => setSpellElementFilter('all')}
                 className="text-xs uppercase tracking-[0.2em] text-primary"
               >
-                Clear filters
+                {t('clearFilters')}
               </button>
             ) : null}
           </div>
 
-          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            元素筛选
-          </p>
-          <div className="flex flex-wrap gap-2" aria-label="法术元素筛选">
+          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('elementFilter')}</p>
+          <div className="flex flex-wrap gap-2" aria-label={t('elementFilterAria')}>
             <button
               type="button"
               aria-pressed={spellElementFilter === 'all'}
@@ -227,7 +208,7 @@ export function MagicsFilterSection({
               onClick={() => setSpellElementFilter('all')}
               className={elementFilterButtonClass(spellElementFilter === 'all')}
             >
-              全部
+              {t('all')}
             </button>
             {(['fire', 'wind', 'earth', 'water'] as const).map((element) => (
               <button
@@ -238,7 +219,7 @@ export function MagicsFilterSection({
                 onClick={() => setSpellElementFilter(element)}
                 className={elementFilterButtonClass(spellElementFilter === element)}
               >
-                {elementLabel(element)}
+                {t(`elements.${element}`)}
               </button>
             ))}
           </div>
@@ -247,7 +228,7 @@ export function MagicsFilterSection({
 
       <div className="space-y-14">
         {sections.map((section) => (
-          <div key={section.key}>{renderMagicSection(section.key, section.items)}</div>
+          <div key={section.key}>{renderMagicSection(section.key, section.items, t)}</div>
         ))}
       </div>
     </div>

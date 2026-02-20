@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { placeholders } from '@/lib/placeholders'
+import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 import styles from '@/app/(marketing)/creatures/page.module.css'
 
 type CreatureCard = {
@@ -16,27 +17,31 @@ type CreatureCard = {
   region?: { name: string; slug: { current: string } }
 }
 
-const categoryLabels: Record<string, string> = {
-  animal: '动物',
-  plant: '植物',
-  element: '元素',
-}
+const supportedCategories = ['animal', 'plant', 'element'] as const
 
-function labelForCategory(value: string) {
-  return categoryLabels[value] ?? value
+type SupportedCategory = (typeof supportedCategories)[number]
+
+function isSupportedCategory(value: string): value is SupportedCategory {
+  return supportedCategories.includes(value as SupportedCategory)
 }
 
 function uniqueSorted(values: string[]) {
-  return Array.from(new Set(values.filter(Boolean))).sort((a, b) =>
-    labelForCategory(a).localeCompare(labelForCategory(b))
-  )
+  return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b))
 }
 
 export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
+  const t = useTranslations('CreaturesFilter')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
+  const labelForCategory = (value: string) => {
+    if (isSupportedCategory(value)) {
+      return t(`categories.${value}`)
+    }
+    return value
+  }
+
   const categories = useMemo(() => {
-    const baseCategories = ['animal', 'plant', 'element']
+    const baseCategories = [...supportedCategories]
     const dataCategories = creatures.map((creature) => creature.category ?? '')
     return uniqueSorted([...baseCategories, ...dataCategories])
   }, [creatures])
@@ -59,11 +64,9 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
       <section className="rounded-2xl border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Filters
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Showing {filteredCreatures.length} of {creatures.length}
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{t('filters')}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('showing', { current: filteredCreatures.length, total: creatures.length })}
             </p>
           </div>
           {hasFilters ? (
@@ -72,15 +75,13 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
               onClick={() => setSelectedCategory(null)}
               className="text-xs uppercase tracking-[0.2em] text-primary"
             >
-              Clear filters
+              {t('clearFilters')}
             </button>
           ) : null}
         </div>
 
         <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
-            Category
-          </p>
+          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('category')}</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -91,16 +92,14 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
                   : 'text-muted-foreground hover:border-primary'
               }`}
             >
-              All
+              {t('all')}
             </button>
             {categories.map((category) => (
               <button
                 key={category}
                 type="button"
                 onClick={() =>
-                  setSelectedCategory((current) =>
-                    current === category ? null : category
-                  )
+                  setSelectedCategory((current) => (current === category ? null : category))
                 }
                 className={`rounded-full border px-3 py-1 text-xs transition ${
                   selectedCategory === category
@@ -117,22 +116,21 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
 
       {filteredCreatures.length === 0 ? (
         <div className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground">
-          <p>当前筛选没有匹配结果。</p>
-          <p className="mt-2">No creatures match the selected filters.</p>
+          <p>{t('empty')}</p>
           {hasFilters ? (
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}
               className="mt-4 inline-flex rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary transition hover:border-primary"
             >
-              Reset filters
+              {t('resetFilters')}
             </button>
           ) : null}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredCreatures.map((creature) => (
-            <Link
+            <LocalizedLink
               key={creature._id}
               href={`/creatures/${creature.slug.current}`}
               className={`group ${styles.card}`}
@@ -150,31 +148,17 @@ export function CreaturesFilter({ creatures }: { creatures: CreatureCard[] }) {
               <div className={styles.cardBody}>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardName}>{creature.name}</h2>
-                  {creature.species ? (
-                    <span className={styles.cardSpecies}>
-                      {creature.species}
-                    </span>
-                  ) : null}
+                  {creature.species ? <span className={styles.cardSpecies}>{creature.species}</span> : null}
                 </div>
                 <div className={styles.cardTags}>
                   {creature.category ? (
-                    <span className={styles.cardTag}>
-                      {labelForCategory(creature.category)}
-                    </span>
+                    <span className={styles.cardTag}>{labelForCategory(creature.category)}</span>
                   ) : null}
-                  {creature.species ? (
-                    <span className={styles.cardTag}>
-                      {creature.species}
-                    </span>
-                  ) : null}
+                  {creature.species ? <span className={styles.cardTag}>{creature.species}</span> : null}
                 </div>
-                {creature.region?.name ? (
-                  <p className={styles.cardRegion}>
-                    {creature.region.name}
-                  </p>
-                ) : null}
+                {creature.region?.name ? <p className={styles.cardRegion}>{creature.region.name}</p> : null}
               </div>
-            </Link>
+            </LocalizedLink>
           ))}
         </div>
       )}

@@ -1,0 +1,390 @@
+{
+  "Header": {
+    "nav": {
+      "countries": "国家",
+      "regions": "区域",
+      "creatures": "生物",
+      "champions": "英雄",
+      "magics": "魔法",
+      "stories": "故事"
+    },
+    "search": {
+      "placeholder": "搜索",
+      "aria": "站内搜索",
+      "submit": "提交搜索"
+    }
+  },
+  "LanguageSwitcher": {
+    "buttonAria": "切换语言",
+    "options": {
+      "en": "English",
+      "zh-CN": "中文"
+    }
+  },
+  "ThemeToggle": {
+    "buttonAria": "切换主题",
+    "options": {
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    }
+  },
+  "Footer": {
+    "about": "关于",
+    "contact": "联系",
+    "copyright": "© {year} WorldWiki。保留所有权利。"
+  },
+  "UserNav": {
+    "login": "登录"
+  },
+  "NotFound": {
+    "description": "页面不存在。",
+    "backHome": "返回首页"
+  },
+  "AuthLogin": {
+    "title": "登录",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "登录",
+    "loading": "登录中...",
+    "registerPrompt": "还没有账号？",
+    "registerLink": "注册"
+  },
+  "AuthRegister": {
+    "title": "注册",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "注册",
+    "loading": "注册中...",
+    "loginPrompt": "已有账号？",
+    "loginLink": "登录"
+  },
+  "HomePage": {
+    "kicker": "Museum Universe",
+    "title": "以细节为入口，开启探索。",
+    "description": "随机展柜展示内容切片，最新英雄与国家条目作为固定入口，帮助你快速进入世界观。",
+    "randomEmpty": "暂无可展示内容。",
+    "championsKicker": "Champions",
+    "championsTitle": "英雄",
+    "championsEmpty": "暂无英雄内容。",
+    "countriesKicker": "Countries",
+    "countriesTitle": "国家",
+    "countriesEmpty": "暂无国家内容。",
+    "types": {
+      "hero": "英雄",
+      "region": "区域",
+      "country": "国家",
+      "creature": "生物",
+      "story": "故事",
+      "magic": "魔法"
+    }
+  },
+  "AboutPage": {
+    "eyebrow": "About",
+    "title": "关于这座博物馆宇宙",
+    "intro": "这里不是一个营销网站，而是一座可被探索的游戏宇宙档案库。角色、区域、生物与故事在此连接成网。",
+    "exploreTitle": "探索方式",
+    "exploreDesc": "从视觉入口进入各个板块，再沿着内链自由漫游。",
+    "structureTitle": "内容结构",
+    "structureDesc": "国家、区域、生物、英雄与故事相互引用，强调连接而非层级。"
+  },
+  "ContactPage": {
+    "eyebrow": "Contact",
+    "title": "联系我们",
+    "description": "任何建议、合作或世界观补充，都欢迎在这里留下信息。",
+    "name": "姓名",
+    "email": "邮箱",
+    "message": "消息",
+    "success": "提交成功，我们会尽快回复。",
+    "error": "提交失败，请稍后再试。",
+    "submit": "提交",
+    "submitting": "提交中...",
+    "notesTitle": "Museum Notes",
+    "notesBody": "如果你有角色设定或世界观素材，欢迎联系我们一起完善宇宙。",
+    "tipsTitle": "联系建议",
+    "tipsBody": "请尽量提供清晰主题与背景，便于我们更快处理与整合。"
+  },
+  "CountriesPage": {
+    "eyebrow": "Countries",
+    "title": "国家与组织",
+    "lead": "按政治实体与组织体系两条路径进入世界版图与文明结构。",
+    "empty": "暂无国家或组织内容，请先在 Studio 中创建。"
+  },
+  "CountriesFilter": {
+    "navAria": "国家和组织切换",
+    "all": "全部",
+    "nation": "国家",
+    "organization": "组织",
+    "emptyNation": "暂无国家内容。",
+    "emptyOrganization": "暂无组织内容。",
+    "ctaNation": "探索国家",
+    "ctaOrganization": "探索组织",
+    "subtitleNation": "Nations",
+    "subtitleOrganization": "Organizations"
+  },
+  "RegionsPage": {
+    "eyebrow": "Regions",
+    "title": "区域画廊",
+    "lead": "以地图与场景为线索，进入每一块世界碎片。",
+    "empty": "暂无区域内容，请先在 Studio 中创建。"
+  },
+  "StoriesPage": {
+    "eyebrow": "Stories",
+    "title": "故事画廊",
+    "lead": "以小说与短篇连接世界的情绪与线索。",
+    "empty": "暂无故事内容，请先在 Studio 中创建。",
+    "defaultSummary": "进入故事章节，沿着线索连接世界的其他入口。",
+    "read": "开始阅读"
+  },
+  "ChampionsPage": {
+    "eyebrow": "Champions",
+    "title": "英雄画廊",
+    "lead": "每一位英雄都是一幅展品，选择你感兴趣的角色进入传记。",
+    "empty": "暂无英雄内容，请先在 Studio 中创建。"
+  },
+  "ChampionsFilter": {
+    "filters": "筛选",
+    "showing": "显示 {current} / {total}",
+    "clearFilters": "清除筛选",
+    "country": "国家",
+    "region": "区域",
+    "all": "全部",
+    "empty": "没有符合筛选条件的英雄，请尝试清除筛选。"
+  },
+  "CreaturesPage": {
+    "eyebrow": "Creatures",
+    "title": "生物画廊",
+    "lead": "记录这个世界里的物种与生态切面。",
+    "empty": "暂无生物内容，请先在 Studio 中创建。"
+  },
+  "CreaturesFilter": {
+    "filters": "筛选",
+    "showing": "显示 {current} / {total}",
+    "clearFilters": "清除筛选",
+    "resetFilters": "重置筛选",
+    "category": "分类",
+    "all": "全部",
+    "empty": "没有符合筛选条件的生物。",
+    "categories": {
+      "animal": "动物",
+      "plant": "植物",
+      "element": "元素"
+    }
+  },
+  "MagicsPage": {
+    "eyebrow": "Magic",
+    "title": "魔法图鉴",
+    "lead": "将魔法拆分为原理与法术两条主线，分别理解世界观规则与实战应用。",
+    "empty": "暂无魔法内容，请先在 Studio 中创建。"
+  },
+  "MagicsFilter": {
+    "switchAria": "原理和法术切换",
+    "all": "全部",
+    "principle": "原理",
+    "spell": "法术",
+    "subtitlePrinciple": "Principles",
+    "subtitleSpell": "Spells",
+    "emptyPrinciple": "暂无原理内容。",
+    "emptySpell": "暂无法术内容。",
+    "summaryFallback": "查看这条魔法的完整设定与关联内容。",
+    "filters": "筛选",
+    "showing": "显示 {current} / {total}",
+    "clearFilters": "清除筛选",
+    "elementFilter": "元素筛选",
+    "elementFilterAria": "法术元素筛选",
+    "elements": {
+      "fire": "火",
+      "wind": "风",
+      "earth": "土",
+      "water": "水"
+    }
+  },
+  "RecommendationGrid": {
+    "title": "相关推荐",
+    "subtitle": "Related Picks",
+    "empty": "暂无相关推荐内容。",
+    "types": {
+      "hero": "英雄",
+      "region": "区域",
+      "country": "国家",
+      "creature": "生物",
+      "story": "故事",
+      "magic": "魔法"
+    }
+  },
+  "CreatureDetailPage": {
+    "heroTag": "生物档案",
+    "fields": {
+      "category": "分类",
+      "region": "区域",
+      "country": "国家",
+      "habitat": "栖息地",
+      "diet": "食性",
+      "temperament": "习性",
+      "activityCycle": "活动周期",
+      "threatLevel": "威胁等级",
+      "abilities": "能力标签"
+    },
+    "ecologyKicker": "生态",
+    "ecologyTitle": "生态描述",
+    "emptyValue": "未记录",
+    "emptyBio": "暂无生态描述。",
+    "categories": {
+      "animal": "动物",
+      "plant": "植物",
+      "element": "元素"
+    },
+    "threatLevels": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    }
+  },
+  "MagicDetailPage": {
+    "principle": "原理",
+    "spell": "法术",
+    "elements": {
+      "fire": "火",
+      "wind": "风",
+      "earth": "土",
+      "water": "水"
+    },
+    "elementWithValue": "元素：{element}",
+    "archiveTitle": "施放档案",
+    "params": "参数",
+    "fields": {
+      "difficulty": "难度",
+      "castType": "施放方式",
+      "manaCost": "法力消耗",
+      "cooldown": "冷却时间",
+      "requirements": "前置条件",
+      "risks": "风险说明"
+    },
+    "difficultyLabels": {
+      "beginner": "入门",
+      "intermediate": "进阶",
+      "advanced": "高级",
+      "master": "大师"
+    },
+    "castTypeLabels": {
+      "instant": "瞬发",
+      "channel": "引导",
+      "ritual": "仪式"
+    },
+    "detailKicker": "详情",
+    "principleDetailTitle": "原理设定",
+    "spellDetailTitle": "法术设定",
+    "emptyValue": "未记录",
+    "emptyRisk": "暂无风险记录。",
+    "emptyDetailsPrinciple": "原理：暂无详细设定。",
+    "emptyDetailsSpell": "法术：暂无详细设定。"
+  },
+  "RandomShowcase": {
+    "kicker": "Random Details",
+    "title": "随机展柜",
+    "shuffleAria": "随机刷新",
+    "empty": "暂无内容可展示。"
+  },
+  "FullscreenHero": {
+    "welcomeKicker": "Museum Universe Archive",
+    "welcomeSubtitle": "一个以详情为入口的世界观档案馆",
+    "scroll": "向下",
+    "prev": "上一张",
+    "next": "下一张"
+  },
+  "CountryDetailPage": {
+    "emptyValue": "???",
+    "emptyCustoms": "???????",
+    "organizationTag": "????",
+    "nationTag": "????",
+    "countLabelOrganization": "??",
+    "countLabelNation": "??",
+    "recordedRegions": "??????",
+    "overviewTitle": "??",
+    "cultureTitle": "??",
+    "fields": {
+      "capitalHQ": "?? / ??",
+      "governance": "????",
+      "populationScale": "?? / ??",
+      "currency": "??",
+      "languages": "??"
+    },
+    "relatedRegionsTitle": "????",
+    "relatedRegionsSubtitle": "????"
+  },
+  "RegionDetailPage": {
+    "heroTag": "????",
+    "emptyValue": "???",
+    "emptySummary": "???????",
+    "emptyTravelAdvice": "???????",
+    "emptyCountry": "??????",
+    "overviewTitle": "????",
+    "fields": {
+      "climate": "??",
+      "terrain": "??",
+      "dangerLevel": "????",
+      "relatedHeroes": "????"
+    },
+    "dangerLevels": {
+      "low": "?",
+      "medium": "?",
+      "high": "?"
+    },
+    "travelAdviceTitle": "????",
+    "countryTitle": "????",
+    "countryArchive": "????",
+    "landmarksTitle": "??",
+    "landmarksSubtitle": "??",
+    "featuredHeroesTitle": "????",
+    "featuredHeroesSubtitle": "??"
+  },
+  "HeroDetailPage": {
+    "heroTag": "????",
+    "relatedHeroesTitle": "????",
+    "emptyRelatedHeroes": "???????",
+    "quoteFallback": "????????????????????",
+    "quoteMeta": "????",
+    "bioTitle": "??",
+    "bioExpand": "????",
+    "close": "??",
+    "bioEmpty": "???????????",
+    "profileTitle": "????",
+    "fields": {
+      "alias": "??",
+      "age": "??",
+      "status": "??",
+      "faction": "??",
+      "roles": "??",
+      "weapon": "??",
+      "motto": "??",
+      "region": "??",
+      "country": "??"
+    },
+    "statusLabels": {
+      "active": "??",
+      "missing": "??",
+      "deceased": "??"
+    },
+    "crestTitle": "??",
+    "storiesTitle": "????",
+    "storiesSubtitle": "????",
+    "storyCardTag": "????",
+    "readStory": "???? ->",
+    "emptyRelatedStories": "?????????",
+    "miscTitle": "??",
+    "miscSubtitle": "??",
+    "misc": {
+      "conceptArt": "????",
+      "equipmentBadges": "?????"
+    },
+    "otherHeroesTitle": "????",
+    "otherHeroesSubtitle": "??",
+    "emptyOtherHeroes": "??????????"
+  },
+  "StoryDetailPage": {
+    "heroTag": "????",
+    "scrollToStart": "??????",
+    "articleTag": "????",
+    "emptyContent": "?????????????????????????"
+  }
+}

@@ -1,9 +1,11 @@
 ﻿import Image from 'next/image'
 import Link from 'next/link'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { placeholders } from '@/lib/placeholders'
 import { client } from '@/lib/sanity/client'
 import { storiesQuery } from '@/lib/sanity/queries'
+import { withLocalePrefix } from '@/i18n/path'
 import styles from './page.module.css'
 
 type Story = {
@@ -20,11 +22,9 @@ type Story = {
   }>
 }
 
-const DEFAULT_STORY_SUMMARY = '进入故事章节，沿着线索连接世界的其他入口。'
-
-function extractStorySummary(story: Story): string {
+function extractStorySummary(story: Story, fallbackSummary: string): string {
   if (!story.content) {
-    return DEFAULT_STORY_SUMMARY
+    return fallbackSummary
   }
 
   for (const block of story.content) {
@@ -43,28 +43,31 @@ function extractStorySummary(story: Story): string {
     }
   }
 
-  return DEFAULT_STORY_SUMMARY
+  return fallbackSummary
 }
 
 export default async function StoriesPage() {
+  const locale = await getLocale()
+  const t = await getTranslations('StoriesPage')
   const stories: Story[] = await client.fetch(storiesQuery)
+  const fallbackSummary = t('defaultSummary')
 
   return (
     <div className={`${styles.page} container mx-auto px-4 py-12 sm:py-16`}>
       <ScrollReveal as="header" className="max-w-2xl mb-12">
-        <p className={styles.eyebrow}>Stories</p>
-        <h1 className={styles.title}>故事画廊</h1>
-        <p className={styles.lead}>以小说与短篇链接世界的情绪与线索。</p>
+        <p className={styles.eyebrow}>{t('eyebrow')}</p>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <p className={styles.lead}>{t('lead')}</p>
       </ScrollReveal>
 
       {stories.length === 0 ? (
-        <p className={styles.empty}>暂无故事内容，请先在 Studio 中创建。</p>
+        <p className={styles.empty}>{t('empty')}</p>
       ) : (
         <div className="space-y-5 sm:space-y-6">
           {stories.map((story, i) => (
             <Link
               key={story._id}
-              href={`/stories/${story.slug.current}`}
+              href={withLocalePrefix(`/stories/${story.slug.current}`, locale)}
               className={`${styles.card} flex flex-col md:flex-row`}
               style={{ '--story-index': `"${String(i + 1).padStart(2, '0')}"` } as React.CSSProperties}
             >
@@ -81,9 +84,11 @@ export default async function StoriesPage() {
               <div className={styles.cardBody}>
                 <div>
                   <h2 className={styles.cardTitle}>{story.title}</h2>
-                  <p className={styles.cardSummary}>{extractStorySummary(story)}</p>
+                  <p className={styles.cardSummary}>{extractStorySummary(story, fallbackSummary)}</p>
                 </div>
-                <div className={styles.cardCta}>开始阅读 {'>'}</div>
+                <div className={styles.cardCta}>
+                  {t('read')} {'>'}
+                </div>
               </div>
             </Link>
           ))}
@@ -92,4 +97,3 @@ export default async function StoriesPage() {
     </div>
   )
 }
-
