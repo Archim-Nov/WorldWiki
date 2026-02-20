@@ -41,12 +41,26 @@ const dangerLevelLabels: Record<NonNullable<Region['dangerLevel']>, string> = {
 const EMPTY_VALUE_TEXT = '未记录'
 const EMPTY_REGION_SUMMARY_TEXT = '暂无区域概述。'
 const EMPTY_TRAVEL_ADVICE_TEXT = '暂无行进建议记录。'
+const EMPTY_COUNTRY_TEXT = '未归属国家'
 
 function labelForDangerLevel(level?: Region['dangerLevel']) {
   if (!level) {
     return EMPTY_VALUE_TEXT
   }
   return dangerLevelLabels[level] ?? level
+}
+
+function dangerLevelTone(level?: Region['dangerLevel']) {
+  if (level === 'high') {
+    return 'text-red-600 bg-red-500/10 border-red-500/30'
+  }
+  if (level === 'medium') {
+    return 'text-amber-600 bg-amber-500/10 border-amber-500/30'
+  }
+  if (level === 'low') {
+    return 'text-emerald-600 bg-emerald-500/10 border-emerald-500/30'
+  }
+  return 'text-muted-foreground bg-muted border-border'
 }
 
 export default async function RegionDetailPage({
@@ -65,10 +79,8 @@ export default async function RegionDetailPage({
 
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
-  const landmarks =
-    region.landmarks && region.landmarks.length > 0
-      ? region.landmarks.join(' / ')
-      : EMPTY_VALUE_TEXT
+  const landmarks = (region.landmarks ?? []).filter(Boolean)
+  const heroCount = region.featuredHeroes?.length ?? 0
 
   addRecommendations(recommendations, seen, region.featuredHeroes ?? [], 'hero')
   if (region.country) {
@@ -158,44 +170,116 @@ export default async function RegionDetailPage({
       </section>
 
       <div className="container mx-auto px-4 detail-body">
-      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-  <div className="rounded-2xl border bg-card p-5 sm:p-6">
-    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-      区域概览
-    </p>
-    <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-      <p>
-        {region.summary ?? EMPTY_REGION_SUMMARY_TEXT}
-      </p>
-      <p>
-        {region.travelAdvice ?? EMPTY_TRAVEL_ADVICE_TEXT}
-      </p>
-    </div>
-  </div>
-  <div className="rounded-2xl border bg-card p-5 sm:p-6">
-    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-      探索信息
-    </p>
-    <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-      <div className="flex items-center justify-between">
-        <span>地形</span>
-        <span>{region.terrain ?? EMPTY_VALUE_TEXT}</span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span>气候</span>
-        <span>{region.climate ?? EMPTY_VALUE_TEXT}</span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span>危险等级</span>
-        <span>{labelForDangerLevel(region.dangerLevel)}</span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span>地标</span>
-        <span className="text-right">{landmarks}</span>
-      </div>
-    </div>
-  </div>
-</section>
+        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+          <article className="rounded-3xl border bg-card p-6 sm:p-7">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              区域概览
+            </p>
+            <p className="mt-4 text-base leading-7 text-foreground/90">
+              {region.summary ?? EMPTY_REGION_SUMMARY_TEXT}
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  气候
+                </p>
+                <p className="mt-2 text-sm font-medium">
+                  {region.climate ?? EMPTY_VALUE_TEXT}
+                </p>
+              </div>
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  地形
+                </p>
+                <p className="mt-2 text-sm font-medium">
+                  {region.terrain ?? EMPTY_VALUE_TEXT}
+                </p>
+              </div>
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  危险等级
+                </p>
+                <span
+                  className={`mt-2 inline-flex rounded-full border px-3 py-1 text-sm font-medium ${dangerLevelTone(region.dangerLevel)}`}
+                >
+                  {labelForDangerLevel(region.dangerLevel)}
+                </span>
+              </div>
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  关联英雄
+                </p>
+                <p className="mt-2 text-sm font-medium">{heroCount}</p>
+              </div>
+            </div>
+          </article>
+
+          <aside className="space-y-6">
+            <article className="rounded-3xl border bg-card p-6">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                行进建议
+              </p>
+              <p className="mt-4 text-sm leading-7 text-foreground/85">
+                {region.travelAdvice ?? EMPTY_TRAVEL_ADVICE_TEXT}
+              </p>
+            </article>
+
+            <article className="rounded-3xl border bg-card p-6">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                所属国家
+              </p>
+              {region.country ? (
+                <Link
+                  href={`/countries/${region.country.slug.current}`}
+                  className="mt-4 block overflow-hidden rounded-2xl border bg-background/60 transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <div className="aspect-[16/9] bg-muted">
+                    <Image
+                      src={region.country.mapImage ?? placeholders.country}
+                      alt={region.country.name}
+                      width={960}
+                      height={540}
+                      className="h-full w-full object-cover"
+                      sizes="(max-width: 1024px) 100vw, 25vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm text-muted-foreground">国家档案</p>
+                    <p className="mt-1 text-lg font-semibold">{region.country.name}</p>
+                  </div>
+                </Link>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  {EMPTY_COUNTRY_TEXT}
+                </p>
+              )}
+            </article>
+          </aside>
+        </section>
+
+        <section className="mt-8 rounded-3xl border bg-card p-6 sm:p-7">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl font-semibold">地标</h2>
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              landmarks
+            </span>
+          </div>
+          {landmarks.length > 0 ? (
+            <div className="mt-5 flex flex-wrap gap-3">
+              {landmarks.map((landmark) => (
+                <span
+                  key={landmark}
+                  className="inline-flex rounded-full border bg-background/60 px-4 py-2 text-sm"
+                >
+                  {landmark}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-5 text-sm text-muted-foreground">{EMPTY_VALUE_TEXT}</p>
+          )}
+        </section>
 
       {region.featuredHeroes && region.featuredHeroes.length > 0 && (
         <section className="mt-12">
@@ -205,27 +289,27 @@ export default async function RegionDetailPage({
               角色
             </span>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {region.featuredHeroes.map((hero) => (
               <Link
                 key={hero._id}
                 href={`/champions/${hero.slug.current}`}
-                className="group w-36 shrink-0 rounded-xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
+                className="group rounded-2xl border bg-card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <div className="aspect-square bg-muted">
+                <div className="aspect-[4/5] bg-muted">
                   <Image
                     src={hero.portrait ?? placeholders.hero}
                     alt={hero.name}
                     width={640}
                     height={640}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                    sizes="144px"
+                    sizes="(max-width: 1024px) 50vw, 25vw"
                   />
                 </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-semibold">{hero.name}</h3>
+                <div className="p-4">
+                  <h3 className="text-base font-semibold">{hero.name}</h3>
                   {hero.title && (
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                    <p className="text-sm text-muted-foreground mt-1 truncate">
                       {hero.title}
                     </p>
                   )}
@@ -236,7 +320,7 @@ export default async function RegionDetailPage({
         </section>
       )}
 
-      <RecommendationGrid items={recommendations} />
+        <RecommendationGrid items={recommendations} />
       </div>
     </div>
   )
