@@ -22,6 +22,22 @@ vi.mock("next/link", () => ({
   ),
 }))
 
+vi.mock("@/components/i18n/LocalizedLink", () => ({
+  LocalizedLink: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string
+    children: ReactNode
+    [key: string]: unknown
+  }) => (
+    <a href={`/en${href}`} {...props}>
+      {children}
+    </a>
+  ),
+}))
+
 import { CenteredCarousel } from "./CenteredCarousel"
 
 class ResizeObserverMock {

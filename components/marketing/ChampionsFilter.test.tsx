@@ -6,6 +6,27 @@ import userEvent from "@testing-library/user-event"
 import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
+const translations: Record<string, string> = {
+  filters: "Filters",
+  showing: "Showing {current} of {total}",
+  clearFilters: "Clear filters",
+  country: "Country",
+  region: "Region",
+  all: "All",
+  empty: "No champions match the selected filters. Try clearing filters.",
+}
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, values?: Record<string, unknown>) => {
+    const template = translations[key] ?? key
+    if (!values) return template
+    return template.replace(
+      /\{(\w+)\}/g,
+      (_, token) => String(values[token] ?? `{${token}}`)
+    )
+  },
+}))
+
 vi.mock("next/link", () => ({
   default: ({
     href,
@@ -17,6 +38,22 @@ vi.mock("next/link", () => ({
     [key: string]: unknown
   }) => (
     <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}))
+
+vi.mock("@/components/i18n/LocalizedLink", () => ({
+  LocalizedLink: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string
+    children: ReactNode
+    [key: string]: unknown
+  }) => (
+    <a href={`/en${href}`} {...props}>
       {children}
     </a>
   ),
