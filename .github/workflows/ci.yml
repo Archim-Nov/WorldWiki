@@ -29,16 +29,16 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Build
-        if: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID != '' && secrets.NEXT_PUBLIC_SANITY_DATASET != '' && secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
-        run: npm run build
+      - name: Build or skip
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-
-      - name: Build skipped
-        if: ${{ !(secrets.NEXT_PUBLIC_SANITY_PROJECT_ID != '' && secrets.NEXT_PUBLIC_SANITY_DATASET != '' && secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '') }}
-        run: echo "Skipping build because required NEXT_PUBLIC_* secrets are not configured."
+        run: |
+          if [ -n "$NEXT_PUBLIC_SANITY_PROJECT_ID" ] && [ -n "$NEXT_PUBLIC_SANITY_DATASET" ] && [ -n "$NEXT_PUBLIC_SUPABASE_URL" ] && [ -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            npm run build
+          else
+            echo "Skipping build because required NEXT_PUBLIC_* secrets are not configured."
+          fi
