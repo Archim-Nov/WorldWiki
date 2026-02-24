@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 
@@ -13,8 +12,14 @@ type CarouselItem = {
   typeLabel?: string
 }
 
-function clampSize(items: CarouselItem[], max: number) {
-  return items.slice(0, max)
+const VISIBLE = 2
+const AUTO_INTERVAL = 5000
+
+function ringOffset(from: number, to: number, len: number) {
+  let d = to - from
+  if (d > len / 2) d -= len
+  if (d < -len / 2) d += len
+  return d
 }
 
 export function CenteredCarousel({
@@ -24,242 +29,104 @@ export function CenteredCarousel({
   items: CarouselItem[]
   className?: string
 }) {
-  const displayItems = useMemo(() => clampSize(items, 5), [items])
-  const total = displayItems.length
-  const showSides = total > 1
-  const [position, setPosition] = useState(() => (total > 1 ? total * 2 : 0))
-  const [isSnapping, setIsSnapping] = useState(false)
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const previousTotalRef = useRef(total)
-  const [metrics, setMetrics] = useState({ container: 0, card: 0 })
+  const pool = useMemo(() => items.slice(0, 5), [items])
+  const total = pool.length
+  const [active, setActive] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const pausedRef = useRef(false)
 
+  const go = useCallback(
+    (dir: number) => setActive((a) => (a + dir + total) % total),
+    [total],
+  )
+
+  /* ── auto-scroll every 5s, pause on hover ── */
   useEffect(() => {
-    if (previousTotalRef.current === total) {
-      return
-    }
+    if (total <= 1) return
+    timerRef.current = setInterval(() => {
+      if (!pausedRef.current) go(1)
+    }, AUTO_INTERVAL)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [total, go])
 
-    previousTotalRef.current = total
-    const frame = requestAnimationFrame(() => {
-      setPosition(total > 1 ? total * 2 : 0)
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [total])
+  const onMouseEnter = useCallback(() => { pausedRef.current = true }, [])
+  const onMouseLeave = useCallback(() => { pausedRef.current = false }, [])
 
-  useEffect(() => {
-    if (!isSnapping) {
-      return
-    }
-    const id = requestAnimationFrame(() => setIsSnapping(false))
-    return () => cancelAnimationFrame(id)
-  }, [isSnapping])
+  const onCardClick = useCallback(
+    (e: React.MouseEvent, idx: number) => {
+      if (idx !== active) {
+        e.preventDefault()
+        setActive(idx)
+      }
+    },
+    [active],
+  )
 
-  useEffect(() => {
-    const node = viewportRef.current
-    if (!node) {
-      return
-    }
-
-    const update = () => {
-      const width = node.clientWidth
-      const ratio = showSides ? 0.76 : 1
-      setMetrics({
-        container: width,
-        card: Math.round(width * ratio),
-      })
-    }
-
-    update()
-    const observer = new ResizeObserver(update)
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [showSides])
-
-  const trackItems = useMemo(() => {
-    if (total <= 1) {
-      return displayItems.map((item, itemIndex) => ({
-        key: item._id,
-        item,
-        itemIndex,
-      }))
-    }
-
-    const copies = 5
-    return Array.from({ length: copies })
-      .flatMap(() => displayItems)
-      .map((item, trackIndex) => ({
-        key: `${item._id}-${trackIndex}`,
-        item,
-        itemIndex: trackIndex % total,
-      }))
-  }, [displayItems, total])
-
-  if (total === 0) {
-    return <p className="text-sm text-muted-foreground">No content yet.</p>
-  }
-
-  const activeIndex = ((position % total) + total) % total
-
-  const goPrev = () => {
-    if (!showSides) {
-      return
-    }
-    setPosition((current) => current - 1)
-  }
-
-  const goNext = () => {
-    if (!showSides) {
-      return
-    }
-    setPosition((current) => current + 1)
-  }
-
-  const goTo = (dotIndex: number) => {
-    if (dotIndex === activeIndex || !showSides) {
-      return
-    }
-
-    const forward = (dotIndex - activeIndex + total) % total
-    const backward = (activeIndex - dotIndex + total) % total
-    if (forward <= backward) {
-      setPosition((current) => current + forward)
-    } else {
-      setPosition((current) => current - backward)
-    }
-  }
-
-  const handleTransitionEnd = (
-    event: React.TransitionEvent<HTMLDivElement>
-  ) => {
-    if (event.target !== event.currentTarget || event.propertyName !== 'transform') {
-      return
-    }
-    if (!showSides) {
-      return
-    }
-    if (position <= total - 1) {
-      setIsSnapping(true)
-      setPosition((current) => current + total * 2)
-      return
-    }
-    if (position >= total * 4) {
-      setIsSnapping(true)
-      setPosition((current) => current - total * 2)
-    }
-  }
-
-  const handleCardClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    trackIndex: number
-  ) => {
-    if (!showSides || trackIndex === position) {
-      return
-    }
-
-    event.preventDefault()
-    if (trackIndex === position - 1) {
-      goPrev()
-      return
-    }
-    if (trackIndex === position + 1) {
-      goNext()
-      return
-    }
-
-    const diff = trackIndex - position
-    if (diff > 0) {
-      setPosition((current) => current + 1)
-    } else if (diff < 0) {
-      setPosition((current) => current - 1)
-    }
-  }
-
-  const cardLabel = (item: CarouselItem) =>
-    item.typeLabel ? (
-      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-        {item.typeLabel}
-      </div>
-    ) : null
-
-  const gap = 50
-  const translate =
-    metrics.card > 0
-      ? (metrics.container - metrics.card) / 2 - position * (metrics.card + gap)
-      : 0
-
-  const trackStyle: CSSProperties = {
-    transform: `translateX(${translate}px)`,
-    '--carousel-card-width': metrics.card ? `${metrics.card}px` : '100%',
-    '--carousel-gap': `${gap}px`,
-  } as CSSProperties
+  if (total === 0) return null
 
   return (
-    <div className={`space-y-4 ${className ?? ''}`}>
-      <div ref={viewportRef} className="relative overflow-x-clip">
-        <div
-          className={`home-carousel-track flex items-stretch ${
-            isSnapping ? 'home-carousel-track-snap' : ''
-          }`}
-          style={trackStyle}
-          onTransitionEnd={handleTransitionEnd}
-        >
-          {trackItems.map((entry, trackIndex) => (
+    <div className={`coverflow ${className ?? ''}`}>
+      <div
+        className="coverflow-stage"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {pool.map((item, i) => {
+          const offset = ringOffset(active, i, total)
+          const abs = Math.abs(offset)
+          const hidden = abs > VISIBLE
+
+          return (
             <LocalizedLink
-              key={entry.key}
-              href={entry.item.href}
-              data-active={entry.itemIndex === activeIndex}
-              onClick={(event) => handleCardClick(event, trackIndex)}
-              className="home-carousel-card group rounded-3xl border border-border/30 bg-card overflow-hidden"
+              key={item._id}
+              href={item.href}
+              onClick={(e) => onCardClick(e, i)}
+              className={`coverflow-card group${offset === 0 ? ' coverflow-card--center' : ''}`}
+              style={
+                hidden
+                  ? { visibility: 'hidden', pointerEvents: 'none' }
+                  : ({
+                      '--cf-offset': offset,
+                      '--cf-abs': abs,
+                    } as React.CSSProperties)
+              }
+              aria-hidden={hidden}
+              tabIndex={hidden ? -1 : undefined}
             >
-              <div className="h-[340px] sm:h-[440px] lg:h-[540px] bg-muted">
+              <div className="coverflow-card-img">
                 <Image
-                  src={entry.item.image}
-                  alt={entry.item.title}
+                  src={item.image}
+                  alt={item.title}
                   width={960}
-                  height={1280}
-                  className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 76vw, 720px"
+                  height={540}
+                  className="h-full w-full object-cover"
+                  sizes="(max-width:640px) 90vw, 560px"
                 />
               </div>
-              <div className="p-5 sm:p-6">
-                {cardLabel(entry.item)}
-                <h3 className="text-2xl font-semibold mt-2">{entry.item.title}</h3>
+              <div className="coverflow-card-body">
+                {item.typeLabel && (
+                  <span className="coverflow-card-tag">{item.typeLabel}</span>
+                )}
+                <h3 className="coverflow-card-title">{item.title}</h3>
               </div>
             </LocalizedLink>
-          ))}
-        </div>
+          )
+        })}
       </div>
 
-      {showSides ? (
-        <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={goPrev}
-            className="rounded-full border px-3 py-1 text-sm transition hover:border-primary"
-          >
-            {'<'}
-          </button>
-          <div className="flex items-center gap-2">
-            {displayItems.map((item, dotIndex) => (
-              <button
-                key={item._id}
-                type="button"
-                onClick={() => goTo(dotIndex)}
-                className={`h-2 w-2 rounded-full transition ${
-                  dotIndex === activeIndex ? 'bg-primary' : 'bg-muted-foreground/40'
-                }`}
-                aria-label={`Go to ${item.title}`}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={goNext}
-            className="rounded-full border px-3 py-1 text-sm transition hover:border-primary"
-          >
-            {'>'}
-          </button>
+      {total > 1 && (
+        <div className="coverflow-dots">
+          {pool.map((item, i) => (
+            <button
+              key={item._id}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`coverflow-dot${i === active ? ' coverflow-dot--active' : ''}`}
+              aria-label={`Go to ${item.title}`}
+            />
+          ))}
         </div>
-      ) : null}
+      )}
     </div>
   )
 }

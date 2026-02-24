@@ -27,39 +27,135 @@
   50%      { opacity: 1;   transform: scale(1.05); }
 }
 
-:global(.home-carousel-track) {
-  gap: var(--carousel-gap);
-  transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
-  will-change: transform;
+/* ── 3D Coverflow Carousel ── */
+:global(.coverflow) {
+  --cf-card-w: 408px;
+  --cf-card-h: 276px;
+  --cf-gap: 264px;
+  --cf-depth: 120px;
+  --cf-rotate: 42deg;
+  position: relative;
+  user-select: none;
 }
-:global(.home-carousel-track.home-carousel-track-snap) {
-  transition: none;
+
+:global(.coverflow-stage) {
+  position: relative;
+  height: var(--cf-card-h);
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  overflow: visible;
 }
-:global(.home-carousel-track.home-carousel-track-snap .home-carousel-card) {
-  transition: none;
+
+:global(.coverflow-card) {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: var(--cf-card-w);
+  height: var(--cf-card-h);
+  margin-left: calc(var(--cf-card-w) / -2);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transform-style: preserve-3d;
+  transform:
+    translateX(calc(var(--cf-offset) * var(--cf-gap)))
+    translateZ(calc(var(--cf-abs) * var(--cf-depth) * -1))
+    rotateY(calc(var(--cf-offset) * var(--cf-rotate) * -1))
+    scale(calc(1 - var(--cf-abs) * 0.1));
+  z-index: calc(5 - var(--cf-abs));
+  opacity: calc(1 - var(--cf-abs) * 0.22);
+  filter: brightness(calc(1 - var(--cf-abs) * 0.08));
+  transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              opacity 500ms ease,
+              filter 500ms ease,
+              box-shadow 500ms ease;
+  will-change: transform, opacity;
 }
-:global(.home-carousel-card) {
-  flex: 0 0 var(--carousel-card-width);
-  opacity: 0.55;
-  transition: opacity 420ms ease, box-shadow 420ms ease;
+
+:global(.coverflow-card--center) {
+  box-shadow:
+    0 12px 40px color-mix(in oklch, var(--primary) 30%, transparent),
+    0 0 0 1px var(--border);
 }
-:global(.home-carousel-card[data-active='true']) {
+
+:global(.coverflow-card-img) {
+  width: 100%;
+  height: 68%;
+  overflow: hidden;
+  background: var(--muted);
+}
+
+:global(.coverflow-card-body) {
+  padding: 14px 16px;
+}
+
+:global(.coverflow-card-tag) {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}
+
+:global(.coverflow-card-title) {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dots */
+:global(.coverflow-dots) {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+:global(.coverflow-dot) {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  border: none;
+  background: var(--muted-foreground);
+  opacity: 0.3;
+  cursor: pointer;
+  transition: opacity 300ms ease, transform 300ms ease, background 300ms ease;
+}
+
+:global(.coverflow-dot--active) {
   opacity: 1;
-  box-shadow: 0 8px 32px color-mix(in oklch, var(--primary) 35%, transparent), 0 0 0 1px var(--border);
+  background: var(--primary);
+  transform: scale(1.4);
 }
-:global(.home-carousel--latest .home-carousel-card) {
-  filter: grayscale(100%) brightness(0.6);
-  transition: opacity 420ms ease, filter 420ms ease;
+
+/* ── Responsive ── */
+@media (min-width: 640px) {
+  :global(.coverflow) {
+    --cf-card-w: 504px;
+    --cf-card-h: 336px;
+    --cf-gap: 312px;
+  }
 }
-:global(.home-carousel--latest .home-carousel-card[data-active='true']) {
-  filter: grayscale(0%) brightness(1);
+
+@media (min-width: 1024px) {
+  :global(.coverflow) {
+    --cf-card-w: 576px;
+    --cf-card-h: 384px;
+    --cf-gap: 360px;
+    --cf-depth: 150px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global(.home-carousel-track) {
-    transition: none;
-  }
-  :global(.home-carousel-card) {
+  :global(.coverflow-card) {
     transition: none;
   }
 }
