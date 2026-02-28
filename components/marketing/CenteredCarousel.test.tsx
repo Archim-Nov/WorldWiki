@@ -1,7 +1,7 @@
-/** @vitest-environment jsdom */
+﻿/** @vitest-environment jsdom */
 
 import "@testing-library/jest-dom/vitest"
-import { cleanup, render, screen } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -88,8 +88,35 @@ describe("CenteredCarousel", () => {
     const { container } = render(<CenteredCarousel items={makeItems(4)} />)
 
     const cards = container.querySelectorAll<HTMLAnchorElement>(".coverflow-card")
-    // Click a side card (index 1) — should become active, not navigate
+    // Click a side card (index 1) 鈥?should become active, not navigate
     await user.click(cards[1])
     expect(activeDotIndex()).toBe(1)
   })
+  it("resets auto-scroll timing after manual selection to avoid double jumps", async () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<CenteredCarousel items={makeItems(4)} />)
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(4900)
+      })
+      fireEvent.click(screen.getByRole("button", { name: "Go to Item 3" }))
+      expect(activeDotIndex()).toBe(2)
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(150)
+      })
+      expect(activeDotIndex()).toBe(2)
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5100)
+      })
+      expect(activeDotIndex()).toBe(3)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })
+
+

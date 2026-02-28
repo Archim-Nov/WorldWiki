@@ -40,14 +40,22 @@ export function CenteredCarousel({
     [total],
   )
 
-  /* ── auto-scroll every 5s, pause on hover ── */
-  useEffect(() => {
+  const restartAutoScroll = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
     if (total <= 1) return
+
     timerRef.current = setInterval(() => {
       if (!pausedRef.current) go(1)
     }, AUTO_INTERVAL)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [total, go])
+
+  /* ── auto-scroll every 5s, pause on hover ── */
+  useEffect(() => {
+    restartAutoScroll()
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [restartAutoScroll])
 
   const onMouseEnter = useCallback(() => { pausedRef.current = true }, [])
   const onMouseLeave = useCallback(() => { pausedRef.current = false }, [])
@@ -57,9 +65,10 @@ export function CenteredCarousel({
       if (idx !== active) {
         e.preventDefault()
         setActive(idx)
+        restartAutoScroll()
       }
     },
-    [active],
+    [active, restartAutoScroll],
   )
 
   if (total === 0) return null
@@ -120,7 +129,10 @@ export function CenteredCarousel({
             <button
               key={item._id}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => {
+                setActive(i)
+                restartAutoScroll()
+              }}
               className={`coverflow-dot${i === active ? ' coverflow-dot--active' : ''}`}
               aria-label={`Go to ${item.title}`}
             />
