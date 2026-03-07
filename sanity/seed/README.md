@@ -1,6 +1,6 @@
 # Sample Data Import
 
-This folder contains minimal sample documents for the Museum Universe schema.
+This folder contains minimal sample documents for the Austrum schema.
 
 ## Import (manual)
 1) Ensure you are in the project root.

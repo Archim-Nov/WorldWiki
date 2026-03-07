@@ -1,6 +1,6 @@
-# WorldWiki
+# Austrum
 
-沉浸式游戏世界百科，以"博物馆宇宙"为设计理念。用户通过视觉画廊与网状内链自由探索，搜索仅作为辅助入口，而非主要导航方式。
+Austrum（奥斯特姆）的沉浸式世界百科，以“世界档案馆”为设计理念。用户通过视觉画廊与网状内链自由探索，搜索仅作为辅助入口，而非主要导航方式。
 
 ## 设计理念
 
@@ -86,7 +86,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 RESEND_API_KEY=re_xxx
-CONTACT_FROM_EMAIL=WorldWiki <noreply@your-domain.com>
+CONTACT_FROM_EMAIL=Austrum <noreply@your-domain.com>
 CONTACT_TO_EMAIL=owner@your-domain.com
 SANITY_WEBHOOK_SECRET=replace_with_random_secret
 # 可选：跨实例限流（推荐生产开启）

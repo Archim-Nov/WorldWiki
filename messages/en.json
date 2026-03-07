@@ -32,7 +32,7 @@
   "Footer": {
     "about": "About",
     "contact": "Contact",
-    "copyright": "© {year} WorldWiki. All rights reserved."
+    "copyright": "© {year} Austrum. All rights reserved."
   },
   "UserNav": {
     "login": "Login"
@@ -60,9 +60,9 @@
     "loginLink": "Login"
   },
   "HomePage": {
-    "kicker": "Museum Universe",
+    "kicker": "Austrum",
     "title": "Start from details, then explore the world.",
-    "description": "Random showcases present slices of content, while latest champions and countries stay pinned as curated entrances.",
+    "description": "Random showcases present slices of Austrum, while latest champions and countries stay pinned as curated entrances.",
     "randomEmpty": "No content available yet.",
     "championsKicker": "Champions",
     "championsTitle": "Champions",
@@ -81,8 +81,8 @@
   },
   "AboutPage": {
     "eyebrow": "About",
-    "title": "About this museum universe",
-    "intro": "This is not a showcase site, but an explorable game universe archive connected by characters, regions, creatures and stories.",
+    "title": "About Austrum",
+    "intro": "Austrum is an explorable worldbuilding archive where characters, regions, creatures, and stories connect into a living network.",
     "exploreTitle": "How to explore",
     "exploreDesc": "Enter from visual gateways and follow internal links to roam through connected entries.",
     "structureTitle": "Content structure",
@@ -99,8 +99,8 @@
     "error": "Submission failed. Please try again later.",
     "submit": "Submit",
     "submitting": "Submitting...",
-    "notesTitle": "Museum Notes",
-    "notesBody": "If you have character settings or worldbuilding materials, feel free to contact us.",
+    "notesTitle": "Austrum Notes",
+    "notesBody": "If you have character concepts or worldbuilding material for Austrum, feel free to contact us.",
     "tipsTitle": "Contact tip",
     "tipsBody": "Please include a clear topic and context so we can integrate your idea efficiently."
   },
@@ -381,7 +381,7 @@
     "empty": "No content to display yet."
   },
   "FullscreenHero": {
-    "welcomeKicker": "Museum Universe Archive",
+    "welcomeKicker": "Austrum",
     "welcomeSubtitle": "A worldbuilding archive entered through details",
     "scroll": "Scroll",
     "prev": "Previous",

@@ -117,7 +117,7 @@ export async function POST(request: Request) {
       from: emailConfig.from,
       to: [emailConfig.to],
       replyTo: email,
-      subject: `WorldWiki 联系表单 - ${name}`,
+      subject: `Austrum 联系表单 - ${name}`,
       text: `姓名: ${name}\n邮箱: ${email}\n消息:\n${message}`,
     })
 

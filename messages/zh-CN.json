@@ -32,7 +32,7 @@
   "Footer": {
     "about": "关于",
     "contact": "联系",
-    "copyright": "© {year} WorldWiki。保留所有权利。"
+    "copyright": "© {year} Austrum。保留所有权利。"
   },
   "UserNav": {
     "login": "登录"
@@ -60,9 +60,9 @@
     "loginLink": "登录"
   },
   "HomePage": {
-    "kicker": "Museum Universe",
+    "kicker": "Austrum",
     "title": "以细节为入口，开启探索。",
-    "description": "随机展柜展示内容切片，最新英雄与国家条目作为固定入口，帮助你快速进入世界观。",
+    "description": "随机展柜展示奥斯特姆的内容切片，最新英雄与国家条目作为固定入口，帮助你快速进入世界观。",
     "randomEmpty": "暂无可展示内容。",
     "championsKicker": "Champions",
     "championsTitle": "英雄",
@@ -81,8 +81,8 @@
   },
   "AboutPage": {
     "eyebrow": "About",
-    "title": "关于这座博物馆宇宙",
-    "intro": "这里不是一个营销网站，而是一座可被探索的游戏宇宙档案库。角色、区域、生物与故事在此连接成网。",
+    "title": "关于 Austrum",
+    "intro": "这里不是一个营销网站，而是一座可被探索的 Austrum 世界档案馆。角色、区域、生物与故事在此连接成网。",
     "exploreTitle": "探索方式",
     "exploreDesc": "从视觉入口进入各个板块，再沿着内链自由漫游。",
     "structureTitle": "内容结构",
@@ -99,8 +99,8 @@
     "error": "提交失败，请稍后再试。",
     "submit": "提交",
     "submitting": "提交中...",
-    "notesTitle": "Museum Notes",
-    "notesBody": "如果你有角色设定或世界观素材，欢迎联系我们一起完善宇宙。",
+    "notesTitle": "Austrum 札记",
+    "notesBody": "如果你有角色设定或奥斯特姆世界观素材，欢迎联系我们一起完善这部世界档案。",
     "tipsTitle": "联系建议",
     "tipsBody": "请尽量提供清晰主题与背景，便于我们更快处理与整合。"
   },
@@ -286,8 +286,8 @@
     "empty": "暂无内容可展示。"
   },
   "FullscreenHero": {
-    "welcomeKicker": "Museum Universe Archive",
-    "welcomeSubtitle": "一个以详情为入口的世界观档案馆",
+    "welcomeKicker": "Austrum",
+    "welcomeSubtitle": "一个从细节进入奥斯特姆的世界档案馆",
     "scroll": "向下",
     "prev": "上一张",
     "next": "下一张"

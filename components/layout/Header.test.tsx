@@ -68,7 +68,7 @@ describe("Header", () => {
   it("renders localized links and right utility controls", () => {
     const { container } = render(<Header />)
 
-    expect(screen.getByRole("link", { name: "WorldWiki" })).toHaveAttribute("href", "/zh-CN")
+    expect(screen.getByRole("link", { name: "Austrum" })).toHaveAttribute("href", "/zh-CN")
     expect(screen.getByRole("link", { name: "Countries" })).toHaveAttribute("href", "/zh-CN/countries")
     expect(screen.getByRole("link", { name: "Regions" })).toHaveAttribute("href", "/zh-CN/regions")
     expect(screen.getByRole("link", { name: "Creatures" })).toHaveAttribute("href", "/zh-CN/creatures")

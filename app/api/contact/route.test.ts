@@ -80,7 +80,7 @@ describe("POST /api/contact", () => {
 
   it("sends email via resend when contact email config exists", async () => {
     process.env.RESEND_API_KEY = "re_test_api_key"
-    process.env.CONTACT_FROM_EMAIL = "WorldWiki <noreply@example.com>"
+    process.env.CONTACT_FROM_EMAIL = "Austrum <noreply@example.com>"
     process.env.CONTACT_TO_EMAIL = "owner@example.com"
     sendEmailMock.mockResolvedValue({ data: { id: "mail_1" }, error: null })
 
@@ -100,10 +100,10 @@ describe("POST /api/contact", () => {
     expect(json).toEqual({ success: true })
     expect(sendEmailMock).toHaveBeenCalledOnce()
     expect(sendEmailMock).toHaveBeenCalledWith({
-      from: "WorldWiki <noreply@example.com>",
+      from: "Austrum <noreply@example.com>",
       to: ["owner@example.com"],
       replyTo: "alice@example.com",
-      subject: "WorldWiki 联系表单 - Alice",
+      subject: "Austrum 联系表单 - Alice",
       text: "姓名: Alice\n邮箱: alice@example.com\n消息:\nhello world",
     })
   })

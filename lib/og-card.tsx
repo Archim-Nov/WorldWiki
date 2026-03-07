@@ -1,11 +1,18 @@
 import type { ReactElement } from 'react'
 
 type OgCardOptions = {
+  brandLabel?: string
+  brandSignature?: string
   title: string
   subtitle: string
 }
 
-export function createOgCard({ title, subtitle }: OgCardOptions): ReactElement {
+export function createOgCard({
+  brandLabel = 'Austrum',
+  brandSignature = 'austrum',
+  title,
+  subtitle,
+}: OgCardOptions): ReactElement {
   return (
     <div
       style={{
@@ -35,7 +42,7 @@ export function createOgCard({ title, subtitle }: OgCardOptions): ReactElement {
           width: 'auto',
         }}
       >
-        WorldWiki
+        {brandLabel}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 980 }}>
@@ -74,7 +81,7 @@ export function createOgCard({ title, subtitle }: OgCardOptions): ReactElement {
           right: 64,
         }}
       >
-        worldwiki
+        {brandSignature}
       </div>
     </div>
   )

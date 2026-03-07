@@ -9,11 +9,13 @@ import { ThemeToggle } from './ThemeToggle'
 import { LocalizedLink } from '@/components/i18n/LocalizedLink'
 import { withLocalePrefix } from '@/i18n/path'
 import { defaultLocale, isValidLocale } from '@/i18n/routing'
+import { getBrandName } from '@/lib/brand'
 
 export function Header() {
   const t = useTranslations('Header')
   const locale = useLocale()
   const activeLocale = isValidLocale(locale) ? locale : defaultLocale
+  const brandName = getBrandName(activeLocale)
 
   const navItems = [
     { href: '/countries', label: t('nav.countries') },
@@ -28,8 +30,8 @@ export function Header() {
     <ScrollHeader>
       <div className="mx-auto w-full max-w-[88rem] px-3 py-3 sm:px-4 sm:py-0 sm:h-16 flex flex-col gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6">
         <div className="flex flex-wrap items-center gap-5 sm:gap-8 sm:justify-self-start">
-          <LocalizedLink href="/" className="font-semibold text-lg sm:text-xl tracking-wide" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
-            WorldWiki
+          <LocalizedLink href="/" className="whitespace-nowrap font-semibold text-lg sm:text-xl tracking-wide" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
+            {brandName}
           </LocalizedLink>
           <span aria-hidden="true" className="text-muted-foreground/55 text-lg leading-none">
             |

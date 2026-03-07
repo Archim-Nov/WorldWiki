@@ -5,7 +5,7 @@ import { schemaTypes } from './schemas'
 
 export default defineConfig({
   name: 'default',
-  title: 'WorldWiki',
+  title: 'Austrum',
   projectId: '1jkwdaz4',
   dataset: 'production',
   basePath: '/studio',

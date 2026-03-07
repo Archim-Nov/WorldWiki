@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { ViewTransitionRouter } from '@/components/layout'
+import { getBrandDescription, getBrandName } from '@/lib/brand'
 import { getSiteUrl } from '@/lib/site-url'
 import './globals.css'
 
@@ -23,37 +24,41 @@ const cinzel = Cinzel({
   subsets: ['latin'],
 })
 
-const siteDescription = 'WorldWiki - 博物馆宇宙与游戏网状百科'
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const brandName = getBrandName(locale)
+  const siteDescription = getBrandDescription(locale)
 
-export const metadata: Metadata = {
-  metadataBase: getSiteUrl(),
-  title: {
-    default: 'WorldWiki',
-    template: '%s | WorldWiki',
-  },
-  description: siteDescription,
-  openGraph: {
-    title: 'WorldWiki',
+  return {
+    metadataBase: getSiteUrl(),
+    title: {
+      default: brandName,
+      template: `%s | ${brandName}`,
+    },
     description: siteDescription,
-    siteName: 'WorldWiki',
-    type: 'website',
-    locale: 'zh_CN',
-    url: '/',
-    images: [
-      {
-        url: '/opengraph-image',
-        width: 1200,
-        height: 630,
-        alt: 'WorldWiki Open Graph Image',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'WorldWiki',
-    description: siteDescription,
-    images: ['/twitter-image'],
-  },
+    openGraph: {
+      title: brandName,
+      description: siteDescription,
+      siteName: brandName,
+      type: 'website',
+      locale: locale === 'en' ? 'en_US' : 'zh_CN',
+      url: '/',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: `${brandName} Open Graph Image`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: brandName,
+      description: siteDescription,
+      images: ['/twitter-image'],
+    },
+  }
 }
 
 export default async function RootLayout({

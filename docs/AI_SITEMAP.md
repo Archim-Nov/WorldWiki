@@ -1,4 +1,4 @@
-# AI Site Map (Museum Universe)
+# AI Site Map (Austrum)
 
 Purpose: a compact, stable map of this repo so future agents can orient quickly.
 

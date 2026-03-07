@@ -1,10 +1,11 @@
 ﻿'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { HeroFade } from './HeroFade'
 import { LocalizedLink } from '@/components/i18n/LocalizedLink'
+import { getBrandName } from '@/lib/brand'
 
 type HeroItem = {
   _id: string
@@ -16,6 +17,8 @@ type HeroItem = {
 
 export function FullscreenHero({ items }: { items: HeroItem[] }) {
   const t = useTranslations('FullscreenHero')
+  const locale = useLocale()
+  const brandName = getBrandName(locale)
   const [active, setActive] = useState(0)
   const [direction, setDirection] = useState<'next' | 'prev'>('next')
   const total = items.length
@@ -81,7 +84,7 @@ export function FullscreenHero({ items }: { items: HeroItem[] }) {
           <div className="hero-fs-welcome-lockup">
             <p className="hero-fs-welcome-kicker">{t('welcomeKicker')}</p>
             <p className="hero-fs-welcome-title" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
-              WorldWiki
+              {brandName}
             </p>
             <p className="hero-fs-welcome-subtitle">{t('welcomeSubtitle')}</p>
           </div>
