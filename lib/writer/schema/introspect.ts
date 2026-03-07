@@ -16,6 +16,7 @@ type SanityFieldLike = {
   type?: string
   description?: string
   validation?: unknown
+  initialValue?: unknown
   options?: {
     list?: Array<{ title?: string; value?: string }>
   }
@@ -53,6 +54,16 @@ function mapFieldKind(field: SanityFieldLike): WriterFieldKind {
   }
 }
 
+function normalizeDefaultValue(value: unknown) {
+  if (value === undefined || typeof value === 'function') return undefined
+
+  try {
+    return JSON.parse(JSON.stringify(value))
+  } catch {
+    return undefined
+  }
+}
+
 function mapFieldDefinition(field: SanityFieldLike): WriterFieldDefinition | null {
   if (!field.name || !field.title) return null
 
@@ -77,6 +88,7 @@ function mapFieldDefinition(field: SanityFieldLike): WriterFieldDefinition | nul
     description: field.description,
     options,
     referenceTypes: referenceTypes ?? arrayReferenceTypes,
+    defaultValue: normalizeDefaultValue(field.initialValue),
   }
 }
 
@@ -126,4 +138,14 @@ export function listWriterSchemas() {
 
 export function getWriterFieldDefinition(documentType: WriterDocumentType, fieldName: string) {
   return getWriterSchemaSummary(documentType).fields.find((field) => field.name === fieldName)
+}
+
+export function getWriterDefaultFieldValues(documentType: WriterDocumentType) {
+  const schema = getWriterSchemaSummary(documentType)
+
+  return schema.fields.reduce<Record<string, unknown>>((defaults, field) => {
+    if (field.defaultValue === undefined) return defaults
+    defaults[field.name] = normalizeDefaultValue(field.defaultValue)
+    return defaults
+  }, {})
 }

@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { WriterConceptCard, WriterDocumentType, WriterSession, WriterWorkflowMode } from '@/types/writer'
 import { createTimestamp, createWriterId, deepClone, slugifyText } from '@/lib/writer/utils'
-import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
+import { getWriterDefaultFieldValues, getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
 import { ensureWriterStorage, deleteJsonFile, listJsonFiles, readJsonFile, writeJsonFile } from '@/lib/writer/storage/fs'
 import { getWriterSessionPath, getWriterSessionsDir } from '@/lib/writer/storage/paths'
 import { saveSnapshot } from '@/lib/writer/storage/snapshots'
@@ -14,9 +14,23 @@ function createInitialFields(documentType: WriterDocumentType, title: string) {
   const slugField = schema.slugField
 
   return {
+    ...getWriterDefaultFieldValues(documentType),
     [titleField]: title,
     [slugField]: slugifyText(title),
   }
+}
+
+function mergeMissingDefaultFields(documentType: WriterDocumentType, fields: Record<string, unknown>) {
+  const defaults = getWriterDefaultFieldValues(documentType)
+  const nextFields = { ...fields }
+
+  for (const [fieldName, defaultValue] of Object.entries(defaults)) {
+    if (nextFields[fieldName] === undefined || nextFields[fieldName] === null) {
+      nextFields[fieldName] = deepClone(defaultValue)
+    }
+  }
+
+  return nextFields
 }
 
 function normalizeStringArray(value: unknown) {
@@ -71,7 +85,12 @@ export function normalizeWriterSession(session: WriterSession): WriterSession {
   const title = typeof session.title === 'string' && session.title.trim() ? session.title : 'Untitled Entry'
   const workflowMode = inferWorkflowMode(session)
   const sourceText = typeof session.draft?.sourceText === 'string' ? session.draft.sourceText : ''
-  const draftFields = session.draft?.fields && typeof session.draft.fields === 'object' ? deepClone(session.draft.fields) : createInitialFields(session.documentType, title)
+  const draftFields = mergeMissingDefaultFields(
+    session.documentType,
+    session.draft?.fields && typeof session.draft.fields === 'object'
+      ? deepClone(session.draft.fields)
+      : createInitialFields(session.documentType, title)
+  )
 
   return {
     ...session,

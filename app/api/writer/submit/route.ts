@@ -1,8 +1,9 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
 import { publishWriterDocument, submitWriterDraft } from '@/lib/writer/sanity/submit'
+import { getSanityWriteConfigStatus } from '@/lib/sanity/write-client'
 
 export async function POST(request: Request) {
   const accessResponse = await requireWriterAccess()
@@ -50,6 +51,21 @@ export async function POST(request: Request) {
       session: nextSession,
     })
   } catch (error) {
+    if (error instanceof Error && error.message === 'sanity_write_disabled') {
+      const status = getSanityWriteConfigStatus()
+      return NextResponse.json(
+        {
+          error: 'sanity_write_disabled',
+          message:
+            status.missingEnvVars.length > 0
+              ? `Sanity 写入未启用，缺少环境变量：${status.missingEnvVars.join(', ')}`
+              : 'Sanity 写入未启用，请检查服务端写入配置。',
+          missingEnvVars: status.missingEnvVars,
+        },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : 'submit_failed',

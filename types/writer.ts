@@ -1,4 +1,4 @@
-﻿export type WriterDocumentType =
+export type WriterDocumentType =
   | 'country'
   | 'region'
   | 'creature'
@@ -62,6 +62,7 @@ export interface WriterFieldDefinition {
   description?: string
   options?: WriterFieldOption[]
   referenceTypes?: string[]
+  defaultValue?: unknown
 }
 
 export interface WriterFieldGroup {
