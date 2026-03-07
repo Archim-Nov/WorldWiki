@@ -50,6 +50,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     draft: body.draft && typeof body.draft === 'object' ? (body.draft as never) : undefined,
     conceptCard: body.conceptCard && typeof body.conceptCard === 'object' ? (body.conceptCard as never) : undefined,
     outline: Array.isArray(body.outline) ? (body.outline as never) : undefined,
+    calibrationPatches: Array.isArray(body.calibrationPatches) ? (body.calibrationPatches as never) : undefined,
     lastCheck: body.lastCheck && typeof body.lastCheck === 'object' ? (body.lastCheck as never) : undefined,
   })
 

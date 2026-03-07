@@ -1,8 +1,10 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
-import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
 import { runWriterChecks } from '@/lib/writer/checkers/consistency'
+import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
+import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
+import { buildWriterCalibrationPatches } from '@/lib/writer/workflow/calibration'
 
 export async function POST(request: Request) {
   const accessResponse = await requireWriterAccess()
@@ -20,15 +22,26 @@ export async function POST(request: Request) {
   }
 
   const lastCheck = await runWriterChecks(session.draft)
+  const schema = getWriterSchemaSummary(session.documentType)
+  const calibrationPatches = buildWriterCalibrationPatches({
+    session: {
+      ...session,
+      lastCheck,
+    },
+    schema,
+    checkResult: lastCheck,
+  })
+
   const nextSession = await updateWriterSession(sessionId, {
     lastCheck,
-    calibrationPatches: [],
-    stage: session.workflowMode === 'conversation' ? 'review' : session.stage,
+    calibrationPatches,
+    stage: session.workflowMode === 'conversation' ? 'calibration' : session.stage,
     status: lastCheck.issues.some((issue) => issue.level === 'error') ? 'draft' : 'checked',
   })
 
   return NextResponse.json({
     lastCheck,
+    patches: calibrationPatches,
     session: nextSession,
   })
 }

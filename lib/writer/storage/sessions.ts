@@ -101,6 +101,8 @@ export async function updateWriterSession(id: string, patch: Partial<WriterSessi
       : current.draft,
     conceptCard: patch.conceptCard ? deepClone(patch.conceptCard) : current.conceptCard,
     outline: patch.outline ? deepClone(patch.outline) : current.outline,
+    calibrationPatches: patch.calibrationPatches ? deepClone(patch.calibrationPatches) : current.calibrationPatches,
+    lastCheck: patch.lastCheck ? deepClone(patch.lastCheck) : current.lastCheck,
   }
 
   await writeJsonFile(getWriterSessionPath(id), next)

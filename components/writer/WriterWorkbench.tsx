@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useMemo, useState } from 'react'
 import type {
@@ -11,6 +11,7 @@ import type {
 } from '@/types/writer'
 import { StructuredFieldEditor } from '@/components/writer/StructuredFieldEditor'
 import { ChecksPanel } from '@/components/writer/ChecksPanel'
+import { CalibrationPanel } from '@/components/writer/CalibrationPanel'
 import { ConceptCardPanel } from '@/components/writer/ConceptCardPanel'
 import { ConversationTimeline } from '@/components/writer/ConversationTimeline'
 import { OutlinePanel } from '@/components/writer/OutlinePanel'
@@ -24,7 +25,7 @@ type WriterWorkbenchProps = {
   presets: WriterPromptPreset[]
 }
 
-const conversationStages: WriterStage[] = ['conversation', 'outline', 'drafting', 'review', 'submitted']
+const conversationStages: WriterStage[] = ['conversation', 'outline', 'drafting', 'calibration', 'review', 'submitted']
 
 export function WriterWorkbench({ initialSession, schema, providers, presets }: WriterWorkbenchProps) {
   const [session, setSession] = useState(initialSession)
@@ -58,9 +59,25 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     return { response, data }
   }
 
+  async function syncSessionState(overrides: Record<string, unknown> = {}) {
+    return patchSession({
+      title: session.title,
+      providerId: session.providerId,
+      presetIds: session.presetIds,
+      workflowMode,
+      stage,
+      draft: session.draft,
+      conceptCard: session.conceptCard,
+      outline: session.outline,
+      calibrationPatches: session.calibrationPatches,
+      ...overrides,
+    })
+  }
+
   function handleFieldChange(fieldName: string, value: unknown) {
     setSession((current) => ({
       ...current,
+      calibrationPatches: [],
       draft: {
         ...current.draft,
         fields: {
@@ -117,23 +134,20 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
 
   async function handleSave() {
     setBusyAction('save')
-    const { response, data } = await patchSession({
-      title: session.title,
-      providerId: session.providerId,
-      presetIds: session.presetIds,
-      workflowMode,
-      stage,
-      draft: session.draft,
-      conceptCard: session.conceptCard,
-      outline: session.outline,
-    })
-
+    const { response, data } = await syncSessionState()
     setFlashMessage(response.ok ? '本地草稿已保存。' : data.error ?? '保存失败')
     setBusyAction('')
   }
 
   async function handleCheck() {
     setBusyAction('check')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法校验')
+      setBusyAction('')
+      return
+    }
+
     const response = await fetch('/api/writer/check', {
       method: 'POST',
       headers: {
@@ -155,6 +169,13 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     if (!instruction.trim() && (!outlineBlockIds || outlineBlockIds.length === 0)) return
 
     setBusyAction('generate')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法生成')
+      setBusyAction('')
+      return
+    }
+
     const response = await fetch('/api/writer/generate', {
       method: 'POST',
       headers: {
@@ -203,6 +224,13 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     if (!chatInput.trim()) return
 
     setBusyAction('chat')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法继续对话')
+      setBusyAction('')
+      return
+    }
+
     const response = await fetch('/api/writer/chat', {
       method: 'POST',
       headers: {
@@ -229,6 +257,13 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
 
   async function handleCreateOutline() {
     setBusyAction('outline')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法整理雏形')
+      setBusyAction('')
+      return
+    }
+
     const response = await fetch('/api/writer/outline', {
       method: 'POST',
       headers: {
@@ -250,6 +285,83 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     setBusyAction('')
   }
 
+  async function handleCalibrate() {
+    setBusyAction('calibrate')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法校准')
+      setBusyAction('')
+      return
+    }
+
+    const response = await fetch('/api/writer/calibrate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sessionId: session.id }),
+    })
+
+    const data = await response.json()
+    if (response.ok && data.session) {
+      setSession(data.session)
+      setFlashMessage(data.patches?.length ? `AI 校准已生成 ${data.patches.length} 条建议。` : '当前没有可自动校准的项。')
+    } else {
+      setFlashMessage(data.error ?? 'AI 校准失败')
+    }
+
+    setBusyAction('')
+  }
+
+  async function handleApplyCalibrationPatch(patchId: string) {
+    setBusyAction('apply-patch')
+    const response = await fetch('/api/writer/patches/apply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId: session.id,
+        patchIds: [patchId],
+      }),
+    })
+
+    const data = await response.json()
+    if (response.ok && data.session) {
+      setSession(data.session)
+      setFlashMessage('已应用校准建议。')
+    } else {
+      setFlashMessage(data.error ?? '应用建议失败')
+    }
+
+    setBusyAction('')
+  }
+
+  async function handleApplyAllCalibrationPatches() {
+    if (!session.calibrationPatches || session.calibrationPatches.length === 0) return
+
+    setBusyAction('apply-patch')
+    const response = await fetch('/api/writer/patches/apply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId: session.id,
+      }),
+    })
+
+    const data = await response.json()
+    if (response.ok && data.session) {
+      setSession(data.session)
+      setFlashMessage('已一键应用全部校准建议。')
+    } else {
+      setFlashMessage(data.error ?? '应用全部建议失败')
+    }
+
+    setBusyAction('')
+  }
+
   async function handleEnableConversation() {
     const conceptCard =
       session.conceptCard ??
@@ -265,6 +377,7 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
       stage: 'conversation',
       conceptCard,
       outline: session.outline,
+      calibrationPatches: session.calibrationPatches,
     })
     setFlashMessage(response.ok ? '已切换为对话式创作。' : data.error ?? '切换失败')
     setBusyAction('')
@@ -276,12 +389,14 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
       return
     }
 
+    if (nextStage === 'calibration') {
+      await handleCalibrate()
+      return
+    }
+
     setBusyAction('stage')
-    const { response, data } = await patchSession({
+    const { response, data } = await syncSessionState({
       stage: nextStage,
-      workflowMode,
-      conceptCard: session.conceptCard,
-      outline: session.outline,
     })
     setFlashMessage(response.ok ? `已切换到${getWriterStageLabel(nextStage)}。` : data.error ?? '阶段切换失败')
     setBusyAction('')
@@ -289,6 +404,13 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
 
   async function handleSubmit(action: 'saveDraft' | 'publish') {
     setBusyAction('submit')
+    const saved = await syncSessionState()
+    if (!saved.response.ok) {
+      setFlashMessage(saved.data.error ?? '保存失败，无法提交')
+      setBusyAction('')
+      return
+    }
+
     const response = await fetch('/api/writer/submit', {
       method: 'POST',
       headers: {
@@ -385,6 +507,7 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
                   onChange={(event) =>
                     setSession((current) => ({
                       ...current,
+                      calibrationPatches: [],
                       draft: {
                         ...current.draft,
                         sourceText: event.target.value,
@@ -545,6 +668,14 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
               </button>
               <button
                 type="button"
+                onClick={handleCalibrate}
+                disabled={busyAction !== ''}
+                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
+              >
+                AI 校准
+              </button>
+              <button
+                type="button"
                 onClick={() => handleSubmit('saveDraft')}
                 disabled={busyAction !== ''}
                 className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
@@ -592,11 +723,26 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
                 <span>{session.draft.lockedFields.length}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">校准建议</span>
+                <span>{session.calibrationPatches?.length ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-muted-foreground">最后更新</span>
                 <span>{new Date(session.updatedAt).toLocaleString()}</span>
               </div>
             </div>
           </section>
+
+          <CalibrationPanel
+            schema={schema}
+            fields={session.draft.fields}
+            patches={session.calibrationPatches}
+            result={session.lastCheck}
+            disabled={busyAction !== ''}
+            onRunCalibration={handleCalibrate}
+            onApplyPatch={handleApplyCalibrationPatch}
+            onApplyAll={handleApplyAllCalibrationPatches}
+          />
 
           <ChecksPanel result={session.lastCheck} />
         </aside>

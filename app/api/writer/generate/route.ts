@@ -119,6 +119,7 @@ export async function POST(request: Request) {
 
   const nextSession = await updateWriterSession(sessionId, {
     messages: nextMessages,
+    calibrationPatches: [],
     stage: session.workflowMode === 'conversation' ? 'drafting' : session.stage,
     outline: markOutlineBlocksExpanded(session.outline, outlineBlockIds),
     draft: {

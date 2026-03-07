@@ -40,6 +40,8 @@ export type WriterConversationIntent = 'explore' | 'refine' | 'resolve'
 
 export type WriterOutlineStatus = 'pending' | 'accepted' | 'expanded'
 
+export type WriterCalibrationPatchKind = 'schema' | 'consistency' | 'style' | 'reference'
+
 export interface WriterFieldOption {
   title: string
   value: string
@@ -193,6 +195,15 @@ export interface WriterOutlineBlock {
   status: WriterOutlineStatus
 }
 
+export interface WriterCalibrationPatch {
+  id: string
+  kind: WriterCalibrationPatchKind
+  title: string
+  reason: string
+  fieldName?: string
+  nextValue: unknown
+}
+
 export interface WriterSession {
   id: string
   title: string
@@ -208,6 +219,7 @@ export interface WriterSession {
   draft: WriterDraft
   conceptCard?: WriterConceptCard
   outline?: WriterOutlineBlock[]
+  calibrationPatches?: WriterCalibrationPatch[]
   lastCheck?: WriterCheckResult
 }
 
