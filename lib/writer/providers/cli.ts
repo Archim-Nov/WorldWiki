@@ -1,8 +1,9 @@
-import 'server-only'
+﻿import 'server-only'
 
 import { spawn } from 'node:child_process'
-import type { WriterGenerationResult, WriterProviderConfig } from '@/types/writer'
+import type { WriterProviderConfig } from '@/types/writer'
 import type { WriterProvider, WriterProviderRequest } from '@/lib/writer/providers/base'
+import { parseWriterResponse } from '@/lib/writer/providers/parse'
 
 function buildPrompt(request: WriterProviderRequest) {
   return `${request.systemPrompt}\n\n${request.userPrompt}`
@@ -23,7 +24,7 @@ export class CliWriterProvider implements WriterProvider {
     return { ok: true, message: 'CLI Provider 已配置' }
   }
 
-  async generate(request: WriterProviderRequest): Promise<WriterGenerationResult> {
+  async generate(request: WriterProviderRequest) {
     if (!this.config.command) {
       throw new Error('cli_command_missing')
     }
@@ -58,10 +59,6 @@ export class CliWriterProvider implements WriterProvider {
       child.stdin.end()
     })
 
-    return {
-      assistantMessage: stdout.trim() || 'CLI 未返回结构化内容。',
-      fields: {},
-      rawText: stdout,
-    }
+    return parseWriterResponse(stdout)
   }
 }

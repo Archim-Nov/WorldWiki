@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
@@ -22,6 +22,7 @@ export async function POST(request: Request) {
   const lastCheck = await runWriterChecks(session.draft)
   const nextSession = await updateWriterSession(sessionId, {
     lastCheck,
+    stage: session.workflowMode === 'conversation' ? 'review' : session.stage,
     status: lastCheck.issues.some((issue) => issue.level === 'error') ? 'draft' : 'checked',
   })
 

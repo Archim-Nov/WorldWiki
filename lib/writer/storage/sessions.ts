@@ -1,11 +1,12 @@
-import 'server-only'
+﻿import 'server-only'
 
-import type { WriterDocumentType, WriterSession } from '@/types/writer'
+import type { WriterConceptCard, WriterDocumentType, WriterSession, WriterWorkflowMode } from '@/types/writer'
 import { createTimestamp, createWriterId, deepClone, slugifyText } from '@/lib/writer/utils'
 import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
 import { ensureWriterStorage, deleteJsonFile, listJsonFiles, readJsonFile, writeJsonFile } from '@/lib/writer/storage/fs'
 import { getWriterSessionPath, getWriterSessionsDir } from '@/lib/writer/storage/paths'
 import { saveSnapshot } from '@/lib/writer/storage/snapshots'
+import { createConceptCard, getInitialWriterStage } from '@/lib/writer/workflow/conversation'
 
 function createInitialFields(documentType: WriterDocumentType, title: string) {
   const schema = getWriterSchemaSummary(documentType)
@@ -25,9 +26,7 @@ export async function listWriterSessions() {
     files.map((file) => readJsonFile<WriterSession>(`${getWriterSessionsDir()}/${file}`, null as never))
   )
 
-  return sessions
-    .filter(Boolean)
-    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  return sessions.filter(Boolean).sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
 }
 
 export async function getWriterSession(id: string) {
@@ -41,10 +40,15 @@ export async function createWriterSession(input: {
   sourceText?: string
   providerId?: string
   presetIds?: string[]
+  workflowMode?: WriterWorkflowMode
+  stage?: WriterSession['stage']
+  conceptCard?: WriterConceptCard
 }) {
   await ensureWriterStorage()
   const now = createTimestamp()
-  const title = input.title?.trim() || '未命名条目'
+  const title = input.title?.trim() || 'Untitled Entry'
+  const workflowMode = input.workflowMode ?? 'direct'
+  const sourceText = input.sourceText?.trim() ?? ''
   const session: WriterSession = {
     id: createWriterId('session'),
     title,
@@ -53,15 +57,26 @@ export async function createWriterSession(input: {
     presetIds: input.presetIds ?? [],
     createdAt: now,
     updatedAt: now,
+    workflowMode,
+    stage: input.stage ?? getInitialWriterStage(workflowMode),
     status: 'draft',
     messages: [],
     draft: {
       documentType: input.documentType,
-      sourceText: input.sourceText?.trim() ?? '',
+      sourceText,
       fields: createInitialFields(input.documentType, title),
       lockedFields: [],
       updatedAt: now,
     },
+    conceptCard:
+      input.conceptCard ??
+      (workflowMode === 'conversation'
+        ? createConceptCard({
+            title,
+            sourceText,
+            documentType: input.documentType,
+          })
+        : undefined),
   }
 
   await writeJsonFile(getWriterSessionPath(session.id), session)
@@ -84,6 +99,8 @@ export async function updateWriterSession(id: string, patch: Partial<WriterSessi
           updatedAt: createTimestamp(),
         }
       : current.draft,
+    conceptCard: patch.conceptCard ? deepClone(patch.conceptCard) : current.conceptCard,
+    outline: patch.outline ? deepClone(patch.outline) : current.outline,
   }
 
   await writeJsonFile(getWriterSessionPath(id), next)

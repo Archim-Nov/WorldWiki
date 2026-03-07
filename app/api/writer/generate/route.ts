@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
@@ -68,6 +68,8 @@ export async function POST(request: Request) {
     sourceText: session.draft.sourceText,
     instruction,
     currentFields: session.draft.fields,
+    conceptCard: session.conceptCard,
+    outline: session.outline,
   })
 
   const result = await provider.generate(prompt)
@@ -101,6 +103,12 @@ export async function POST(request: Request) {
 
   const nextSession = await updateWriterSession(sessionId, {
     messages: nextMessages,
+    stage: session.workflowMode === 'conversation' ? 'drafting' : session.stage,
+    outline:
+      session.outline?.map((block) => ({
+        ...block,
+        status: block.status === 'accepted' ? 'expanded' : block.status,
+      })) ?? session.outline,
     draft: {
       ...session.draft,
       fields: nextFields,

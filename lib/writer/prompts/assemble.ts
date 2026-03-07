@@ -1,26 +1,68 @@
-import type { WriterDocumentType, WriterPromptPreset, WriterSchemaSummary } from '@/types/writer'
+﻿import type {
+  WriterConversationIntent,
+  WriterDocumentType,
+  WriterPromptPreset,
+  WriterSchemaSummary,
+  WriterSession,
+  WriterTypeSuggestion,
+} from '@/types/writer'
 
 function formatSchema(schema: WriterSchemaSummary) {
   return schema.fields
     .map((field) => {
-      const extra = [field.required ? 'required' : null, field.description ?? null]
-        .filter(Boolean)
-        .join(', ')
+      const extra = [field.required ? 'required' : null, field.description ?? null].filter(Boolean).join(', ')
       return `- ${field.name} (${field.kind}${extra ? `, ${extra}` : ''})`
     })
     .join('\n')
 }
 
+function formatSchemaGroups(schema: WriterSchemaSummary) {
+  if (schema.groups.length === 0) return 'No schema groups.'
+
+  return schema.groups
+    .map((group) => `- ${group.title}: ${group.fieldNames.join(', ')}`)
+    .join('\n')
+}
+
 function formatPresets(presets: WriterPromptPreset[]) {
-  if (presets.length === 0) return '无额外预设。'
-  return presets
-    .filter((preset) => preset.enabled)
-    .map((preset) => `## ${preset.name}\n${preset.content}`)
+  const enabledPresets = presets.filter((preset) => preset.enabled)
+  if (enabledPresets.length === 0) return 'No extra presets enabled.'
+
+  return enabledPresets.map((preset) => `## ${preset.name}\n${preset.content}`).join('\n\n')
+}
+
+function formatSuggestions(suggestions: WriterTypeSuggestion[]) {
+  if (suggestions.length === 0) return 'No type suggestions yet.'
+
+  return suggestions
+    .map((suggestion) => `- ${suggestion.documentType} (score: ${suggestion.score.toFixed(2)}) ${suggestion.reason}`)
+    .join('\n')
+}
+
+function formatRecentMessages(session: WriterSession) {
+  if (session.messages.length === 0) return 'No prior messages.'
+
+  return session.messages
+    .slice(-8)
+    .map((message) => `[${message.role}] ${message.content}`)
     .join('\n\n')
 }
 
+function formatOutline(session: WriterSession) {
+  if (!session.outline || session.outline.length === 0) return 'No outline yet.'
+
+  return session.outline
+    .map((block) => `- ${block.title} [${block.status}] => ${block.summary} (fields: ${block.mappedFields.join(', ')})`)
+    .join('\n')
+}
+
 export function buildClassificationPrompt(text: string, documentTypes: WriterDocumentType[]) {
-  return `请根据以下内容判断它更适合哪一类条目：${documentTypes.join(', ')}。\n\n内容：\n${text}`
+  return [
+    'Classify the following worldbuilding note into the most suitable entry type.',
+    `Allowed types: ${documentTypes.join(', ')}`,
+    '',
+    text,
+  ].join('\n')
 }
 
 export function buildGenerationPrompt(args: {
@@ -29,28 +71,131 @@ export function buildGenerationPrompt(args: {
   sourceText: string
   instruction: string
   currentFields: Record<string, unknown>
+  conceptCard?: WriterSession['conceptCard']
+  outline?: WriterSession['outline']
 }) {
-  const { schema, presets, sourceText, instruction, currentFields } = args
+  const { schema, presets, sourceText, instruction, currentFields, conceptCard, outline } = args
 
   const systemPrompt = [
-    '你是一个世界观条目创作助手。',
-    '你的任务是根据用户需求与预设，产出结构化条目草稿。',
-    '必须返回 JSON，不要添加多余说明。',
-    'JSON 结构为：{"assistantMessage": string, "title": string?, "fields": Record<string, unknown>}。',
-    '只填写当前条目 schema 允许的字段。',
-    `当前条目类型：${schema.documentType}`,
-    '字段列表：',
+    'You are a structured worldbuilding entry assistant.',
+    'Return JSON only.',
+    'Use this shape: {"assistantMessage": string, "title": string?, "fields": Record<string, unknown>}.',
+    'Only fill fields that exist in the schema.',
+    'For rich text fields, return plain paragraph text; the app will convert it later.',
+    `Current document type: ${schema.documentType}`,
+    'Schema fields:',
     formatSchema(schema),
-    '预设：',
+    'Schema groups:',
+    formatSchemaGroups(schema),
+    'Active presets:',
     formatPresets(presets),
   ].join('\n\n')
 
   const userPrompt = [
-    `原始素材：\n${sourceText || '无'}`,
-    `当前字段：\n${JSON.stringify(currentFields, null, 2)}`,
-    `本次任务：\n${instruction}`,
-    '对于富文本字段，请直接返回字符串段落；系统会自动转换为 Portable Text。',
-    '对于 slug 字段，只返回字符串，不要返回对象。',
+    `Source material:\n${sourceText || '(empty)'}`,
+    `Current concept card:\n${JSON.stringify(conceptCard ?? null, null, 2)}`,
+    `Current outline:\n${JSON.stringify(outline ?? null, null, 2)}`,
+    `Current fields:\n${JSON.stringify(currentFields, null, 2)}`,
+    `Instruction:\n${instruction}`,
+  ].join('\n\n')
+
+  return { systemPrompt, userPrompt }
+}
+
+export function buildConversationPrompt(args: {
+  session: WriterSession
+  presets: WriterPromptPreset[]
+  input: string
+  intent: WriterConversationIntent
+  suggestions: WriterTypeSuggestion[]
+}) {
+  const { session, presets, input, intent, suggestions } = args
+
+  const systemPrompt = [
+    'You are a collaborative worldbuilding partner helping the user talk through an idea before drafting a full entry.',
+    'Stay discussion-first: clarify intent, preserve established decisions, and do not rush into final prose.',
+    'Respond in Chinese.',
+    'Return JSON only.',
+    'Use this shape:',
+    '{',
+    '  "assistantMessage": string,',
+    '  "conceptCard": {',
+    '    "premise": string,',
+    '    "tone": string?,',
+    '    "goals": string[],',
+    '    "constraints": string[],',
+    '    "candidateTypes": Array<{"documentType": string, "score": number, "reason": string}>,',
+    '    "openQuestions": string[],',
+    '    "decisions": Array<{"label": string, "value": string, "locked": boolean?, "source": "assistant" | "user"}>',
+    '  },',
+    '  "suggestedNextAction": "continue-conversation" | "create-outline" | "start-drafting" | "run-calibration" | "submit",',
+    '  "fields": {}',
+    '}',
+    'Keep the concept card concise and stable. Preserve previous locked or confirmed decisions when possible.',
+    'Prefer 1-3 sharp follow-up questions instead of a huge answer when information is missing.',
+    'Active presets:',
+    formatPresets(presets),
+  ].join('\n\n')
+
+  const userPrompt = [
+    `Session title: ${session.title}`,
+    `Current document type: ${session.documentType}`,
+    `Workflow stage: ${session.stage ?? 'conversation'}`,
+    `Initial concept brief:\n${session.draft.sourceText || '(empty)'}`,
+    `Current concept card:\n${JSON.stringify(session.conceptCard ?? null, null, 2)}`,
+    `Candidate types:\n${formatSuggestions(suggestions)}`,
+    `Recent conversation:\n${formatRecentMessages(session)}`,
+    `User intent: ${intent}`,
+    `Latest user message:\n${input}`,
+    'Help the user converge on a solid concept card that can later become a structured entry draft.',
+  ].join('\n\n')
+
+  return { systemPrompt, userPrompt }
+}
+
+export function buildOutlinePrompt(args: {
+  session: WriterSession
+  schema: WriterSchemaSummary
+  presets: WriterPromptPreset[]
+}) {
+  const { session, schema, presets } = args
+
+  const systemPrompt = [
+    'You are a worldbuilding outlining assistant.',
+    'Turn the current concept discussion into a concise entry outline before full drafting begins.',
+    'Respond in Chinese.',
+    'Return JSON only.',
+    'Use this shape:',
+    '{',
+    '  "assistantMessage": string,',
+    '  "outline": Array<{',
+    '    "title": string,',
+    '    "summary": string,',
+    '    "mappedFields": string[],',
+    '    "status": "pending" | "accepted" | "expanded"',
+    '  }>,',
+    '  "suggestedNextAction": "create-outline" | "start-drafting" | "continue-conversation",',
+    '  "fields": {}',
+    '}',
+    'The outline should be practical, field-aware, and avoid full prose paragraphs.',
+    'Each block should map to fields that exist in the schema.',
+    'Prefer 3-5 blocks.',
+    'Schema groups:',
+    formatSchemaGroups(schema),
+    'Schema fields:',
+    formatSchema(schema),
+    'Active presets:',
+    formatPresets(presets),
+  ].join('\n\n')
+
+  const userPrompt = [
+    `Session title: ${session.title}`,
+    `Document type: ${session.documentType}`,
+    `Source material:\n${session.draft.sourceText || '(empty)'}`,
+    `Current concept card:\n${JSON.stringify(session.conceptCard ?? null, null, 2)}`,
+    `Recent conversation:\n${formatRecentMessages(session)}`,
+    `Existing outline:\n${formatOutline(session)}`,
+    'Please produce an outline that the user can review before structured drafting.',
   ].join('\n\n')
 
   return { systemPrompt, userPrompt }

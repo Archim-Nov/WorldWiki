@@ -1,4 +1,4 @@
-export type WriterDocumentType =
+﻿export type WriterDocumentType =
   | 'country'
   | 'region'
   | 'creature'
@@ -24,6 +24,21 @@ export type WriterMessageRole = 'system' | 'user' | 'assistant'
 export type WriterCheckLevel = 'error' | 'warning' | 'info'
 
 export type WriterGenerationMode = 'scaffold' | 'rewrite' | 'fill-missing'
+
+export type WriterWorkflowMode = 'direct' | 'conversation'
+
+export type WriterStage = 'conversation' | 'outline' | 'drafting' | 'calibration' | 'review' | 'submitted'
+
+export type WriterNextAction =
+  | 'continue-conversation'
+  | 'create-outline'
+  | 'start-drafting'
+  | 'run-calibration'
+  | 'submit'
+
+export type WriterConversationIntent = 'explore' | 'refine' | 'resolve'
+
+export type WriterOutlineStatus = 'pending' | 'accepted' | 'expanded'
 
 export interface WriterFieldOption {
   title: string
@@ -145,6 +160,39 @@ export interface WriterSnapshot {
   draft: WriterDraft
 }
 
+export interface WriterTypeSuggestion {
+  documentType: WriterDocumentType
+  score: number
+  reason: string
+}
+
+export interface WriterConceptDecision {
+  id: string
+  label: string
+  value: string
+  locked: boolean
+  source: 'user' | 'assistant'
+}
+
+export interface WriterConceptCard {
+  premise: string
+  tone?: string
+  goals: string[]
+  constraints: string[]
+  candidateTypes: WriterTypeSuggestion[]
+  openQuestions: string[]
+  decisions: WriterConceptDecision[]
+  updatedAt: string
+}
+
+export interface WriterOutlineBlock {
+  id: string
+  title: string
+  summary: string
+  mappedFields: string[]
+  status: WriterOutlineStatus
+}
+
 export interface WriterSession {
   id: string
   title: string
@@ -153,21 +201,22 @@ export interface WriterSession {
   presetIds: string[]
   createdAt: string
   updatedAt: string
+  workflowMode?: WriterWorkflowMode
+  stage?: WriterStage
   status: 'draft' | 'checked' | 'submitted'
   messages: WriterMessage[]
   draft: WriterDraft
+  conceptCard?: WriterConceptCard
+  outline?: WriterOutlineBlock[]
   lastCheck?: WriterCheckResult
-}
-
-export interface WriterTypeSuggestion {
-  documentType: WriterDocumentType
-  score: number
-  reason: string
 }
 
 export interface WriterGenerationResult {
   assistantMessage: string
   title?: string
   fields: Record<string, unknown>
+  conceptCard?: Partial<WriterConceptCard>
+  outline?: WriterOutlineBlock[]
+  suggestedNextAction?: WriterNextAction
   rawText: string
 }
