@@ -35,6 +35,8 @@ Thumbs.db
 # local tooling
 .claude/
 backups/
+.local/writer/
+.local/writer-cache/
 
 # vercel
 .vercel

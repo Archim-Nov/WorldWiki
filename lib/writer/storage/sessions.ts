@@ -1,0 +1,98 @@
+import 'server-only'
+
+import type { WriterDocumentType, WriterSession } from '@/types/writer'
+import { createTimestamp, createWriterId, deepClone, slugifyText } from '@/lib/writer/utils'
+import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
+import { ensureWriterStorage, deleteJsonFile, listJsonFiles, readJsonFile, writeJsonFile } from '@/lib/writer/storage/fs'
+import { getWriterSessionPath, getWriterSessionsDir } from '@/lib/writer/storage/paths'
+import { saveSnapshot } from '@/lib/writer/storage/snapshots'
+
+function createInitialFields(documentType: WriterDocumentType, title: string) {
+  const schema = getWriterSchemaSummary(documentType)
+  const titleField = schema.titleField
+  const slugField = schema.slugField
+
+  return {
+    [titleField]: title,
+    [slugField]: slugifyText(title),
+  }
+}
+
+export async function listWriterSessions() {
+  await ensureWriterStorage()
+  const files = await listJsonFiles(getWriterSessionsDir())
+  const sessions = await Promise.all(
+    files.map((file) => readJsonFile<WriterSession>(`${getWriterSessionsDir()}/${file}`, null as never))
+  )
+
+  return sessions
+    .filter(Boolean)
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+}
+
+export async function getWriterSession(id: string) {
+  await ensureWriterStorage()
+  return readJsonFile<WriterSession | null>(getWriterSessionPath(id), null)
+}
+
+export async function createWriterSession(input: {
+  documentType: WriterDocumentType
+  title?: string
+  sourceText?: string
+  providerId?: string
+  presetIds?: string[]
+}) {
+  await ensureWriterStorage()
+  const now = createTimestamp()
+  const title = input.title?.trim() || '未命名条目'
+  const session: WriterSession = {
+    id: createWriterId('session'),
+    title,
+    documentType: input.documentType,
+    providerId: input.providerId,
+    presetIds: input.presetIds ?? [],
+    createdAt: now,
+    updatedAt: now,
+    status: 'draft',
+    messages: [],
+    draft: {
+      documentType: input.documentType,
+      sourceText: input.sourceText?.trim() ?? '',
+      fields: createInitialFields(input.documentType, title),
+      lockedFields: [],
+      updatedAt: now,
+    },
+  }
+
+  await writeJsonFile(getWriterSessionPath(session.id), session)
+  await saveSnapshot(session.id, session.draft, 'session-created')
+  return session
+}
+
+export async function updateWriterSession(id: string, patch: Partial<WriterSession>) {
+  const current = await getWriterSession(id)
+  if (!current) return null
+
+  const next: WriterSession = {
+    ...current,
+    ...patch,
+    updatedAt: createTimestamp(),
+    draft: patch.draft
+      ? {
+          ...current.draft,
+          ...deepClone(patch.draft),
+          updatedAt: createTimestamp(),
+        }
+      : current.draft,
+  }
+
+  await writeJsonFile(getWriterSessionPath(id), next)
+  if (patch.draft) {
+    await saveSnapshot(id, next.draft, 'session-updated')
+  }
+  return next
+}
+
+export async function deleteWriterSession(id: string) {
+  await deleteJsonFile(getWriterSessionPath(id))
+}
