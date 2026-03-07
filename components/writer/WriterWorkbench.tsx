@@ -15,6 +15,7 @@ import { ConceptCardPanel } from '@/components/writer/ConceptCardPanel'
 import { ConversationTimeline } from '@/components/writer/ConversationTimeline'
 import { OutlinePanel } from '@/components/writer/OutlinePanel'
 import { createConceptCard, getWriterStageLabel } from '@/lib/writer/workflow/conversation'
+import { buildOutlineExpansionInstruction, pickOutlineBlocksForExpansion } from '@/lib/writer/workflow/expand'
 
 type WriterWorkbenchProps = {
   initialSession: WriterSession
@@ -150,8 +151,8 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     setBusyAction('')
   }
 
-  async function handleGenerate(mode: 'scaffold' | 'rewrite' | 'fill-missing') {
-    if (!instruction.trim()) return
+  async function handleGenerate(mode: 'scaffold' | 'rewrite' | 'fill-missing', outlineBlockIds?: string[]) {
+    if (!instruction.trim() && (!outlineBlockIds || outlineBlockIds.length === 0)) return
 
     setBusyAction('generate')
     const response = await fetch('/api/writer/generate', {
@@ -163,17 +164,39 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
         sessionId: session.id,
         instruction,
         mode,
+        outlineBlockIds,
       }),
     })
     const data = await response.json()
     if (response.ok && data.session) {
       setSession(data.session)
-      setInstruction('')
+      if (!outlineBlockIds || outlineBlockIds.length === 0) {
+        setInstruction('')
+      }
       setFlashMessage('AI 结果已应用到草稿。')
     } else {
       setFlashMessage(data.error ?? '生成失败')
     }
     setBusyAction('')
+  }
+
+  async function handleExpandOutlineBlocks(outlineBlockIds?: string[]) {
+    const selectedBlocks = pickOutlineBlocksForExpansion(session, outlineBlockIds)
+    if (selectedBlocks.length === 0) {
+      setFlashMessage('当前没有可展开的雏形块。')
+      return
+    }
+
+    if (!instruction.trim()) {
+      setInstruction(
+        buildOutlineExpansionInstruction({
+          schema,
+          blocks: selectedBlocks,
+        })
+      )
+    }
+
+    await handleGenerate('scaffold', selectedBlocks.map((block) => block.id))
   }
 
   async function handleChat(intent: WriterConversationIntent) {
@@ -460,6 +483,8 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
               disabled={busyAction !== ''}
               onToggleStatus={handleToggleOutlineStatus}
               onRefresh={handleCreateOutline}
+              onExpandAccepted={() => handleExpandOutlineBlocks()}
+              onExpandBlock={(blockId) => handleExpandOutlineBlocks([blockId])}
               onStartDrafting={() => handleStageChange('drafting')}
             />
           ) : null}
@@ -579,4 +604,3 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     </div>
   )
 }
-

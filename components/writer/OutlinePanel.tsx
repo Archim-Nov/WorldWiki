@@ -8,6 +8,8 @@ type OutlinePanelProps = {
   onToggleStatus?: (blockId: string) => void
   onRefresh?: () => Promise<void>
   onStartDrafting?: () => Promise<void>
+  onExpandBlock?: (blockId: string) => Promise<void>
+  onExpandAccepted?: () => Promise<void>
 }
 
 function getStatusLabel(status: WriterOutlineBlock['status']) {
@@ -21,7 +23,15 @@ function getStatusLabel(status: WriterOutlineBlock['status']) {
   }
 }
 
-export function OutlinePanel({ outline, disabled, onToggleStatus, onRefresh, onStartDrafting }: OutlinePanelProps) {
+export function OutlinePanel({
+  outline,
+  disabled,
+  onToggleStatus,
+  onRefresh,
+  onStartDrafting,
+  onExpandBlock,
+  onExpandAccepted,
+}: OutlinePanelProps) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -38,6 +48,16 @@ export function OutlinePanel({ outline, disabled, onToggleStatus, onRefresh, onS
               className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
             >
               重新整理雏形
+            </button>
+          ) : null}
+          {onExpandAccepted ? (
+            <button
+              type="button"
+              onClick={() => onExpandAccepted()}
+              disabled={disabled}
+              className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
+            >
+              展开已确认块
             </button>
           ) : null}
           {onStartDrafting ? (
@@ -86,6 +106,19 @@ export function OutlinePanel({ outline, disabled, onToggleStatus, onRefresh, onS
                     </span>
                   ))
                 )}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {onExpandBlock ? (
+                  <button
+                    type="button"
+                    onClick={() => onExpandBlock(block.id)}
+                    disabled={disabled}
+                    className="rounded-lg border border-border px-3 py-2 text-sm disabled:opacity-60"
+                  >
+                    展开此块
+                  </button>
+                ) : null}
               </div>
             </div>
           ))

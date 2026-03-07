@@ -1,6 +1,7 @@
 ﻿import type {
   WriterConversationIntent,
   WriterDocumentType,
+  WriterOutlineBlock,
   WriterPromptPreset,
   WriterSchemaSummary,
   WriterSession,
@@ -19,9 +20,7 @@ function formatSchema(schema: WriterSchemaSummary) {
 function formatSchemaGroups(schema: WriterSchemaSummary) {
   if (schema.groups.length === 0) return 'No schema groups.'
 
-  return schema.groups
-    .map((group) => `- ${group.title}: ${group.fieldNames.join(', ')}`)
-    .join('\n')
+  return schema.groups.map((group) => `- ${group.title}: ${group.fieldNames.join(', ')}`).join('\n')
 }
 
 function formatPresets(presets: WriterPromptPreset[]) {
@@ -56,6 +55,14 @@ function formatOutline(session: WriterSession) {
     .join('\n')
 }
 
+function formatSelectedOutlineBlocks(blocks?: WriterOutlineBlock[]) {
+  if (!blocks || blocks.length === 0) return 'No specific outline blocks selected.'
+
+  return blocks
+    .map((block) => `- ${block.title}: ${block.summary} (fields: ${block.mappedFields.join(', ')})`)
+    .join('\n')
+}
+
 export function buildClassificationPrompt(text: string, documentTypes: WriterDocumentType[]) {
   return [
     'Classify the following worldbuilding note into the most suitable entry type.',
@@ -73,8 +80,9 @@ export function buildGenerationPrompt(args: {
   currentFields: Record<string, unknown>
   conceptCard?: WriterSession['conceptCard']
   outline?: WriterSession['outline']
+  selectedOutlineBlocks?: WriterOutlineBlock[]
 }) {
-  const { schema, presets, sourceText, instruction, currentFields, conceptCard, outline } = args
+  const { schema, presets, sourceText, instruction, currentFields, conceptCard, outline, selectedOutlineBlocks } = args
 
   const systemPrompt = [
     'You are a structured worldbuilding entry assistant.',
@@ -95,6 +103,7 @@ export function buildGenerationPrompt(args: {
     `Source material:\n${sourceText || '(empty)'}`,
     `Current concept card:\n${JSON.stringify(conceptCard ?? null, null, 2)}`,
     `Current outline:\n${JSON.stringify(outline ?? null, null, 2)}`,
+    `Selected outline blocks:\n${formatSelectedOutlineBlocks(selectedOutlineBlocks)}`,
     `Current fields:\n${JSON.stringify(currentFields, null, 2)}`,
     `Instruction:\n${instruction}`,
   ].join('\n\n')

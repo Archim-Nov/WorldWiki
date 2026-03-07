@@ -7,6 +7,11 @@ import { listPromptPresets } from '@/lib/writer/storage/presets'
 import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
 import { buildGenerationPrompt } from '@/lib/writer/prompts/assemble'
 import { createTimestamp, createWriterId } from '@/lib/writer/utils'
+import {
+  buildOutlineExpansionInstruction,
+  markOutlineBlocksExpanded,
+  pickOutlineBlocksForExpansion,
+} from '@/lib/writer/workflow/expand'
 
 function mergeGeneratedFields(args: {
   currentFields: Record<string, unknown>
@@ -44,10 +49,13 @@ export async function POST(request: Request) {
   if (!body) return badRequest('invalid_body')
 
   const sessionId = typeof body.sessionId === 'string' ? body.sessionId : ''
-  const instruction = typeof body.instruction === 'string' ? body.instruction.trim() : ''
+  const rawInstruction = typeof body.instruction === 'string' ? body.instruction : ''
   const mode = body.mode === 'fill-missing' || body.mode === 'rewrite' ? body.mode : 'scaffold'
+  const outlineBlockIds = Array.isArray(body.outlineBlockIds)
+    ? body.outlineBlockIds.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    : []
 
-  if (!sessionId || !instruction) return badRequest('missing_session_or_instruction')
+  if (!sessionId) return badRequest('missing_session_id')
 
   const session = await getWriterSession(sessionId)
   if (!session) {
@@ -62,6 +70,13 @@ export async function POST(request: Request) {
   const allPresets = await listPromptPresets()
   const presets = allPresets.filter((preset) => session.presetIds.includes(preset.id))
   const schema = getWriterSchemaSummary(session.documentType)
+  const selectedOutlineBlocks = pickOutlineBlocksForExpansion(session, outlineBlockIds)
+  const instruction = buildOutlineExpansionInstruction({
+    schema,
+    blocks: selectedOutlineBlocks,
+    existingInstruction: rawInstruction,
+  })
+
   const prompt = buildGenerationPrompt({
     schema,
     presets,
@@ -70,6 +85,7 @@ export async function POST(request: Request) {
     currentFields: session.draft.fields,
     conceptCard: session.conceptCard,
     outline: session.outline,
+    selectedOutlineBlocks,
   })
 
   const result = await provider.generate(prompt)
@@ -104,11 +120,7 @@ export async function POST(request: Request) {
   const nextSession = await updateWriterSession(sessionId, {
     messages: nextMessages,
     stage: session.workflowMode === 'conversation' ? 'drafting' : session.stage,
-    outline:
-      session.outline?.map((block) => ({
-        ...block,
-        status: block.status === 'accepted' ? 'expanded' : block.status,
-      })) ?? session.outline,
+    outline: markOutlineBlocksExpanded(session.outline, outlineBlockIds),
     draft: {
       ...session.draft,
       fields: nextFields,
