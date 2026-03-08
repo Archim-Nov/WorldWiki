@@ -53,14 +53,14 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof Error && error.message === 'sanity_write_disabled') {
       const status = getSanityWriteConfigStatus()
+
       return NextResponse.json(
         {
           error: 'sanity_write_disabled',
-          message:
-            status.missingEnvVars.length > 0
-              ? `Sanity 写入未启用，缺少环境变量：${status.missingEnvVars.join(', ')}`
-              : 'Sanity 写入未启用，请检查服务端写入配置。',
+          message: status.reason ?? 'Sanity push is currently unavailable.',
+          hint: status.hint,
           missingEnvVars: status.missingEnvVars,
+          tokenSource: status.tokenSource,
         },
         { status: 503 }
       )

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, normalizeStringArray, readJsonObject } from '@/lib/writer/api/validators'
 import { WRITER_DOCUMENT_TYPES } from '@/lib/writer/constants'
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
     sourceText: imported.draft.sourceText,
     providerId: typeof body.providerId === 'string' ? body.providerId : undefined,
     presetIds: normalizeStringArray(body.presetIds),
+    workflowMode: 'conversation',
   })
 
   const patchedSession = await updateWriterSession(session.id, {

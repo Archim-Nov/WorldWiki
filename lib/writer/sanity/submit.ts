@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { writeClient, isSanityWriteEnabled } from '@/lib/sanity/write-client'
+import { getSanityWriteClient } from '@/lib/sanity/write-client'
 import { mapDraftToSanityDocument } from '@/lib/writer/sanity/draft-mapper'
 import type { WriterSession } from '@/types/writer'
 import { slugifyText } from '@/lib/writer/utils'
@@ -14,7 +14,9 @@ function getBaseDocumentId(session: WriterSession) {
 }
 
 export async function submitWriterDraft(session: WriterSession) {
-  if (!writeClient || !isSanityWriteEnabled()) {
+  const writeClient = getSanityWriteClient()
+
+  if (!writeClient) {
     throw new Error('sanity_write_disabled')
   }
 
@@ -37,7 +39,9 @@ export async function submitWriterDraft(session: WriterSession) {
 }
 
 export async function publishWriterDocument(documentId: string) {
-  if (!writeClient || !isSanityWriteEnabled()) {
+  const writeClient = getSanityWriteClient()
+
+  if (!writeClient) {
     throw new Error('sanity_write_disabled')
   }
 

@@ -1,85 +1,109 @@
-﻿'use client'
+'use client'
 
-import type { WriterConversationIntent, WriterMessage } from '@/types/writer'
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
+import type { WriterMessage } from '@/types/writer'
 
 type ConversationTimelineProps = {
   messages: WriterMessage[]
   value: string
   disabled?: boolean
+  composerToolbar?: ReactNode
   onChange: (value: string) => void
-  onSend: (intent: WriterConversationIntent) => Promise<void>
-  onStartDrafting?: () => Promise<void>
+  onSend: () => Promise<void>
 }
 
-export function ConversationTimeline({ messages, value, disabled, onChange, onSend, onStartDrafting }: ConversationTimelineProps) {
+export function ConversationTimeline({ messages, value, disabled, composerToolbar, onChange, onSend }: ConversationTimelineProps) {
+  const t = useTranslations('Writer.ConversationTimeline')
+  const bottomRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [messages])
+
+  function getRoleLabel(role: WriterMessage['role']) {
+    switch (role) {
+      case 'assistant':
+        return t('roles.assistant')
+      case 'user':
+        return t('roles.user')
+      default:
+        return t('roles.system')
+    }
+  }
+
+  async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      if (!disabled && value.trim()) {
+        await onSend()
+      }
+    }
+  }
+
   return (
-    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">概念对话</h2>
-          <p className="mt-1 text-sm text-muted-foreground">先和 AI 讨论设定，再逐步收束成条目雏形。</p>
-        </div>
-        {onStartDrafting ? (
-          <button
-            type="button"
-            onClick={() => onStartDrafting()}
-            className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-            disabled={disabled}
-          >
-            进入结构化起草
-          </button>
-        ) : null}
-      </div>
-
-      <div className="mt-4 max-h-[28rem] space-y-3 overflow-y-auto pr-1">
-        {messages.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
-            还没有对话记录。你可以先描述概念、风格、设定边界，AI 会帮助你持续梳理。
-          </div>
-        ) : (
-          messages.map((message) => (
-            <div key={message.id} className="rounded-xl border border-border px-4 py-3">
-              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{message.role}</div>
-              <div className="mt-2 whitespace-pre-wrap text-sm leading-6">{message.content}</div>
+    <div className='flex min-h-0 flex-1 flex-col bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.06)_1px,transparent_0)] [background-size:18px_18px]'>
+      <div className='flex-1 overflow-y-auto px-6 py-6'>
+        <div className='mx-auto flex w-full max-w-4xl flex-col gap-6'>
+          {messages.length === 0 ? (
+            <div className='rounded-[28px] border border-dashed border-border bg-background/90 px-6 py-12 text-center shadow-sm'>
+              <div className='text-lg font-semibold'>{t('emptyTitle')}</div>
+              <p className='mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground'>{t('emptyDescription')}</p>
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            messages.map((message) => {
+              const isUser = message.role === 'user'
 
-      <div className="mt-4 space-y-3">
-        <textarea
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="min-h-32 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
-          placeholder="例如：我想先讨论一个海上贸易国家，它依靠潮汐魔法维持远航和港口秩序。"
-        />
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => onSend('explore')}
-            disabled={disabled || !value.trim()}
-            className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
-          >
-            继续讨论
-          </button>
-          <button
-            type="button"
-            onClick={() => onSend('refine')}
-            disabled={disabled || !value.trim()}
-            className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-          >
-            收束设定
-          </button>
-          <button
-            type="button"
-            onClick={() => onSend('resolve')}
-            disabled={disabled || !value.trim()}
-            className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-          >
-            解决冲突
-          </button>
+              return (
+                <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`w-full max-w-[88%] ${isUser ? 'items-end' : 'items-start'}`}>
+                    <div className={`mb-2 text-xs ${isUser ? 'text-right text-muted-foreground' : 'text-left text-muted-foreground'}`}>
+                      {getRoleLabel(message.role)}
+                    </div>
+                    <div
+                      className={[
+                        'rounded-[24px] px-5 py-4 text-sm leading-7 shadow-sm',
+                        isUser
+                          ? 'ml-auto bg-slate-950 text-white dark:bg-slate-100 dark:text-slate-950'
+                          : 'border border-border bg-background/95 text-foreground',
+                      ].join(' ')}
+                    >
+                      <div className='whitespace-pre-wrap'>{message.content}</div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          )}
+          <div ref={bottomRef} />
         </div>
       </div>
-    </section>
+
+      <div className='border-t border-border bg-background/95 px-6 py-4 backdrop-blur'>
+        <div className='mx-auto w-full max-w-4xl'>
+          <div className='rounded-[24px] border border-border bg-background px-4 py-3 shadow-sm'>
+            {composerToolbar ? <div className='mb-3'>{composerToolbar}</div> : null}
+            <textarea
+              value={value}
+              onChange={(event) => onChange(event.target.value)}
+              onKeyDown={handleKeyDown}
+              className='min-h-24 w-full resize-none border-0 bg-transparent py-2 text-sm leading-7 outline-none'
+              placeholder={t('placeholder')}
+            />
+            <div className='flex items-center justify-between gap-3 pt-2'>
+              <div className='text-xs text-muted-foreground'>{t('footerNote')}</div>
+              <button
+                type='button'
+                onClick={() => onSend()}
+                disabled={disabled || !value.trim()}
+                className='rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60'
+              >
+                {t('send')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -1,21 +1,21 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import type {
   WriterConversationIntent,
+  WriterDocumentType,
+  WriterMessage,
   WriterPromptPreset,
   WriterProviderSummary,
   WriterSchemaSummary,
   WriterSession,
-  WriterStage,
 } from '@/types/writer'
-import { StructuredFieldEditor } from '@/components/writer/StructuredFieldEditor'
-import { ChecksPanel } from '@/components/writer/ChecksPanel'
-import { CalibrationPanel } from '@/components/writer/CalibrationPanel'
-import { ConceptCardPanel } from '@/components/writer/ConceptCardPanel'
 import { ConversationTimeline } from '@/components/writer/ConversationTimeline'
-import { OutlinePanel } from '@/components/writer/OutlinePanel'
-import { createConceptCard, getWriterStageLabel } from '@/lib/writer/workflow/conversation'
+import { EntryCardDialog } from '@/components/writer/EntryCardDialog'
+import { getWriterDraftFieldProgress } from '@/lib/writer/draft-fields'
+import { createConceptCard } from '@/lib/writer/workflow/conversation'
 import { buildOutlineExpansionInstruction, pickOutlineBlocksForExpansion } from '@/lib/writer/workflow/expand'
 
 type WriterWorkbenchProps = {
@@ -23,24 +23,134 @@ type WriterWorkbenchProps = {
   schema: WriterSchemaSummary
   providers: WriterProviderSummary[]
   presets: WriterPromptPreset[]
+  homePath: string
 }
 
-const conversationStages: WriterStage[] = ['conversation', 'outline', 'drafting', 'calibration', 'review', 'submitted']
+function PaneRail(props: {
+  title: string
+  meta: string
+  description: string
+  onExpand: () => void
+  expandLabel: string
+}) {
+  const { title, meta, description, onExpand, expandLabel } = props
 
-export function WriterWorkbench({ initialSession, schema, providers, presets }: WriterWorkbenchProps) {
+  return (
+    <div className='flex h-full w-full flex-col justify-between bg-background px-3 py-4 lg:w-20 lg:flex-none'>
+      <div>
+        <div className='text-[11px] uppercase tracking-[0.24em] text-muted-foreground'>{title}</div>
+        <div className='mt-3 text-sm font-semibold'>{meta}</div>
+        <div className='mt-2 text-xs leading-5 text-muted-foreground'>{description}</div>
+      </div>
+      <div className='flex flex-col gap-2'>
+        <button type='button' onClick={onExpand} className='rounded-xl border border-border px-3 py-2 text-xs'>
+          {expandLabel}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function WriterWorkbench({ initialSession, schema, providers, presets, homePath }: WriterWorkbenchProps) {
+  const router = useRouter()
+  const t = useTranslations('Writer.Workbench')
+  const commonT = useTranslations('Writer.Common')
   const [session, setSession] = useState(initialSession)
-  const [instruction, setInstruction] = useState('')
   const [chatInput, setChatInput] = useState('')
   const [busyAction, setBusyAction] = useState('')
   const [flashMessage, setFlashMessage] = useState('')
+  const [isCardCollapsed, setIsCardCollapsed] = useState(false)
+  const [isChatCollapsed, setIsChatCollapsed] = useState(false)
+  const [sanityWriteStatus, setSanityWriteStatus] = useState<{
+    enabled: boolean
+    missingEnvVars: string[]
+    reason: string
+    hint: string
+  }>({
+    enabled: true,
+    missingEnvVars: [],
+    reason: '',
+    hint: '',
+  })
+  const [presetPickerOpen, setPresetPickerOpen] = useState(false)
+  const [optimisticMessages, setOptimisticMessages] = useState<WriterMessage[] | null>(null)
 
-  const workflowMode = session.workflowMode ?? 'direct'
-  const stage = session.stage ?? (workflowMode === 'conversation' ? 'conversation' : 'drafting')
+  const workflowMode = session.workflowMode ?? 'conversation'
+  const isBusy = busyAction !== ''
 
   const availablePresets = useMemo(
     () => presets.filter((preset) => preset.scope !== 'documentType' || preset.documentType === session.documentType),
     [presets, session.documentType]
   )
+
+  const activePresets = useMemo(
+    () => availablePresets.filter((preset) => session.presetIds.includes(preset.id)),
+    [availablePresets, session.presetIds]
+  )
+
+  const conceptCard = useMemo(
+    () =>
+      session.conceptCard ??
+      createConceptCard({
+        title: session.title,
+        sourceText: session.draft.sourceText,
+        documentType: session.documentType,
+      }),
+    [session.conceptCard, session.documentType, session.draft.sourceText, session.title]
+  )
+
+  const { filledFieldCount, missingRequiredFields } = useMemo(
+    () => getWriterDraftFieldProgress(schema, session.draft.fields),
+    [schema, session.draft.fields]
+  )
+  const displayedMessages = optimisticMessages ?? session.messages
+  const requiredFieldCount = schema.fields.filter((field) => field.required).length
+  const canSubmit = sanityWriteStatus.enabled
+
+  useEffect(() => {
+    let active = true
+
+    fetch('/api/writer/config')
+      .then(async (response) => {
+        const data = await response.json()
+        if (!active || !response.ok) return
+        const nextStatus = data.sanityWrite
+        setSanityWriteStatus({
+          enabled: Boolean(nextStatus?.enabled ?? data.canSubmit),
+          missingEnvVars: Array.isArray(nextStatus?.missingEnvVars)
+            ? nextStatus.missingEnvVars.filter((value: unknown): value is string => typeof value === 'string')
+            : [],
+          reason: typeof nextStatus?.reason === 'string' ? nextStatus.reason : '',
+          hint: typeof nextStatus?.hint === 'string' ? nextStatus.hint : '',
+        })
+      })
+      .catch(() => undefined)
+
+    fetch(`/api/writer/sessions/${initialSession.id}`, { cache: 'no-store' })
+      .then(async (response) => {
+        const data = await response.json()
+        if (!active || !response.ok) return
+        setSession(data)
+        setOptimisticMessages(null)
+      })
+      .catch(() => undefined)
+
+    return () => {
+      active = false
+    }
+  }, [initialSession.id])
+
+  function getDocumentTypeLabel(type: WriterDocumentType) {
+    return commonT(`documentTypes.${type}`)
+  }
+
+  function toggleCardPaneCollapsed() {
+    setIsCardCollapsed((current) => !current)
+  }
+
+  function toggleChatPaneCollapsed() {
+    setIsChatCollapsed((current) => !current)
+  }
 
   async function patchSession(payload: Record<string, unknown>) {
     const response = await fetch(`/api/writer/sessions/${session.id}`, {
@@ -65,7 +175,8 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
       providerId: session.providerId,
       presetIds: session.presetIds,
       workflowMode,
-      stage,
+      stage: session.stage,
+      messages: session.messages,
       draft: session.draft,
       conceptCard: session.conceptCard,
       outline: session.outline,
@@ -95,47 +206,44 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
         ...current,
         draft: {
           ...current.draft,
-          lockedFields: isLocked
-            ? current.draft.lockedFields.filter((name) => name !== fieldName)
-            : [...current.draft.lockedFields, fieldName],
+          lockedFields: isLocked ? current.draft.lockedFields.filter((name) => name !== fieldName) : [...current.draft.lockedFields, fieldName],
         },
       }
     })
   }
 
-  function handleToggleDecisionLock(decisionId: string) {
-    setSession((current) => ({
-      ...current,
-      conceptCard: current.conceptCard
-        ? {
-            ...current.conceptCard,
-            decisions: current.conceptCard.decisions.map((decision) =>
-              decision.id === decisionId ? { ...decision, locked: !decision.locked } : decision
-            ),
-          }
-        : current.conceptCard,
-    }))
-  }
+  async function handleDeleteDraft() {
+    const confirmed = window.confirm(t('deleteConfirm', { title: session.title }))
+    if (!confirmed) return
 
-  function handleToggleOutlineStatus(blockId: string) {
-    setSession((current) => ({
-      ...current,
-      outline:
-        current.outline?.map((block) =>
-          block.id === blockId
-            ? {
-                ...block,
-                status: block.status === 'pending' ? 'accepted' : block.status === 'accepted' ? 'expanded' : 'pending',
-              }
-            : block
-        ) ?? current.outline,
-    }))
+    setBusyAction('delete')
+
+    try {
+      const response = await fetch(`/api/writer/sessions/${session.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        setFlashMessage(data?.error ?? t('deleteFailed'))
+        setBusyAction('')
+        return
+      }
+
+      router.push(homePath)
+      router.refresh()
+      return
+    } catch {
+      setFlashMessage(t('deleteFailed'))
+    }
+
+    setBusyAction('')
   }
 
   async function handleSave() {
     setBusyAction('save')
     const { response, data } = await syncSessionState()
-    setFlashMessage(response.ok ? '本地草稿已保存。' : data.error ?? '保存失败')
+    setFlashMessage(response.ok ? t('savedLocally') : (data.error ?? t('saveFailed')))
     setBusyAction('')
   }
 
@@ -143,7 +251,7 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     setBusyAction('check')
     const saved = await syncSessionState()
     if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法校验')
+      setFlashMessage(saved.data.error ?? t('saveFailedBeforeCheck'))
       setBusyAction('')
       return
     }
@@ -158,128 +266,152 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     const data = await response.json()
     if (response.ok && data.session) {
       setSession(data.session)
-      setFlashMessage('校验完成。')
+      setFlashMessage(t('checkCompleted'))
     } else {
-      setFlashMessage(data.error ?? '校验失败')
+      setFlashMessage(data.error ?? t('checkFailed'))
     }
     setBusyAction('')
   }
 
-  async function handleGenerate(mode: 'scaffold' | 'rewrite' | 'fill-missing', outlineBlockIds?: string[]) {
-    if (!instruction.trim() && (!outlineBlockIds || outlineBlockIds.length === 0)) return
+  function getDefaultInstruction() {
+    const selectedBlocks = pickOutlineBlocksForExpansion(session)
+
+    if (selectedBlocks.length > 0) {
+      return buildOutlineExpansionInstruction({
+        schema,
+        blocks: selectedBlocks,
+      })
+    }
+
+    return `Generate a complete ${schema.title} draft from the current chat and card context, prioritizing required fields and body content.`
+  }
+
+  async function handleGenerate(mode: 'scaffold' | 'rewrite' | 'fill-missing') {
+    const activeInstruction = getDefaultInstruction()
+    const selectedOutlineBlocks = pickOutlineBlocksForExpansion(session)
 
     setBusyAction('generate')
     const saved = await syncSessionState()
     if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法生成')
+      setFlashMessage(saved.data.error ?? t('generationFailed'))
       setBusyAction('')
       return
     }
 
-    const response = await fetch('/api/writer/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-        instruction,
-        mode,
-        outlineBlockIds,
-      }),
-    })
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      if (!outlineBlockIds || outlineBlockIds.length === 0) {
-        setInstruction('')
+    try {
+      const response = await fetch('/api/writer/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: session.id,
+          instruction: activeInstruction,
+          mode,
+          outlineBlockIds: selectedOutlineBlocks.map((block) => block.id),
+        }),
+      })
+      const data = await response.json()
+      if (response.ok && data.session) {
+        setSession(data.session)
+        setFlashMessage(
+          data.appliedFieldNames?.length > 0
+            ? t('generationUpdatedFields', { count: data.appliedFieldNames.length })
+            : t('generationFinished')
+        )
+      } else {
+        setFlashMessage(data.error ?? data.message ?? t('generationFailed'))
       }
-      setFlashMessage('AI 结果已应用到草稿。')
-    } else {
-      setFlashMessage(data.error ?? '生成失败')
+    } catch {
+      setFlashMessage(t('generationRequestFailed'))
     }
+
     setBusyAction('')
-  }
-
-  async function handleExpandOutlineBlocks(outlineBlockIds?: string[]) {
-    const selectedBlocks = pickOutlineBlocksForExpansion(session, outlineBlockIds)
-    if (selectedBlocks.length === 0) {
-      setFlashMessage('当前没有可展开的雏形块。')
-      return
-    }
-
-    if (!instruction.trim()) {
-      setInstruction(
-        buildOutlineExpansionInstruction({
-          schema,
-          blocks: selectedBlocks,
-        })
-      )
-    }
-
-    await handleGenerate('scaffold', selectedBlocks.map((block) => block.id))
   }
 
   async function handleChat(intent: WriterConversationIntent) {
-    if (!chatInput.trim()) return
+    const inputValue = chatInput.trim()
+    if (!inputValue) return
 
+    const now = new Date().toISOString()
+    const optimisticUserMessage: WriterMessage = {
+      id: `optimistic-user-${Date.now()}`,
+      role: 'user',
+      content: inputValue,
+      createdAt: now,
+    }
+    const optimisticAssistantMessage: WriterMessage = {
+      id: `optimistic-assistant-${Date.now()}`,
+      role: 'assistant',
+      content: t('optimisticThinking'),
+      createdAt: now,
+    }
+
+    setOptimisticMessages([...session.messages, optimisticUserMessage, optimisticAssistantMessage])
+    setChatInput('')
     setBusyAction('chat')
+
     const saved = await syncSessionState()
     if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法继续对话')
+      setOptimisticMessages([
+        ...session.messages,
+        optimisticUserMessage,
+        {
+          ...optimisticAssistantMessage,
+          content: saved.data.error ?? t('messageSendFailed'),
+        },
+      ])
+      setChatInput(inputValue)
+      setFlashMessage(saved.data.error ?? t('saveFailedBeforeChat'))
       setBusyAction('')
       return
     }
 
-    const response = await fetch('/api/writer/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-        input: chatInput,
-        intent,
-      }),
-    })
+    try {
+      const response = await fetch('/api/writer/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: session.id,
+          input: inputValue,
+          intent,
+        }),
+      })
 
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setChatInput('')
-      setFlashMessage('AI 已更新概念对话与意图卡。')
-    } else {
-      setFlashMessage(data.error ?? '对话失败')
-    }
-
-    setBusyAction('')
-  }
-
-  async function handleCreateOutline() {
-    setBusyAction('outline')
-    const saved = await syncSessionState()
-    if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法整理雏形')
-      setBusyAction('')
-      return
-    }
-
-    const response = await fetch('/api/writer/outline', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-      }),
-    })
-
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setFlashMessage(data.assistantMessage ?? '已整理出条目雏形。')
-    } else {
-      setFlashMessage(data.error ?? '整理雏形失败')
+      const data = await response.json()
+      if (response.ok && data.session) {
+        setSession(data.session)
+        setOptimisticMessages(null)
+        setFlashMessage(
+          data.appliedFieldNames?.length > 0
+            ? t('chatSyncedFields', { count: data.appliedFieldNames.length })
+            : t('chatUpdatedUnderstanding')
+        )
+      } else {
+        setOptimisticMessages([
+          ...session.messages,
+          optimisticUserMessage,
+          {
+            ...optimisticAssistantMessage,
+            content: data.error ?? data.message ?? t('chatFailedInline'),
+          },
+        ])
+        setChatInput(inputValue)
+        setFlashMessage(data.error ?? data.message ?? t('chatFailed'))
+      }
+    } catch {
+      setOptimisticMessages([
+        ...session.messages,
+        optimisticUserMessage,
+        {
+          ...optimisticAssistantMessage,
+          content: t('chatNetworkInline'),
+        },
+      ])
+      setChatInput(inputValue)
+      setFlashMessage(t('chatRequestFailed'))
     }
 
     setBusyAction('')
@@ -289,49 +421,29 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     setBusyAction('calibrate')
     const saved = await syncSessionState()
     if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法校准')
+      setFlashMessage(saved.data.error ?? t('saveFailedBeforeCalibration'))
       setBusyAction('')
       return
     }
 
-    const response = await fetch('/api/writer/calibrate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ sessionId: session.id }),
-    })
+    try {
+      const response = await fetch('/api/writer/calibrate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionId: session.id }),
+      })
 
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setFlashMessage(data.patches?.length ? `AI 校准已生成 ${data.patches.length} 条建议。` : '当前没有可自动校准的项。')
-    } else {
-      setFlashMessage(data.error ?? 'AI 校准失败')
-    }
-
-    setBusyAction('')
-  }
-
-  async function handleApplyCalibrationPatch(patchId: string) {
-    setBusyAction('apply-patch')
-    const response = await fetch('/api/writer/patches/apply', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-        patchIds: [patchId],
-      }),
-    })
-
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setFlashMessage('已应用校准建议。')
-    } else {
-      setFlashMessage(data.error ?? '应用建议失败')
+      const data = await response.json()
+      if (response.ok && data.session) {
+        setSession(data.session)
+        setFlashMessage(data.patches?.length ? t('calibrationGenerated', { count: data.patches.length }) : t('calibrationNone'))
+      } else {
+        setFlashMessage(data.error ?? t('calibrationFailed'))
+      }
+    } catch {
+      setFlashMessage(t('calibrationRequestFailed'))
     }
 
     setBusyAction('')
@@ -341,411 +453,273 @@ export function WriterWorkbench({ initialSession, schema, providers, presets }: 
     if (!session.calibrationPatches || session.calibrationPatches.length === 0) return
 
     setBusyAction('apply-patch')
-    const response = await fetch('/api/writer/patches/apply', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-      }),
-    })
 
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setFlashMessage('已一键应用全部校准建议。')
-    } else {
-      setFlashMessage(data.error ?? '应用全部建议失败')
-    }
-
-    setBusyAction('')
-  }
-
-  async function handleEnableConversation() {
-    const conceptCard =
-      session.conceptCard ??
-      createConceptCard({
-        title: session.title,
-        sourceText: session.draft.sourceText,
-        documentType: session.documentType,
+    try {
+      const response = await fetch('/api/writer/patches/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: session.id,
+        }),
       })
 
-    setBusyAction('stage')
-    const { response, data } = await patchSession({
-      workflowMode: 'conversation',
-      stage: 'conversation',
-      conceptCard,
-      outline: session.outline,
-      calibrationPatches: session.calibrationPatches,
-    })
-    setFlashMessage(response.ok ? '已切换为对话式创作。' : data.error ?? '切换失败')
-    setBusyAction('')
-  }
-
-  async function handleStageChange(nextStage: WriterStage) {
-    if (nextStage === 'outline' && (!session.outline || session.outline.length === 0)) {
-      await handleCreateOutline()
-      return
+      const data = await response.json()
+      if (response.ok && data.session) {
+        setSession(data.session)
+        setFlashMessage(t('applyAllSucceeded'))
+      } else {
+        setFlashMessage(data.error ?? t('applyAllFailed'))
+      }
+    } catch {
+      setFlashMessage(t('applyAllRequestFailed'))
     }
 
-    if (nextStage === 'calibration') {
-      await handleCalibrate()
-      return
-    }
-
-    setBusyAction('stage')
-    const { response, data } = await syncSessionState({
-      stage: nextStage,
-    })
-    setFlashMessage(response.ok ? `已切换到${getWriterStageLabel(nextStage)}。` : data.error ?? '阶段切换失败')
     setBusyAction('')
   }
 
   async function handleSubmit(action: 'saveDraft' | 'publish') {
+    if (!canSubmit) {
+      setFlashMessage(sanityWriteStatus.reason || t('sanityUnavailable'))
+      return
+    }
+
     setBusyAction('submit')
     const saved = await syncSessionState()
     if (!saved.response.ok) {
-      setFlashMessage(saved.data.error ?? '保存失败，无法提交')
+      setFlashMessage(saved.data.error ?? t('saveFailedBeforeSubmit'))
       setBusyAction('')
       return
     }
 
-    const response = await fetch('/api/writer/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId: session.id,
-        action,
-      }),
-    })
-    const data = await response.json()
-    if (response.ok && data.session) {
-      setSession(data.session)
-      setFlashMessage(action === 'publish' ? '已发布到 Sanity。' : '已保存到 Sanity draft。')
-    } else {
-      setFlashMessage(data.error ?? '提交失败')
+    try {
+      const response = await fetch('/api/writer/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: session.id,
+          action,
+        }),
+      })
+      const data = await response.json()
+      if (response.ok && data.session) {
+        setSession(data.session)
+        setFlashMessage(action === 'publish' ? t('published') : t('pushedDraft'))
+      } else {
+        if (data.error === 'sanity_write_disabled') {
+          setSanityWriteStatus({
+            enabled: false,
+            missingEnvVars: Array.isArray(data.missingEnvVars)
+              ? data.missingEnvVars.filter((value: unknown): value is string => typeof value === 'string')
+              : [],
+            reason: typeof data.message === 'string' ? data.message : t('sanityUnavailable'),
+            hint: typeof data.hint === 'string' ? data.hint : '',
+          })
+        }
+
+        setFlashMessage(data.message ?? data.error ?? t('submitFailed'))
+      }
+    } catch {
+      setFlashMessage(t('submitRequestFailed'))
     }
+
     setBusyAction('')
   }
 
-  function getDraftSuggestion() {
-    const acceptedBlocks = session.outline?.filter((block) => block.status !== 'pending') ?? []
-    if (acceptedBlocks.length === 0) {
-      return '根据当前意图卡生成完整字段草稿，并优先覆盖核心设定与正文。'
-    }
-
-    return `根据已确认雏形生成字段草稿，优先展开：${acceptedBlocks.map((block) => block.title).join('、')}。`
-  }
+  const candidateType = conceptCard.candidateTypes[0]?.documentType ?? session.documentType
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Session</div>
-            <h1 className="mt-3 text-2xl font-semibold">{session.title}</h1>
-            <div className="mt-2 text-sm text-muted-foreground">
-              {schema.title} · {session.status} · {workflowMode === 'conversation' ? '对话式创作' : '直达式起草'}
-            </div>
+    <div className='h-[calc(100vh-9rem)] min-h-[720px] overflow-hidden rounded-[30px] border border-border bg-[#f6f6f8] shadow-sm dark:bg-slate-950'>
+      <div className='flex h-full flex-col lg:flex-row'>
+        {isCardCollapsed ? (
+          <div className='border-b border-border lg:border-b-0 lg:border-r'>
+            <PaneRail
+              title={t('entryRailTitle')}
+              meta={`${filledFieldCount}/${schema.fields.length}`}
+              description={t('entryCollapsed')}
+              onExpand={toggleCardPaneCollapsed}
+              expandLabel={t('expand')}
+            />
           </div>
-          {workflowMode === 'conversation' ? (
-            <div className="flex flex-wrap gap-2">
-              {conversationStages.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => handleStageChange(item)}
-                  disabled={busyAction !== ''}
-                  className={`rounded-full px-3 py-1 text-xs ${stage === item ? 'bg-primary text-primary-foreground' : 'border border-border text-muted-foreground'}`}
-                >
-                  {getWriterStageLabel(item)}
+        ) : (
+          <section className='flex min-h-0 min-w-0 flex-1 basis-1/2 flex-col border-b border-border bg-[#f8f8fb] lg:border-b-0 lg:border-r dark:bg-slate-900'>
+            <EntryCardDialog
+              variant='panel'
+              className='h-full rounded-none border-0 bg-transparent shadow-none'
+              open={true}
+              session={session}
+              schema={schema}
+              flashMessage={undefined}
+              busyAction={busyAction}
+              canSubmit={canSubmit}
+              submitDisabledReason={canSubmit ? undefined : sanityWriteStatus.reason || undefined}
+              submitDisabledHint={canSubmit ? undefined : sanityWriteStatus.hint || undefined}
+              filledFieldCount={filledFieldCount}
+              requiredFieldCount={requiredFieldCount}
+              missingRequiredFields={missingRequiredFields.map((field) => field.title)}
+              headerActions={
+                <button type='button' onClick={toggleCardPaneCollapsed} className='rounded-lg border border-border px-3 py-2 text-sm'>
+                  {t('collapse')}
                 </button>
-              ))}
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleEnableConversation}
-              disabled={busyAction !== ''}
-              className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-            >
-              切换为对话式创作
-            </button>
-          )}
-        </div>
-      </section>
+              }
+              closeButtonLabel={null}
+              onClose={() => undefined}
+              onFieldChange={handleFieldChange}
+              onToggleLock={handleToggleLock}
+              onSave={handleSave}
+              onCheck={handleCheck}
+              onCalibrate={handleCalibrate}
+              onApplyAllCalibrationPatches={handleApplyAllCalibrationPatches}
+              onSubmit={handleSubmit}
+            />
+          </section>
+        )}
 
-      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.35fr_0.9fr]">
-        <aside className="space-y-5">
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-semibold">会话设置</h2>
+        {isChatCollapsed ? (
+          <div className='border-t border-border lg:border-l lg:border-t-0'>
+            <PaneRail
+              title={t('chatRailTitle')}
+              meta={`${displayedMessages.length}`}
+              description={t('chatCollapsed')}
+              onExpand={toggleChatPaneCollapsed}
+              expandLabel={t('expand')}
+            />
+          </div>
+        ) : (
+          <section className='flex min-h-0 min-w-0 flex-1 basis-1/2 flex-col bg-background'>
+            <header className='border-b border-border px-5 py-4'>
+              <div className='flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between'>
+                <div>
+                  <div className='text-xl font-semibold'>{t('headerTitle')}</div>
+                  <div className='mt-1 text-sm text-muted-foreground'>{t('currentContext', { title: session.title })}</div>
+                  <div className='mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground'>
+                    <span className='rounded-full border border-border px-3 py-1'>{schema.title}</span>
+                    <span className='rounded-full border border-border px-3 py-1'>
+                      {t('candidateType', { type: getDocumentTypeLabel(candidateType) })}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="mt-5 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">当前 Provider</label>
-                <select
-                  value={session.providerId ?? ''}
-                  onChange={(event) => setSession((current) => ({ ...current, providerId: event.target.value || undefined }))}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">不指定</option>
-                  {providers.map((provider) => (
-                    <option key={provider.id} value={provider.id}>
-                      {provider.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className='flex flex-wrap items-center justify-end gap-2'>
+                  <div className='rounded-xl border border-border bg-card px-3 py-2'>
+                    <div className='text-[11px] uppercase tracking-[0.24em] text-muted-foreground'>{t('model')}</div>
+                    <select
+                      value={session.providerId ?? ''}
+                      onChange={(event) => setSession((current) => ({ ...current, providerId: event.target.value || undefined }))}
+                      className='mt-1 min-w-36 bg-transparent text-sm outline-none'
+                    >
+                      <option value=''>{commonT('auto')}</option>
+                      {providers.map((provider) => (
+                        <option key={provider.id} value={provider.id}>
+                          {provider.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">创作简介</label>
-                <textarea
-                  value={session.draft.sourceText}
-                  onChange={(event) =>
-                    setSession((current) => ({
-                      ...current,
-                      calibrationPatches: [],
-                      draft: {
-                        ...current.draft,
-                        sourceText: event.target.value,
-                      },
-                    }))
-                  }
-                  className="min-h-36 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
-                  placeholder="补充你的世界观基础、条目目标或必须遵循的设定。"
-                />
-              </div>
+                  <div className='relative'>
+                    <button
+                      type='button'
+                      onClick={() => setPresetPickerOpen((current) => !current)}
+                      className='rounded-xl border border-border bg-card px-4 py-3 text-sm'
+                    >
+                      {t('presetsButton', { count: activePresets.length })}
+                    </button>
 
-              <div className="space-y-2">
-                <div className="text-sm font-medium">启用预设</div>
-                <div className="space-y-2">
-                  {availablePresets.map((preset) => {
-                    const checked = session.presetIds.includes(preset.id)
-                    return (
-                      <label key={preset.id} className="flex items-start gap-3 rounded-xl border border-border px-3 py-3 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(event) =>
-                            setSession((current) => ({
-                              ...current,
-                              presetIds: event.target.checked
-                                ? [...current.presetIds, preset.id]
-                                : current.presetIds.filter((id) => id !== preset.id),
-                            }))
-                          }
-                          className="mt-0.5"
-                        />
-                        <span>
-                          <span className="font-medium">{preset.name}</span>
-                          <span className="mt-1 block text-xs text-muted-foreground">{preset.scope}</span>
-                        </span>
-                      </label>
-                    )
-                  })}
-                  {availablePresets.length === 0 ? <div className="text-sm text-muted-foreground">当前没有可用预设。</div> : null}
+                    {presetPickerOpen ? (
+                      <div className='absolute right-0 top-[calc(100%+0.5rem)] z-30 w-80 rounded-2xl border border-border bg-card p-4 shadow-xl'>
+                        <div className='text-sm font-medium'>{t('promptPresetsTitle')}</div>
+                        <p className='mt-1 text-xs leading-6 text-muted-foreground'>{t('promptPresetsDescription')}</p>
+                        <div className='mt-4 max-h-72 space-y-3 overflow-y-auto pr-1'>
+                          {availablePresets.length === 0 ? (
+                            <div className='rounded-xl border border-dashed border-border px-4 py-4 text-sm text-muted-foreground'>{t('noPresets')}</div>
+                          ) : (
+                            availablePresets.map((preset) => {
+                              const checked = session.presetIds.includes(preset.id)
+                              return (
+                                <label key={preset.id} className='flex items-start gap-3 rounded-xl border border-border px-4 py-3'>
+                                  <input
+                                    type='checkbox'
+                                    checked={checked}
+                                    onChange={(event) =>
+                                      setSession((current) => ({
+                                        ...current,
+                                        presetIds: event.target.checked
+                                          ? [...new Set([...current.presetIds, preset.id])]
+                                          : current.presetIds.filter((id) => id !== preset.id),
+                                      }))
+                                    }
+                                    className='mt-1'
+                                  />
+                                  <div>
+                                    <div className='text-sm font-medium'>{preset.name}</div>
+                                    <div className='mt-1 text-xs leading-6 text-muted-foreground'>{preset.content}</div>
+                                  </div>
+                                </label>
+                              )
+                            })
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <button
+                    type='button'
+                    onClick={handleDeleteDraft}
+                    disabled={isBusy}
+                    className='rounded-lg border border-red-300 px-3 py-2 text-sm text-red-600 disabled:opacity-60 dark:border-red-800 dark:text-red-300'
+                  >
+                    {busyAction === 'delete' ? t('deleting') : t('deleteDraft')}
+                  </button>
+                  <button type='button' onClick={toggleChatPaneCollapsed} className='rounded-lg border border-border px-3 py-2 text-sm'>
+                    {t('collapse')}
+                  </button>
                 </div>
               </div>
-            </div>
-          </section>
 
-          {workflowMode === 'conversation' ? (
-            <ConceptCardPanel conceptCard={session.conceptCard} onToggleDecisionLock={handleToggleDecisionLock} />
-          ) : null}
-        </aside>
-
-        <div className="space-y-5">
-          {flashMessage ? (
-            <div className="rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-sm">{flashMessage}</div>
-          ) : null}
-
-          {workflowMode === 'conversation' ? (
+              {flashMessage ? <div className='mt-4 rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-foreground/80'>{flashMessage}</div> : null}
+            </header>
             <ConversationTimeline
-              messages={session.messages}
+              messages={displayedMessages}
               value={chatInput}
-              disabled={busyAction !== ''}
+              disabled={isBusy}
+              composerToolbar={
+                <div className='flex flex-wrap items-center gap-2'>
+                  <button
+                    type='button'
+                    onClick={() => handleGenerate('fill-missing')}
+                    disabled={isBusy}
+                    className='rounded-full border border-border px-3 py-2 text-sm disabled:opacity-60'
+                  >
+                    {t('fillMissing')}
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => handleGenerate('rewrite')}
+                    disabled={isBusy}
+                    className='rounded-full border border-border px-3 py-2 text-sm disabled:opacity-60'
+                  >
+                    {t('rewrite')}
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => handleGenerate('scaffold')}
+                    disabled={isBusy}
+                    className='rounded-full bg-primary px-3 py-2 text-sm text-primary-foreground disabled:opacity-60'
+                  >
+                    {t('fullDraft')}
+                  </button>
+                </div>
+              }
               onChange={setChatInput}
-              onSend={handleChat}
-              onStartDrafting={() => handleStageChange('drafting')}
+              onSend={() => handleChat('explore')}
             />
-          ) : null}
-
-          {workflowMode === 'conversation' && stage === 'conversation' ? (
-            <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="text-lg font-semibold">下一步建议</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                当意图卡中的核心前提、候选类型和关键决定已经比较稳定时，可以先整理出一版条目雏形，再决定如何展开正文与字段。
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleCreateOutline}
-                  disabled={busyAction !== ''}
-                  className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
-                >
-                  整理为条目雏形
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  disabled={busyAction !== ''}
-                  className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-                >
-                  先保存当前对话
-                </button>
-              </div>
-            </section>
-          ) : null}
-
-          {workflowMode === 'conversation' && stage === 'outline' ? (
-            <OutlinePanel
-              outline={session.outline}
-              disabled={busyAction !== ''}
-              onToggleStatus={handleToggleOutlineStatus}
-              onRefresh={handleCreateOutline}
-              onExpandAccepted={() => handleExpandOutlineBlocks()}
-              onExpandBlock={(blockId) => handleExpandOutlineBlocks([blockId])}
-              onStartDrafting={() => handleStageChange('drafting')}
-            />
-          ) : null}
-
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-semibold">AI 结构化起草</h2>
-            <textarea
-              value={instruction}
-              onChange={(event) => setInstruction(event.target.value)}
-              className="mt-4 min-h-32 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
-              placeholder={workflowMode === 'conversation' ? getDraftSuggestion() : '例如：补全 summary 和 customs，保持百科式描述，不修改 slug。'}
-            />
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <button
-                type="button"
-                onClick={() => handleGenerate('scaffold')}
-                disabled={busyAction !== '' || !instruction.trim()}
-                className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
-              >
-                生成字段草稿
-              </button>
-              <button
-                type="button"
-                onClick={() => handleGenerate('fill-missing')}
-                disabled={busyAction !== '' || !instruction.trim()}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                只补空字段
-              </button>
-              <button
-                type="button"
-                onClick={() => handleGenerate('rewrite')}
-                disabled={busyAction !== '' || !instruction.trim()}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                重写当前部分
-              </button>
-            </div>
           </section>
-
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={busyAction !== ''}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                保存本地草稿
-              </button>
-              <button
-                type="button"
-                onClick={handleCheck}
-                disabled={busyAction !== ''}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                运行校验
-              </button>
-              <button
-                type="button"
-                onClick={handleCalibrate}
-                disabled={busyAction !== ''}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                AI 校准
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSubmit('saveDraft')}
-                disabled={busyAction !== ''}
-                className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
-              >
-                提交到 Sanity Draft
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSubmit('publish')}
-                disabled={busyAction !== ''}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60"
-              >
-                直接发布
-              </button>
-            </div>
-          </section>
-
-          <StructuredFieldEditor
-            schema={schema}
-            fields={session.draft.fields}
-            lockedFields={session.draft.lockedFields}
-            onFieldChange={handleFieldChange}
-            onToggleLock={handleToggleLock}
-          />
-        </div>
-
-        <aside className="space-y-5">
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-semibold">当前状态</h2>
-            <div className="mt-4 space-y-3 text-sm">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">阶段</span>
-                <span>{getWriterStageLabel(stage)}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">消息数</span>
-                <span>{session.messages.length}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">雏形块数</span>
-                <span>{session.outline?.length ?? 0}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">锁定字段</span>
-                <span>{session.draft.lockedFields.length}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">校准建议</span>
-                <span>{session.calibrationPatches?.length ?? 0}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">最后更新</span>
-                <span>{new Date(session.updatedAt).toLocaleString()}</span>
-              </div>
-            </div>
-          </section>
-
-          <CalibrationPanel
-            schema={schema}
-            fields={session.draft.fields}
-            patches={session.calibrationPatches}
-            result={session.lastCheck}
-            disabled={busyAction !== ''}
-            onRunCalibration={handleCalibrate}
-            onApplyPatch={handleApplyCalibrationPatch}
-            onApplyAll={handleApplyAllCalibrationPatches}
-          />
-
-          <ChecksPanel result={session.lastCheck} />
-        </aside>
+        )}
       </div>
     </div>
   )

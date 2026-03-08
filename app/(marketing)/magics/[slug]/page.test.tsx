@@ -239,4 +239,31 @@ describe('MagicDetailPage', () => {
     ).rejects.toThrow('not-found')
     expect(notFoundMock).toHaveBeenCalledOnce()
   })
+  it('falls back safely when enum-like fields contain descriptive natural language values', async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        _id: 'magic-4',
+        name: 'Thermal Threading',
+        kind: 'spell concept',
+        element: 'fire-attuned',
+        difficulty: 'intermediate (requires micro-material sensing)',
+        castType: 'ritual casting',
+        details: [],
+        relatedHeroes: [],
+        relatedStories: [],
+        linkedRefs: [],
+      })
+      .mockResolvedValueOnce([])
+
+    const page = await MagicDetailPage({
+      params: Promise.resolve({ slug: 'thermal-threading' }),
+    })
+    render(page)
+
+    expect(screen.getByText('Spell')).toBeInTheDocument()
+    expect(screen.getByText('Element: Fire')).toBeInTheDocument()
+    expect(screen.getByText('Intermediate')).toBeInTheDocument()
+    expect(screen.getByText('Ritual')).toBeInTheDocument()
+  })
+
 })

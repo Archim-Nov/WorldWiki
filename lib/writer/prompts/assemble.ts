@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   WriterConversationIntent,
   WriterDocumentType,
   WriterOutlineBlock,
@@ -11,7 +11,13 @@
 function formatSchema(schema: WriterSchemaSummary) {
   return schema.fields
     .map((field) => {
-      const extra = [field.required ? 'required' : null, field.description ?? null].filter(Boolean).join(', ')
+      const extras = [field.required ? 'required' : null, field.description ?? null]
+
+      if (field.options && field.options.length > 0) {
+        extras.push(`allowed values: ${field.options.map((option) => `${option.value} (${option.title})`).join(' | ')}`)
+      }
+
+      const extra = extras.filter(Boolean).join(', ')
       return `- ${field.name} (${field.kind}${extra ? `, ${extra}` : ''})`
     })
     .join('\n')
@@ -89,6 +95,8 @@ export function buildGenerationPrompt(args: {
     'Return JSON only.',
     'Use this shape: {"assistantMessage": string, "title": string?, "fields": Record<string, unknown>}.',
     'Only fill fields that exist in the schema.',
+    'For any field with allowed values, you must return one of the option.value entries exactly. Do not return option titles, Chinese labels, explanations, or value-plus-description strings.',
+    'If a schema field shows allowed values, copy the exact value token only, for example intermediate instead of ???????????????.',
     'For rich text fields, return plain paragraph text; the app will convert it later.',
     `Current document type: ${schema.documentType}`,
     'Schema fields:',
@@ -113,21 +121,23 @@ export function buildGenerationPrompt(args: {
 
 export function buildConversationPrompt(args: {
   session: WriterSession
+  schema: WriterSchemaSummary
   presets: WriterPromptPreset[]
   input: string
   intent: WriterConversationIntent
   suggestions: WriterTypeSuggestion[]
 }) {
-  const { session, presets, input, intent, suggestions } = args
+  const { session, schema, presets, input, intent, suggestions } = args
 
   const systemPrompt = [
-    'You are a collaborative worldbuilding partner helping the user talk through an idea before drafting a full entry.',
-    'Stay discussion-first: clarify intent, preserve established decisions, and do not rush into final prose.',
+    'You are a collaborative worldbuilding partner helping the user talk through an idea while continuously updating a structured entry card.',
+    'Stay discussion-first: clarify intent, preserve established decisions, and avoid rushing into final polished prose when the concept is still changing.',
     'Respond in Chinese.',
     'Return JSON only.',
     'Use this shape:',
     '{',
     '  "assistantMessage": string,',
+    '  "title": string?,',
     '  "conceptCard": {',
     '    "premise": string,',
     '    "tone": string?,',
@@ -138,10 +148,18 @@ export function buildConversationPrompt(args: {
     '    "decisions": Array<{"label": string, "value": string, "locked": boolean?, "source": "assistant" | "user"}>',
     '  },',
     '  "suggestedNextAction": "continue-conversation" | "create-outline" | "start-drafting" | "run-calibration" | "submit",',
-    '  "fields": {}',
+    '  "fields": Record<string, unknown>',
     '}',
-    'Keep the concept card concise and stable. Preserve previous locked or confirmed decisions when possible.',
-    'Prefer 1-3 sharp follow-up questions instead of a huge answer when information is missing.',
+    'The "fields" object is a partial patch for the visible entry card. Only include fields that should change this round.',
+    'If a field has allowed values in the schema, you must use the exact option.value token only. Never output natural-language paraphrases, translated labels, or annotated variants for those fields.',
+    'Never include fields outside the schema. Never modify locked fields. If the user gives stable facts, write them into the most suitable fields immediately.',
+    'If information is still incomplete, keep the assistantMessage conversational and ask 1-3 sharp follow-up questions while still updating any fields that are already clear.',
+    'When updating long-form fields, prefer compact but usable text over placeholder notes.',
+    `Current document type: ${schema.documentType}`,
+    'Schema fields:',
+    formatSchema(schema),
+    'Schema groups:',
+    formatSchemaGroups(schema),
     'Active presets:',
     formatPresets(presets),
   ].join('\n\n')
@@ -152,11 +170,14 @@ export function buildConversationPrompt(args: {
     `Workflow stage: ${session.stage ?? 'conversation'}`,
     `Initial concept brief:\n${session.draft.sourceText || '(empty)'}`,
     `Current concept card:\n${JSON.stringify(session.conceptCard ?? null, null, 2)}`,
+    `Current entry card fields:\n${JSON.stringify(session.draft.fields, null, 2)}`,
+    `Locked fields:\n${session.draft.lockedFields.length > 0 ? session.draft.lockedFields.join(', ') : '(none)'}`,
     `Candidate types:\n${formatSuggestions(suggestions)}`,
     `Recent conversation:\n${formatRecentMessages(session)}`,
+    `Existing outline:\n${formatOutline(session)}`,
     `User intent: ${intent}`,
     `Latest user message:\n${input}`,
-    'Help the user converge on a solid concept card that can later become a structured entry draft.',
+    'Help the user continue the conversation naturally, but also sync the entry card with any newly confirmed information from this round.',
   ].join('\n\n')
 
   return { systemPrompt, userPrompt }

@@ -1,4 +1,4 @@
-import 'server-only'
+﻿import 'server-only'
 
 import type { WriterProviderConfig, WriterProviderSummary } from '@/types/writer'
 import { createTimestamp, createWriterId } from '@/lib/writer/utils'
@@ -58,7 +58,14 @@ export async function listProviderSummaries() {
 
 export async function saveProviderConfig(input: Partial<WriterProviderConfig>) {
   const providers = await readProviders()
-  const nextProvider = normalizeProviderConfig(input)
+  const existing = input.id ? providers.find((provider) => provider.id === input.id) : undefined
+
+  const nextProvider = normalizeProviderConfig({
+    ...existing,
+    ...input,
+    apiKey: input.apiKey?.trim() ? input.apiKey : existing?.apiKey,
+  })
+
   const nextProviders = providers.filter((provider) => provider.id !== nextProvider.id)
   nextProviders.unshift(nextProvider)
   await writeProviders(nextProviders)

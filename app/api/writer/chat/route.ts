@@ -1,11 +1,13 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { classifyWriterType } from '@/lib/writer/classifier/service'
 import { getProviderInstance } from '@/lib/writer/providers/registry'
 import { buildConversationPrompt } from '@/lib/writer/prompts/assemble'
+import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
 import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
 import { listPromptPresets } from '@/lib/writer/storage/presets'
+import { applyWriterFieldPatch } from '@/lib/writer/workflow/fields'
 import { mergeConceptCard, createConceptCard } from '@/lib/writer/workflow/conversation'
 import { createTimestamp, createWriterId } from '@/lib/writer/utils'
 
@@ -34,11 +36,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'provider_not_configured' }, { status: 503 })
   }
 
+  const schema = getWriterSchemaSummary(session.documentType)
   const suggestions = await classifyWriterType([session.title, session.draft.sourceText, input].filter(Boolean).join('\n'))
   const allPresets = await listPromptPresets()
   const presets = allPresets.filter((preset) => session.presetIds.includes(preset.id))
   const prompt = buildConversationPrompt({
     session,
+    schema,
     presets,
     input,
     intent,
@@ -46,7 +50,8 @@ export async function POST(request: Request) {
   })
 
   const result = await provider.generate(prompt)
-  const baseConceptCard = session.conceptCard ??
+  const baseConceptCard =
+    session.conceptCard ??
     createConceptCard({
       title: session.title,
       sourceText: session.draft.sourceText,
@@ -54,6 +59,19 @@ export async function POST(request: Request) {
       suggestions,
     })
   const nextConceptCard = mergeConceptCard(baseConceptCard, result.conceptCard, suggestions)
+  const fieldPatch = applyWriterFieldPatch({
+    currentFields: session.draft.fields,
+    incomingFields: result.fields,
+    lockedFields: session.draft.lockedFields,
+    mode: 'chat',
+    allowedFieldNames: schema.fields.map((field) => field.name),
+  })
+  const nextFields = fieldPatch.fields
+
+  if (result.title && !session.draft.lockedFields.includes(schema.titleField)) {
+    nextFields[schema.titleField] = result.title
+  }
+
   const now = createTimestamp()
   const nextMessages = [
     ...session.messages,
@@ -77,6 +95,10 @@ export async function POST(request: Request) {
     stage: 'conversation',
     messages: nextMessages,
     conceptCard: nextConceptCard,
+    draft: {
+      ...session.draft,
+      fields: nextFields,
+    },
   })
 
   return NextResponse.json({
@@ -84,5 +106,7 @@ export async function POST(request: Request) {
     reply: result.assistantMessage,
     conceptCard: nextConceptCard,
     suggestedNextAction: result.suggestedNextAction ?? 'continue-conversation',
+    appliedFieldNames: fieldPatch.appliedFieldNames,
+    skippedLockedFieldNames: fieldPatch.skippedLockedFieldNames,
   })
 }

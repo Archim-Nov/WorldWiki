@@ -89,6 +89,7 @@ RESEND_API_KEY=re_xxx
 CONTACT_FROM_EMAIL=Austrum <noreply@your-domain.com>
 CONTACT_TO_EMAIL=owner@your-domain.com
 SANITY_WEBHOOK_SECRET=replace_with_random_secret
+SANITY_API_WRITE_TOKEN=replace_with_sanity_write_token # required for /writer submit
 # 可选：跨实例限流（推荐生产开启）
 # UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
 # UPSTASH_REDIS_REST_TOKEN=xxxx

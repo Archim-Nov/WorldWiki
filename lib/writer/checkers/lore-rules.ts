@@ -3,6 +3,7 @@ import 'server-only'
 import { groq } from 'next-sanity'
 import type { WriterCheckIssue, WriterDraft } from '@/types/writer'
 import { client } from '@/lib/sanity/client'
+import { hasMeaningfulWriterValue } from '@/lib/writer/draft-fields'
 import { portableTextToPlainText } from '@/lib/writer/sanity/portable-text'
 
 type ReferenceLookupResult = {
@@ -37,14 +38,6 @@ function createIssue(issue: Omit<WriterCheckIssue, 'id'>): WriterCheckIssue {
   }
 }
 
-function hasMeaningfulValue(value: unknown) {
-  if (value === undefined || value === null) return false
-  if (typeof value === 'string') return value.trim().length > 0
-  if (Array.isArray(value)) return value.length > 0
-  if (typeof value === 'object') return true
-  return false
-}
-
 function getPlainLength(value: unknown) {
   if (typeof value === 'string') return value.trim().length
   return portableTextToPlainText(value).trim().length
@@ -65,7 +58,7 @@ function getReferenceCount(value: unknown) {
 function createRecommendedFieldWarnings(draft: WriterDraft) {
   const fieldNames = recommendedFieldMap[draft.documentType] ?? []
   return fieldNames
-    .filter((fieldName) => !hasMeaningfulValue(draft.fields[fieldName]))
+    .filter((fieldName) => !hasMeaningfulWriterValue(draft.fields[fieldName]))
     .map((fieldName) =>
       createIssue({
         level: 'warning',
@@ -125,7 +118,7 @@ function createLengthWarnings(draft: WriterDraft) {
 function createDocumentTypeWarnings(draft: WriterDraft) {
   const issues: WriterCheckIssue[] = []
 
-  if (draft.documentType === 'creature' && !hasMeaningfulValue(draft.fields.category)) {
+  if (draft.documentType === 'creature' && !hasMeaningfulWriterValue(draft.fields.category)) {
     issues.push(
       createIssue({
         level: 'error',
@@ -149,7 +142,7 @@ function createDocumentTypeWarnings(draft: WriterDraft) {
       )
     }
 
-    if (kind === 'spell' && !hasMeaningfulValue(draft.fields.element)) {
+    if (kind === 'spell' && !hasMeaningfulWriterValue(draft.fields.element)) {
       issues.push(
         createIssue({
           level: 'error',
@@ -179,7 +172,7 @@ function createDocumentTypeWarnings(draft: WriterDraft) {
   }
 
   if (draft.documentType === 'hero' || draft.documentType === 'creature') {
-    if (!hasMeaningfulValue(draft.fields.region) && !hasMeaningfulValue(draft.fields.country)) {
+    if (!hasMeaningfulWriterValue(draft.fields.region) && !hasMeaningfulWriterValue(draft.fields.country)) {
       issues.push(
         createIssue({
           level: 'warning',

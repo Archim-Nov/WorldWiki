@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
@@ -7,39 +7,12 @@ import { listPromptPresets } from '@/lib/writer/storage/presets'
 import { getWriterSchemaSummary } from '@/lib/writer/schema/introspect'
 import { buildGenerationPrompt } from '@/lib/writer/prompts/assemble'
 import { createTimestamp, createWriterId } from '@/lib/writer/utils'
+import { applyWriterFieldPatch } from '@/lib/writer/workflow/fields'
 import {
   buildOutlineExpansionInstruction,
   markOutlineBlocksExpanded,
   pickOutlineBlocksForExpansion,
 } from '@/lib/writer/workflow/expand'
-
-function mergeGeneratedFields(args: {
-  currentFields: Record<string, unknown>
-  generatedFields: Record<string, unknown>
-  lockedFields: string[]
-  mode: string
-}) {
-  const nextFields = { ...args.currentFields }
-
-  for (const [fieldName, value] of Object.entries(args.generatedFields)) {
-    if (args.lockedFields.includes(fieldName)) continue
-
-    const currentValue = nextFields[fieldName]
-    const hasCurrentValue =
-      currentValue !== undefined &&
-      currentValue !== null &&
-      (!(typeof currentValue === 'string') || currentValue.trim().length > 0) &&
-      (!Array.isArray(currentValue) || currentValue.length > 0)
-
-    if (args.mode === 'fill-missing' && hasCurrentValue) {
-      continue
-    }
-
-    nextFields[fieldName] = value
-  }
-
-  return nextFields
-}
 
 export async function POST(request: Request) {
   const accessResponse = await requireWriterAccess()
@@ -89,12 +62,14 @@ export async function POST(request: Request) {
   })
 
   const result = await provider.generate(prompt)
-  const nextFields = mergeGeneratedFields({
+  const fieldPatch = applyWriterFieldPatch({
     currentFields: session.draft.fields,
-    generatedFields: result.fields,
+    incomingFields: result.fields,
     lockedFields: session.draft.lockedFields,
     mode,
+    allowedFieldNames: schema.fields.map((field) => field.name),
   })
+  const nextFields = fieldPatch.fields
 
   if (result.title && !session.draft.lockedFields.includes(schema.titleField)) {
     nextFields[schema.titleField] = result.title
@@ -131,5 +106,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     session: nextSession,
     result,
+    appliedFieldNames: fieldPatch.appliedFieldNames,
+    skippedLockedFieldNames: fieldPatch.skippedLockedFieldNames,
   })
 }

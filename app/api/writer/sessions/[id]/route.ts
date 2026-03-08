@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { requireWriterAccess } from '@/lib/writer/api/auth'
 import { badRequest, readJsonObject } from '@/lib/writer/api/validators'
 import { deleteWriterSession, getWriterSession, updateWriterSession } from '@/lib/writer/storage/sessions'
@@ -17,7 +17,7 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 })
   }
 
-  return NextResponse.json(session)
+  return NextResponse.json(session, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function PATCH(request: Request, context: RouteContext) {

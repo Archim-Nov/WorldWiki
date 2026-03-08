@@ -1,4 +1,4 @@
-﻿import { notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import { client } from '@/lib/sanity/client'
@@ -6,6 +6,16 @@ import { magicBySlugQuery } from '@/lib/sanity/queries'
 import { placeholders } from '@/lib/placeholders'
 import { PortableContent } from '@/components/portable/PortableContent'
 import { RecommendationGrid } from '@/components/marketing/RecommendationGrid'
+import {
+  normalizeMagicCastType,
+  normalizeMagicDifficulty,
+  normalizeMagicElement,
+  normalizeMagicKind,
+  type MagicCastTypeValue,
+  type MagicDifficultyValue,
+  type MagicElementValue,
+  type MagicKindValue,
+} from '@/lib/magic/enums'
 import {
   addRecommendations,
   type RecommendationItem,
@@ -15,12 +25,12 @@ import {
 type MagicDetail = {
   _id: string
   name: string
-  kind?: 'principle' | 'spell'
-  element?: 'fire' | 'wind' | 'earth' | 'water'
+  kind?: MagicKindValue | string
+  element?: MagicElementValue | string
   school?: string
   summary?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'master'
-  castType?: 'instant' | 'channel' | 'ritual'
+  difficulty?: MagicDifficultyValue | string
+  castType?: MagicCastTypeValue | string
   manaCost?: string
   cooldown?: string
   requirements?: string[]
@@ -42,9 +52,16 @@ type MagicDetail = {
   linkedRefs?: RecommendationSource[]
 }
 
+function asDisplayText(value: unknown) {
+  if (typeof value !== 'string') return null
+  const normalized = value.trim()
+  return normalized || null
+}
+
 function elementLabel(element: MagicDetail['element'] | undefined, t: (key: string) => string) {
-  if (!element) return null
-  return t(`elements.${element}`)
+  const normalized = normalizeMagicElement(element)
+  if (normalized) return t(`elements.${normalized}`)
+  return asDisplayText(element)
 }
 
 function labelForDifficulty(
@@ -52,8 +69,9 @@ function labelForDifficulty(
   t: (key: string) => string,
   emptyValue: string
 ) {
-  if (!value) return emptyValue
-  return t(`difficultyLabels.${value}`)
+  const normalized = normalizeMagicDifficulty(value)
+  if (normalized) return t(`difficultyLabels.${normalized}`)
+  return asDisplayText(value) ?? emptyValue
 }
 
 function labelForCastType(
@@ -61,8 +79,9 @@ function labelForCastType(
   t: (key: string) => string,
   emptyValue: string
 ) {
-  if (!value) return emptyValue
-  return t(`castTypeLabels.${value}`)
+  const normalized = normalizeMagicCastType(value)
+  if (normalized) return t(`castTypeLabels.${normalized}`)
+  return asDisplayText(value) ?? emptyValue
 }
 
 export default async function MagicDetailPage({
@@ -81,7 +100,7 @@ export default async function MagicDetailPage({
   const emptyValue = t('emptyValue')
   const recommendations: RecommendationItem[] = []
   const seen = new Set<string>()
-  const isPrinciple = magic.kind === 'principle'
+  const isPrinciple = normalizeMagicKind(magic.kind) === 'principle'
   const element = elementLabel(magic.element, t)
   const requirements =
     magic.requirements && magic.requirements.length > 0

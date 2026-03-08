@@ -386,5 +386,359 @@
     "scroll": "Scroll",
     "prev": "Previous",
     "next": "Next"
+  },
+  "Writer": {
+    "Common": {
+      "documentTypes": {
+        "country": "Country",
+        "region": "Region",
+        "creature": "Creature",
+        "hero": "Hero",
+        "story": "Story",
+        "magic": "Magic"
+      },
+      "presetScopes": {
+        "project": "Global",
+        "documentType": "Type",
+        "task": "Task"
+      },
+      "providerKinds": {
+        "openaiCompatible": "OpenAI-compatible API",
+        "cli": "CLI Provider"
+      },
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "usedBySessions": "Used by {count} sessions",
+      "unusedBySessions": "Not used by any session",
+      "lastUpdated": "Last updated",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancelEdit": "Cancel",
+      "required": "Required",
+      "lockField": "Lock field",
+      "unlockField": "Unlock field",
+      "select": "Select",
+      "auto": "Auto",
+      "none": "No records yet",
+      "remove": "Remove",
+      "mode": "Mode",
+      "type": "Type",
+      "provider": "Provider",
+      "presets": "Presets"
+    },
+    "Layout": {
+      "home": "Writer Home",
+      "newEntry": "New Session",
+      "settings": "Settings"
+    },
+    "Loading": {
+      "message": "Loading writer workspace..."
+    },
+    "Error": {
+      "title": "Failed to load writer workspace",
+      "retry": "Retry"
+    },
+    "Overview": {
+      "kicker": "Writer Workspace",
+      "title": "Shape concepts in chat, settle them into the Entry Card, then decide when to push to Sanity",
+      "description": "Writer now supports two entry paths: start from scratch with AI, or import an existing entry for continuation, rewriting, and calibration. Either way, you finish in the same dual-pane workspace.",
+      "primaryAction": "New session / import entry",
+      "secondaryAction": "Manage models & presets",
+      "howItWorksKicker": "How It Works",
+      "howItWorksTitle": "Recommended flow",
+      "howItWorksStep1": "Choose either \"Conversation creation\" or \"Edit existing entry\" in `/writer/new`.",
+      "howItWorksStep2": "Enter with the right provider and presets so AI starts in the correct direction from round one.",
+      "howItWorksStep3": "Keep discussing in chat while the Entry Card stays synchronized.",
+      "statsDrafts": "Current drafts",
+      "statsUpdated": "Latest update",
+      "statsWorkflow": "Current workflow",
+      "statsWorkflowValue": "Chat collaboration / Entry Card editing / checks and Sanity push",
+      "recentTitle": "Recent sessions",
+      "recentDescription": "Continue an existing session, or delete temporary drafts you no longer need.",
+      "emptySessions": "No drafts yet. Create a new session, or import an existing entry to begin editing.",
+      "sourceFallback": "No starter notes yet.",
+      "openSession": "Open session",
+      "deleteDraft": "Delete draft",
+      "deletingDraft": "Deleting...",
+      "deleteConfirm": "Delete draft \"{title}\"? This cannot be undone.",
+      "deleteFailed": "Failed to delete draft."
+    },
+    "NewEntry": {
+      "entryModes": {
+        "conversation": {
+          "label": "Conversation creation",
+          "shortLabel": "New entry",
+          "description": "Start from a concept, discuss with AI first, converge it into the Entry Card, then validate and push to Sanity.",
+          "steps": {
+            "one": "Describe the concept and starting assumptions",
+            "two": "Let AI chat and keep the card in sync",
+            "three": "Push only after confirmation"
+          }
+        },
+        "import": {
+          "label": "Edit existing entry",
+          "shortLabel": "Import & continue",
+          "description": "Import an existing Sanity entry with its fields and body into Writer. Best for continuation, rewriting, and calibration.",
+          "steps": {
+            "one": "Locate an existing entry by type",
+            "two": "Enter chat-based editing after import",
+            "three": "Discuss and update the card before pushing again"
+          }
+        }
+      },
+      "errors": {
+        "classifyFailed": "Failed to classify entry type",
+        "createFailed": "Failed to create session",
+        "importFailed": "Import failed"
+      },
+      "heroKicker": "Writer · New Session",
+      "heroTitle": "Start from a concept, or import an existing entry into the current chat-driven writing workflow",
+      "heroDescription": "Writer now supports two better entry points: discuss a setting from scratch with AI, or bring an existing entry in for continuation, rewriting, and calibration. Both paths land in the same Entry Card + Chat workspace.",
+      "summary": {
+        "step1Kicker": "Step 01",
+        "step1Title": "Choose an entry path",
+        "step1Description": "Decide whether to begin from a concept or continue from an existing entry.",
+        "step2Kicker": "Step 02",
+        "step2Title": "Enter with presets",
+        "step2Description": "Enable worldview, style, and rule presets before the session starts so AI understands the right direction immediately.",
+        "step3Kicker": "Step 03",
+        "step3Title": "Chat + card collaboration",
+        "step3Description": "AI advances the discussion in chat while synchronizing confirmed content to the Entry Card, and you decide when to push."
+      },
+      "workspaceTitle": "Create a writing session",
+      "workspaceDescription": "The two entry paths here are \"Conversation creation\" from scratch and \"Edit existing entry\" by bringing a Sanity entry into the current workspace.",
+      "workspaceBadge": "Entry Card + Chat is the only workspace",
+      "fields": {
+        "titleLabel": "Session title / temporary entry name",
+        "titlePlaceholder": "Examples: Tidal Alliance, Ashfrost Wastes, Nightcall Caravan",
+        "titleHint": "This is only a starting title. You can keep adjusting it later in chat and on the card.",
+        "sourceLabel": "Starting setting / writing brief",
+        "sourcePlaceholder": "Write what you already know, for example: this is a coastal nation built on tidal religion; I want it to feel both mercantile and ritualistic; I still haven't decided how it relates to the northern frontier, or whether it should be a country or a region.",
+        "sourceHint": "Recommended structure: core concept, desired vibe, known facts, and the questions you still haven't settled. AI will use this to open the first round of discussion.",
+        "documentTypeLabel": "Initial entry type",
+        "documentTypeHint": "If you're unsure, let AI classify it first. You can still change it later.",
+        "providerLabel": "Model source",
+        "providerHint": "Choose either a local CLI or a configured API provider here.",
+        "providerAuto": "Auto",
+        "importTitle": "Import an existing entry",
+        "importDescription": "Choose an entry type and bring an existing item into Writer. After the session starts, you can still keep rewriting, extending, and calibrating it through chat.",
+        "importLookupLabel": "Slug or document ID",
+        "importLookupPlaceholder": "For example: north-kingdom or country-north-kingdom"
+      },
+      "presets": {
+        "title": "Starting presets",
+        "description": "These presets take effect as soon as the session is created and influence the first chat round, generation, outlining, and later calibration.",
+        "selectedCount": "Selected {count}",
+        "empty": "No presets are currently available. You can add worldview, style, or calibration presets later in `/writer/settings`."
+      },
+      "buttons": {
+        "classify": "Let AI classify the entry type",
+        "classifying": "Classifying...",
+        "create": "Create session and open chat",
+        "creating": "Creating...",
+        "import": "Import entry and start editing",
+        "importing": "Importing..."
+      },
+      "preview": {
+        "kicker": "Session Preview",
+        "title": "This session will revolve around the Entry Card",
+        "description": "After entering `/writer/[sessionId]`, the Entry Card sits on the left and chat on the right. Each AI reply will try to keep the card synchronized while respecting the fields you lock manually.",
+        "presetsEnabled": "{count} enabled",
+        "presetsEmpty": "No extra presets selected",
+        "noteConversation": "What you fill in now is only the starting point, not the final draft. Type, fields, text, and push strategy can all keep changing later.",
+        "noteImport": "Importing does not freeze the structure. Once inside Writer, you can still restructure, extend body text, adjust fields, and push again from chat."
+      },
+      "aiSuggestions": {
+        "title": "AI type suggestions",
+        "description": "If the concept is still fuzzy, let AI judge whether it feels closer to a Country, Region, Creature, or another type.",
+        "empty": "After clicking \"Let AI classify the entry type\", candidate types and reasoning will appear here.",
+        "score": "Score {score}"
+      },
+      "importInfo": {
+        "title": "What happens when you edit an existing entry",
+        "item1": "Importing brings the current Sanity fields and values into Writer instead of giving you an empty draft.",
+        "item2": "After entering the session, you can still ask AI in chat to summarize gaps, expand the body, unify tone, and check worldview conflicts.",
+        "item3": "If presets are enabled, AI will use those worldview and writing requirements from the very first round."
+      }
+    },
+    "SettingsPage": {
+      "kicker": "Writer Settings",
+      "title": "Manage model providers and writing presets",
+      "description": "Use this page to maintain local CLI/API providers plus presets for worldview, writing requirements, and task rules. Changes take effect immediately in `/writer/new` and active Writer sessions.",
+      "tipsKicker": "Tips",
+      "tipsTitle": "Recommended maintenance approach",
+      "tip1": "Keep clear names for frequently used models so they are easy to switch in a session.",
+      "tip2": "Split worldview rules and writing style into composable presets instead of stuffing everything into one giant prompt.",
+      "tip3": "Pick the provider and presets before creating a session so AI starts in the right direction from the first round."
+    },
+    "ProviderManager": {
+      "existingTitle": "Providers",
+      "count": "{count} total",
+      "empty": "No providers configured yet.",
+      "commandInfo": "Command: {command}",
+      "apiInfo": "Model: {model} · {baseUrl}",
+      "defaultBaseUrl": "Default Base URL",
+      "testConnection": "Test connection",
+      "testing": "Testing...",
+      "connectionSuccess": "Connection succeeded",
+      "connectionFailed": "Connection failed",
+      "createTitle": "Add provider",
+      "editTitle": "Edit provider",
+      "namePlaceholder": "Provider name",
+      "enabledLabel": "Enable this provider",
+      "commandPlaceholder": "CLI command, for example: opencode",
+      "argsPlaceholder": "CLI arguments separated by spaces",
+      "modelPlaceholder": "Model name, for example: gpt-5-mini",
+      "baseUrlPlaceholder": "Base URL, leave blank to use the default",
+      "apiKeyPlaceholderCreate": "API Key",
+      "apiKeyPlaceholderEdit": "Fill only if you want to replace the API key; leave blank to keep the current one",
+      "temperaturePlaceholder": "Temperature, optional",
+      "save": "Save provider",
+      "saveChanges": "Save changes",
+      "saving": "Saving..."
+    },
+    "PresetManager": {
+      "existingTitle": "Presets",
+      "count": "{count} total",
+      "empty": "No presets saved yet.",
+      "createTitle": "Add preset",
+      "editTitle": "Edit preset",
+      "namePlaceholder": "Preset name",
+      "enabledLabel": "Enable this preset",
+      "documentTypePlaceholder": "Select an entry type",
+      "contentPlaceholder": "Write worldview rules, writing requirements, forbidden settings, output style, or task constraints...",
+      "save": "Save preset",
+      "saveChanges": "Save changes",
+      "saving": "Saving..."
+    },
+    "ExistingEntryPicker": {
+      "typeLabel": "Entry type",
+      "searchLabel": "Search existing entries",
+      "searchPlaceholder": "Search by title, slug, or summary",
+      "empty": "No matching entries found."
+    },
+    "FieldInput": {
+      "stringArrayPlaceholder": "One item per line, or separate with commas",
+      "selectPlaceholder": "Please select",
+      "imagePlaceholder": "Enter a Sanity asset reference ID (optional)"
+    },
+    "PortableText": {
+      "charCount": "{count} chars",
+      "paragraphCount": "{count} paragraphs",
+      "normalize": "Normalize paragraphs",
+      "insertParagraph": "Insert paragraph",
+      "insertSectionTemplate": "Insert section template",
+      "sectionTemplateValue": "[Section Heading]",
+      "placeholder": "Write in natural paragraphs. Writer will convert this to Portable Text automatically when submitting.",
+      "previewTitle": "Paragraph preview",
+      "previewEmpty": "No body paragraphs yet.",
+      "previewParagraph": "Paragraph {index}",
+      "hints": {
+        "summary": "Recommended 50-120 characters for a concise overview of the entry.",
+        "bio": "Recommended 200-500 characters, split into 2-4 paragraphs for readability.",
+        "content": "Recommended 1000+ characters, ideally split into multiple natural paragraphs.",
+        "details": "Recommended to explain rules, origin, risks, and effects in separate paragraphs.",
+        "default": "Recommended to write in natural paragraphs so it converts cleanly into Portable Text later."
+      }
+    },
+    "ReferenceFieldPicker": {
+      "searchPlaceholder": "Search existing entries to link",
+      "empty": "Results will appear after you enter keywords.",
+      "removeAria": "Remove reference"
+    },
+    "StructuredFieldEditor": {
+      "groupDescription": "Structured fields generated automatically from the current Sanity schema.",
+      "requiredBadge": "Required"
+    },
+    "ConversationTimeline": {
+      "roles": {
+        "assistant": "AI Assistant",
+        "user": "You",
+        "system": "System"
+      },
+      "emptyTitle": "Start by talking through the concept",
+      "emptyDescription": "Tell AI about the concept, tone, gaps, or conflicts. It will refine the setting through conversation and keep the Entry Card synchronized.",
+      "placeholder": "Continue the discussion, or tell AI how to change the Entry Card. Press Enter to send, Shift+Enter for a new line.",
+      "footerNote": "Messages appear instantly and the full chat history is preserved.",
+      "send": "Send"
+    },
+    "EntryCard": {
+      "kicker": "Entry Card",
+      "filled": "Filled {filled}/{total}",
+      "required": "Required {filled}/{total}",
+      "locked": "Locked {count}",
+      "hideCard": "Hide card",
+      "backToChat": "Back to chat",
+      "issues": "Issues {count}",
+      "calibration": "Calibration {count}",
+      "sanityEnabled": "Sanity enabled",
+      "sanityDisabled": "Sanity disabled",
+      "missingRequiredTitle": "Required fields are still missing",
+      "allRequiredPresent": "All required fields are present. You can run checks, calibrate, or submit to Sanity.",
+      "submitDisabledFallback": "Sanity push is currently unavailable.",
+      "submitDisabledTitle": "Sanity push is currently disabled",
+      "saveLocal": "Save local draft",
+      "runChecks": "Run checks",
+      "aiCalibrate": "AI calibrate",
+      "applyAllFixes": "Apply all AI fixes",
+      "pushDraft": "Push to Sanity Draft",
+      "publishNow": "Publish now",
+      "closeOverlayAria": "Close entry card"
+    },
+    "Workbench": {
+      "entryRailTitle": "Entry",
+      "chatRailTitle": "Chat",
+      "expand": "Expand",
+      "entryCollapsed": "Entry card collapsed",
+      "chatCollapsed": "Chat collapsed",
+      "deleteConfirm": "Delete draft \"{title}\"? This cannot be undone.",
+      "deleteFailed": "Delete failed",
+      "savedLocally": "Saved locally.",
+      "saveFailed": "Save failed",
+      "saveFailedBeforeCheck": "Save failed before check",
+      "checkCompleted": "Check completed.",
+      "checkFailed": "Check failed",
+      "generationUpdatedFields": "AI updated the card and wrote {count} fields.",
+      "generationFinished": "AI finished this card update.",
+      "generationFailed": "Generation failed",
+      "generationRequestFailed": "Generation request failed.",
+      "optimisticThinking": "AI is thinking and syncing the entry card...",
+      "messageSendFailed": "Message send failed because the session could not be saved.",
+      "saveFailedBeforeChat": "Save failed before chat",
+      "chatSyncedFields": "AI replied and synchronized {count} card fields.",
+      "chatUpdatedUnderstanding": "AI replied and updated the current understanding.",
+      "chatFailedInline": "Chat failed. Please retry.",
+      "chatFailed": "Chat failed",
+      "chatNetworkInline": "Network or service error. This message was not submitted successfully.",
+      "chatRequestFailed": "Chat request failed.",
+      "saveFailedBeforeCalibration": "Save failed before calibration",
+      "calibrationGenerated": "AI generated {count} calibration suggestions.",
+      "calibrationNone": "No auto-fix suggestions right now.",
+      "calibrationFailed": "Calibration failed",
+      "calibrationRequestFailed": "Calibration request failed.",
+      "applyAllSucceeded": "Applied all AI calibration suggestions.",
+      "applyAllFailed": "Applying fixes failed",
+      "applyAllRequestFailed": "Applying fixes failed.",
+      "sanityUnavailable": "Sanity push is currently unavailable.",
+      "saveFailedBeforeSubmit": "Save failed before submit",
+      "published": "Published to Sanity.",
+      "pushedDraft": "Pushed to Sanity Draft.",
+      "submitFailed": "Submit failed",
+      "submitRequestFailed": "Submit request failed.",
+      "headerTitle": "AI Writing Assistant",
+      "currentContext": "Current context: {title}",
+      "candidateType": "Candidate type {type}",
+      "model": "Model",
+      "presetsButton": "Presets {count}",
+      "promptPresetsTitle": "Prompt presets",
+      "promptPresetsDescription": "Let presets handle exploration, convergence, and conflict checks while keeping the chat natural.",
+      "noPresets": "No presets available.",
+      "deleteDraft": "Delete draft",
+      "deleting": "Deleting...",
+      "collapse": "Collapse",
+      "fillMissing": "Fill missing",
+      "rewrite": "Rewrite",
+      "fullDraft": "Full draft"
+    }
   }
 }

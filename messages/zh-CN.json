@@ -386,5 +386,359 @@
     "scrollToStart": "下滑开始阅读",
     "articleTag": "故事正文",
     "emptyContent": "故事正文将在后续迭代补充更丰富的排版与叙事结构。"
+  },
+  "Writer": {
+    "Common": {
+      "documentTypes": {
+        "country": "国家",
+        "region": "区域",
+        "creature": "生物",
+        "hero": "角色",
+        "story": "故事",
+        "magic": "魔法"
+      },
+      "presetScopes": {
+        "project": "全局",
+        "documentType": "类型",
+        "task": "任务"
+      },
+      "providerKinds": {
+        "openaiCompatible": "OpenAI 兼容 API",
+        "cli": "CLI Provider"
+      },
+      "enabled": "启用",
+      "disabled": "禁用",
+      "usedBySessions": "被 {count} 个会话引用",
+      "unusedBySessions": "未被会话引用",
+      "lastUpdated": "最近更新",
+      "edit": "编辑",
+      "delete": "删除",
+      "cancelEdit": "取消编辑",
+      "required": "必填",
+      "lockField": "锁定字段",
+      "unlockField": "取消锁定",
+      "select": "请选择",
+      "auto": "自动选择",
+      "none": "暂无记录",
+      "remove": "移除",
+      "mode": "模式",
+      "type": "类型",
+      "provider": "Provider",
+      "presets": "预设"
+    },
+    "Layout": {
+      "home": "Writer 首页",
+      "newEntry": "新建会话",
+      "settings": "设置"
+    },
+    "Loading": {
+      "message": "正在加载 Writer 工作区..."
+    },
+    "Error": {
+      "title": "Writer 页面加载失败",
+      "retry": "重试"
+    },
+    "Overview": {
+      "kicker": "Writer Workspace",
+      "title": "用聊天推进设定，用 Entry Card 沉淀条目，再决定何时推送到 Sanity",
+      "description": "现在的 Writer 支持两种入口：从零开始和 AI 讨论设定，或者导入一条已有条目继续补写、改写和校准。无论从哪条路径进入，最终都会回到同一个双栏工作区。",
+      "primaryAction": "新建会话 / 导入条目",
+      "secondaryAction": "管理模型与预设",
+      "howItWorksKicker": "How It Works",
+      "howItWorksTitle": "当前推荐流程",
+      "howItWorksStep1": "先在 `/writer/new` 里选择“对话式创作”或“编辑已有条目”。",
+      "howItWorksStep2": "带着模型和预设进入会话，让 AI 从第一轮就按正确方向工作。",
+      "howItWorksStep3": "在聊天区持续讨论，同时让 Entry Card 保持同步更新。",
+      "statsDrafts": "当前草稿数",
+      "statsUpdated": "最近更新时间",
+      "statsWorkflow": "当前工作方式",
+      "statsWorkflowValue": "聊天协作 / 条目卡编辑 / 校验与 Sanity 推送",
+      "recentTitle": "最近会话",
+      "recentDescription": "继续编辑已有会话，或删除你不再需要的临时草稿。",
+      "emptySessions": "还没有任何草稿。去创建一个新会话，或导入已有条目开始编辑。",
+      "sourceFallback": "还没有写入起始设定。",
+      "openSession": "打开会话",
+      "deleteDraft": "删除草稿",
+      "deletingDraft": "删除中...",
+      "deleteConfirm": "删除草稿“{title}”吗？此操作不可撤销。",
+      "deleteFailed": "删除草稿失败。"
+    },
+    "NewEntry": {
+      "entryModes": {
+        "conversation": {
+          "label": "对话式创作",
+          "shortLabel": "新建条目",
+          "description": "从一个概念开始，先和 AI 讨论，再逐轮收束为 Entry Card，最后核验后推送到 Sanity。",
+          "steps": {
+            "one": "输入概念与起始设定",
+            "two": "AI 聊天并同步更新卡片",
+            "three": "确认后再执行推送"
+          }
+        },
+        "import": {
+          "label": "编辑已有条目",
+          "shortLabel": "导入继续写",
+          "description": "从 Sanity 里导入一条已有内容，带着原字段和正文进入当前 Writer，会更适合补写、改写和校准。",
+          "steps": {
+            "one": "按类型定位已有条目",
+            "two": "导入后进入聊天式编辑",
+            "three": "边聊边改卡片再推送"
+          }
+        }
+      },
+      "errors": {
+        "classifyFailed": "判断条目类型失败",
+        "createFailed": "创建会话失败",
+        "importFailed": "导入失败"
+      },
+      "heroKicker": "Writer · New Session",
+      "heroTitle": "从一个概念开始，或把一条已有内容导入进来，进入现在这套聊天驱动的条目创作流程",
+      "heroDescription": "现在的 Writer 更适合两种入口：要么从零开始和 AI 讨论设定，要么把已有条目导入进来继续补写、改写和校准。无论哪种入口，最终都会回到同一个 Entry Card + Chat 工作区中。",
+      "summary": {
+        "step1Kicker": "Step 01",
+        "step1Title": "选择入口",
+        "step1Description": "决定是从概念起步，还是导入一条现有内容继续编辑。",
+        "step2Kicker": "Step 02",
+        "step2Title": "带着预设进入",
+        "step2Description": "在创建会话前就启用世界观、文风和约束预设，保证 AI 首轮理解方向正确。",
+        "step3Kicker": "Step 03",
+        "step3Title": "聊天 + 卡片协作",
+        "step3Description": "AI 在聊天里推进讨论，同时把确认后的内容同步到 Entry Card，再由你决定何时推送。"
+      },
+      "workspaceTitle": "创建创作会话",
+      "workspaceDescription": "现在这里的两种入口分别是：从零开始的“对话式创作”，以及把 Sanity 条目带入当前工作区继续编辑的“编辑已有条目”。",
+      "workspaceBadge": "Entry Card + Chat 是唯一工作台",
+      "fields": {
+        "titleLabel": "会话标题 / 暂定条目名",
+        "titlePlaceholder": "例如：潮汐同盟、霜灰荒原、鸣夜旅团",
+        "titleHint": "这里只是一个起始标题，后续可以在聊天和卡片中继续调整。",
+        "sourceLabel": "起始设定 / 创作说明",
+        "sourcePlaceholder": "写下你现在已经知道的内容，例如：这是一个建立在潮汐宗教上的沿海国家；我希望它兼具航海商业与神秘仪式感；目前还没想好它和北境之间的关系，也不确定应该归为国家还是区域。",
+        "sourceHint": "推荐写法：概念核心、想要的气质、已知设定、仍不确定的问题。AI 会据此展开第一轮讨论。",
+        "documentTypeLabel": "初始条目类型",
+        "documentTypeHint": "如果不确定，可以先让 AI 判断，后续也仍可修改。",
+        "providerLabel": "模型来源",
+        "providerHint": "这里可以直接选择本地 CLI 或已配置的 API Provider。",
+        "providerAuto": "自动选择",
+        "importTitle": "导入现有条目",
+        "importDescription": "选择条目类型，输入 slug 或文档 ID，把现有内容导入到当前 Writer，会话开启后你仍然可以通过聊天继续补写、改写和校准。",
+        "importLookupLabel": "Slug 或文档 ID",
+        "importLookupPlaceholder": "例如：north-kingdom 或 country-north-kingdom"
+      },
+      "presets": {
+        "title": "起始预设",
+        "description": "这些预设会在会话创建后立即生效，影响首轮聊天、生成、提纲和后续条目校准方向。",
+        "selectedCount": "已选择 {count} 项",
+        "empty": "当前没有可用预设。你可以稍后到 `/writer/settings` 中新增世界观、写作风格或校准规则预设。"
+      },
+      "buttons": {
+        "classify": "让 AI 判断条目类型",
+        "classifying": "判断中...",
+        "create": "创建会话并进入聊天",
+        "creating": "创建中...",
+        "import": "导入条目并进入编辑",
+        "importing": "导入中..."
+      },
+      "preview": {
+        "kicker": "Session Preview",
+        "title": "这次会话将以 Entry Card 为中心",
+        "description": "进入 `/writer/[sessionId]` 后，左侧是 Entry Card，右侧是聊天区。AI 每次回复都会尝试同步整理卡片内容，并尊重你手动锁定的字段。",
+        "presetsEnabled": "已启用 {count} 项",
+        "presetsEmpty": "未选择额外预设",
+        "noteConversation": "你现在填写的是“起点”，不是最终成稿。类型、字段、文本和推送方式都可以在后续编辑中继续调整。",
+        "noteImport": "导入不会锁死内容结构。已有条目进入 Writer 后，依然可以在聊天里继续重构设定、补正文案、调整字段并再次推送。"
+      },
+      "aiSuggestions": {
+        "title": "AI 类型建议",
+        "description": "如果你的概念还比较模糊，可以先让 AI 判断这更像《国家》《区域》《生物》还是其他类型。",
+        "empty": "点击“让 AI 判断条目类型”后，这里会显示候选类型与判断理由。",
+        "score": "score {score}"
+      },
+      "importInfo": {
+        "title": "编辑已有条目会发生什么",
+        "item1": "导入时会把 Sanity 里的现有字段和值带进 Writer，而不是只带一个空草稿。",
+        "item2": "进入会话后，你仍然可以通过聊天让 AI 总结缺口、补充正文、统一风格、排查世界观冲突。",
+        "item3": "如果你启用了预设，AI 会从第一轮开始按这些世界观和写作要求理解这条已有内容。"
+      }
+    },
+    "SettingsPage": {
+      "kicker": "Writer Settings",
+      "title": "管理模型 Provider 与写作预设",
+      "description": "这里用于维护本地 CLI / API Provider，以及世界观、写作要求、任务规则等预设。新增、编辑后的配置会立即影响 `/writer/new` 和当前 Writer 会话中的可选项。",
+      "tipsKicker": "Tips",
+      "tipsTitle": "推荐维护方式",
+      "tip1": "为常用模型保留清晰命名，便于在会话中快速切换。",
+      "tip2": "把世界观规则与文风要求拆成多个可组合预设，而不是塞进一条超长提示词。",
+      "tip3": "创建新会话前先选好 Provider 和预设，让 AI 从第一轮开始按正确方向工作。"
+    },
+    "ProviderManager": {
+      "existingTitle": "已有 Provider",
+      "count": "共 {count} 项",
+      "empty": "还没有配置任何 Provider。",
+      "commandInfo": "命令：{command}",
+      "apiInfo": "模型：{model} · {baseUrl}",
+      "defaultBaseUrl": "默认 Base URL",
+      "testConnection": "测试连接",
+      "testing": "测试中...",
+      "connectionSuccess": "连接成功",
+      "connectionFailed": "连接失败",
+      "createTitle": "新增 Provider",
+      "editTitle": "编辑 Provider",
+      "namePlaceholder": "Provider 名称",
+      "enabledLabel": "启用该 Provider",
+      "commandPlaceholder": "CLI 命令，例如 opencode",
+      "argsPlaceholder": "CLI 参数，使用空格分隔",
+      "modelPlaceholder": "模型名称，例如 gpt-5-mini",
+      "baseUrlPlaceholder": "Base URL，可留空使用默认地址",
+      "apiKeyPlaceholderCreate": "API Key",
+      "apiKeyPlaceholderEdit": "如需更换 API Key 再填写；留空则保留原值",
+      "temperaturePlaceholder": "Temperature，可留空",
+      "save": "保存 Provider",
+      "saveChanges": "保存修改",
+      "saving": "保存中..."
+    },
+    "PresetManager": {
+      "existingTitle": "已有预设",
+      "count": "共 {count} 项",
+      "empty": "还没有保存任何预设。",
+      "createTitle": "新增预设",
+      "editTitle": "编辑预设",
+      "namePlaceholder": "预设名称",
+      "enabledLabel": "启用该预设",
+      "documentTypePlaceholder": "选择条目类型",
+      "contentPlaceholder": "写入世界观规则、写作要求、禁忌设定、输出风格或任务约束...",
+      "save": "保存预设",
+      "saveChanges": "保存修改",
+      "saving": "保存中..."
+    },
+    "ExistingEntryPicker": {
+      "typeLabel": "条目类型",
+      "searchLabel": "搜索现有条目",
+      "searchPlaceholder": "按标题、slug 或摘要搜索",
+      "empty": "没有找到匹配条目。"
+    },
+    "FieldInput": {
+      "stringArrayPlaceholder": "每行一个值，或使用逗号分隔",
+      "selectPlaceholder": "请选择",
+      "imagePlaceholder": "输入 Sanity 资源引用 ID（可选）"
+    },
+    "PortableText": {
+      "charCount": "{count} 字",
+      "paragraphCount": "{count} 段",
+      "normalize": "整理段落",
+      "insertParagraph": "插入分段",
+      "insertSectionTemplate": "插入小节模板",
+      "sectionTemplateValue": "【小节标题】",
+      "placeholder": "按自然段撰写正文。Writer 会在提交时自动转换为 Portable Text。",
+      "previewTitle": "段落预览",
+      "previewEmpty": "还没有正文段落。",
+      "previewParagraph": "段落 {index}",
+      "hints": {
+        "summary": "建议 50-120 字，适合概述条目核心信息。",
+        "bio": "建议 200-500 字，分成 2-4 段更易阅读。",
+        "content": "建议 1000 字以上，可拆成多个自然段。",
+        "details": "建议分段说明规则、来源、风险与效果。",
+        "default": "建议按自然段撰写，便于后续转换为 Portable Text。"
+      }
+    },
+    "ReferenceFieldPicker": {
+      "searchPlaceholder": "搜索现有条目进行关联",
+      "empty": "输入关键词后显示候选条目。",
+      "removeAria": "移除关联"
+    },
+    "StructuredFieldEditor": {
+      "groupDescription": "按当前 Sanity schema 自动生成的结构化字段。",
+      "requiredBadge": "必填"
+    },
+    "ConversationTimeline": {
+      "roles": {
+        "assistant": "AI 助手",
+        "user": "你",
+        "system": "系统"
+      },
+      "emptyTitle": "先从讨论概念开始",
+      "emptyDescription": "把概念、气质、空缺信息或潜在冲突告诉 AI。它会通过对话收束设定，并持续同步 Entry Card。",
+      "placeholder": "继续讨论，或直接告诉 AI 要如何修改 Entry Card。按 Enter 发送，Shift+Enter 换行。",
+      "footerNote": "消息会即时出现，并完整保留历史聊天记录。",
+      "send": "发送"
+    },
+    "EntryCard": {
+      "kicker": "Entry Card",
+      "filled": "已填写 {filled}/{total}",
+      "required": "必填 {filled}/{total}",
+      "locked": "已锁定 {count}",
+      "hideCard": "隐藏卡片",
+      "backToChat": "返回聊天",
+      "issues": "问题 {count}",
+      "calibration": "校准 {count}",
+      "sanityEnabled": "Sanity 已启用",
+      "sanityDisabled": "Sanity 已禁用",
+      "missingRequiredTitle": "仍有必填字段缺失",
+      "allRequiredPresent": "所有必填字段都已具备。你现在可以执行检查、校准或提交到 Sanity。",
+      "submitDisabledFallback": "当前无法推送到 Sanity。",
+      "submitDisabledTitle": "Sanity 推送当前不可用",
+      "saveLocal": "保存本地草稿",
+      "runChecks": "执行检查",
+      "aiCalibrate": "AI 校准",
+      "applyAllFixes": "应用全部 AI 修正",
+      "pushDraft": "推送到 Sanity Draft",
+      "publishNow": "立即发布",
+      "closeOverlayAria": "关闭条目卡"
+    },
+    "Workbench": {
+      "entryRailTitle": "卡片",
+      "chatRailTitle": "聊天",
+      "expand": "展开",
+      "entryCollapsed": "条目卡已收起",
+      "chatCollapsed": "聊天区已收起",
+      "deleteConfirm": "删除草稿“{title}”吗？此操作不可撤销。",
+      "deleteFailed": "删除失败",
+      "savedLocally": "已保存到本地。",
+      "saveFailed": "保存失败",
+      "saveFailedBeforeCheck": "检查前保存失败",
+      "checkCompleted": "检查完成。",
+      "checkFailed": "检查失败",
+      "generationUpdatedFields": "AI 已更新卡片，并写入 {count} 个字段。",
+      "generationFinished": "AI 已完成本轮卡片更新。",
+      "generationFailed": "生成失败",
+      "generationRequestFailed": "生成请求失败。",
+      "optimisticThinking": "AI 正在思考并同步条目卡...",
+      "messageSendFailed": "消息发送失败，因为当前会话未能成功保存。",
+      "saveFailedBeforeChat": "聊天前保存失败",
+      "chatSyncedFields": "AI 已回复并同步 {count} 个卡片字段。",
+      "chatUpdatedUnderstanding": "AI 已回复并更新当前理解。",
+      "chatFailedInline": "聊天失败，请重试。",
+      "chatFailed": "聊天失败",
+      "chatNetworkInline": "网络或服务异常，这条消息未能成功提交。",
+      "chatRequestFailed": "聊天请求失败。",
+      "saveFailedBeforeCalibration": "校准前保存失败",
+      "calibrationGenerated": "AI 生成了 {count} 条校准建议。",
+      "calibrationNone": "当前没有可自动修正的建议。",
+      "calibrationFailed": "校准失败",
+      "calibrationRequestFailed": "校准请求失败。",
+      "applyAllSucceeded": "已应用全部 AI 校准建议。",
+      "applyAllFailed": "应用修正失败",
+      "applyAllRequestFailed": "应用修正失败。",
+      "sanityUnavailable": "当前无法推送到 Sanity。",
+      "saveFailedBeforeSubmit": "提交前保存失败",
+      "published": "已发布到 Sanity。",
+      "pushedDraft": "已推送到 Sanity Draft。",
+      "submitFailed": "提交失败",
+      "submitRequestFailed": "提交请求失败。",
+      "headerTitle": "AI 写作助手",
+      "currentContext": "当前上下文：{title}",
+      "candidateType": "候选类型 {type}",
+      "model": "模型",
+      "presetsButton": "预设 {count}",
+      "promptPresetsTitle": "提示词预设",
+      "promptPresetsDescription": "把探索概念、收束设定和冲突排查交给预设，让聊天本身保持自然。",
+      "noPresets": "当前没有可用预设。",
+      "deleteDraft": "删除草稿",
+      "deleting": "删除中...",
+      "collapse": "收起",
+      "fillMissing": "补全缺失",
+      "rewrite": "重写",
+      "fullDraft": "完整成稿"
+    }
   }
 }

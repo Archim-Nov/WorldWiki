@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { WriterReferenceValue } from '@/types/writer'
 import { cn } from '@/lib/utils'
 
@@ -30,6 +31,7 @@ function normalizeReferences(value: unknown): WriterReferenceValue[] {
 }
 
 export function ReferenceFieldPicker({ multiple, value, onChange }: ReferenceFieldPickerProps) {
+  const t = useTranslations('Writer.ReferenceFieldPicker')
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchItem[]>([])
   const selectedReferences = useMemo(() => normalizeReferences(value), [value])
@@ -82,15 +84,12 @@ export function ReferenceFieldPicker({ multiple, value, onChange }: ReferenceFie
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+    <div className='space-y-3'>
+      <div className='flex flex-wrap gap-2'>
         {selectedReferences.map((item) => (
-          <span
-            key={item._ref}
-            className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs"
-          >
+          <span key={item._ref} className='inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs'>
             <span>{item.label ?? item._ref}</span>
-            <button type="button" onClick={() => removeItem(item._ref)} className="text-muted-foreground">
+            <button type='button' aria-label={t('removeAria')} onClick={() => removeItem(item._ref)} className='text-muted-foreground'>
               ×
             </button>
           </span>
@@ -98,30 +97,30 @@ export function ReferenceFieldPicker({ multiple, value, onChange }: ReferenceFie
       </div>
 
       {(multiple || selectedReferences.length === 0) && (
-        <div className="space-y-2">
+        <div className='space-y-2'>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-            placeholder="搜索现有条目进行关联"
+            className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm'
+            placeholder={t('searchPlaceholder')}
           />
 
-          <div className="space-y-2 rounded-lg border border-border bg-background p-2">
+          <div className='space-y-2 rounded-lg border border-border bg-background p-2'>
             {visibleResults.length === 0 ? (
-              <div className="px-2 py-1 text-xs text-muted-foreground">输入关键词后显示候选条目。</div>
+              <div className='px-2 py-1 text-xs text-muted-foreground'>{t('empty')}</div>
             ) : (
               visibleResults.map((item) => (
                 <button
                   key={item.refId}
-                  type="button"
+                  type='button'
                   onClick={() => selectItem(item)}
                   className={cn(
                     'block w-full rounded-md px-3 py-2 text-left text-sm transition hover:bg-muted',
                     selectedReferences.some((entry) => entry._ref === item.refId) && 'opacity-60'
                   )}
                 >
-                  <div className="font-medium">{item.label}</div>
-                  <div className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">{item.type}</div>
+                  <div className='font-medium'>{item.label}</div>
+                  <div className='mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground'>{item.type}</div>
                 </button>
               ))
             )}
