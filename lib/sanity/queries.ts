@@ -1,5 +1,45 @@
 import { groq } from 'next-sanity'
 
+export const homePageQuery = groq`
+  {
+    "randomPool": *[_type in ["country", "region", "creature", "hero", "story", "magic"]][0..23] {
+      _id,
+      _type,
+      title,
+      name,
+      slug,
+      "portrait": portrait.asset->url,
+      "mapImage": mapImage.asset->url,
+      "coverImage": coverImage.asset->url
+    },
+    "latestHeroes": *[_type == "hero"] | order(_updatedAt desc)[0..4] {
+      _id,
+      _type,
+      name,
+      title,
+      slug,
+      "portrait": portrait.asset->url
+    },
+    "latestCountries": *[_type == "country"] | order(_updatedAt desc)[0..4] {
+      _id,
+      _type,
+      name,
+      slug,
+      "mapImage": mapImage.asset->url
+    },
+    "latestDetails": *[_type in ["country", "region", "creature", "hero", "magic"]] | order(_updatedAt desc)[0..4] {
+      _id,
+      _type,
+      name,
+      title,
+      slug,
+      "portrait": portrait.asset->url,
+      "mapImage": mapImage.asset->url,
+      "coverImage": coverImage.asset->url
+    }
+  }
+`
+
 export const countriesQuery = groq`
   *[_type == "country"] | order(name asc) {
     _id,

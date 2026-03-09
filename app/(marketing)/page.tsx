@@ -1,14 +1,13 @@
-﻿import { unstable_noStore as noStore } from 'next/cache'
+import { unstable_cache } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { client } from '@/lib/sanity/client'
+import { homePageQuery } from '@/lib/sanity/queries'
 import { toRecommendation } from '@/lib/recommendations'
 import { CenteredCarousel } from '@/components/marketing/CenteredCarousel'
 import { FullscreenHero } from '@/components/marketing/FullscreenHero'
 import { RandomShowcase } from '@/components/marketing/RandomShowcase'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import styles from './page.module.css'
-
-export const dynamic = 'force-dynamic'
 
 type RawItem = {
   _id?: string
@@ -21,57 +20,27 @@ type RawItem = {
   coverImage?: string
 }
 
-const randomPoolQuery = `*[_type in ["country","region","creature","hero","story","magic"]][0..60] {
-  _id,
-  _type,
-  title,
-  name,
-  slug,
-  "portrait": portrait.asset->url,
-  "mapImage": mapImage.asset->url,
-  "coverImage": coverImage.asset->url
-}`
+type HomePageQueryResult = {
+  randomPool: RawItem[]
+  latestHeroes: RawItem[]
+  latestCountries: RawItem[]
+  latestDetails: RawItem[]
+}
 
-const latestHeroesQuery = `*[_type == "hero"] | order(_updatedAt desc)[0..4] {
-  _id,
-  _type,
-  name,
-  title,
-  slug,
-  "portrait": portrait.asset->url
-}`
-
-const latestDetailsQuery = `*[_type in ["country","region","creature","hero","magic"]] | order(_updatedAt desc)[0..4] {
-  _id,
-  _type,
-  name,
-  title,
-  slug,
-  "portrait": portrait.asset->url,
-  "mapImage": mapImage.asset->url,
-  "coverImage": coverImage.asset->url
-}`
-
-const latestCountriesQuery = `*[_type == "country"] | order(_updatedAt desc)[0..4] {
-  _id,
-  _type,
-  name,
-  slug,
-  "mapImage": mapImage.asset->url
-}`
+const getHomePageData = unstable_cache(
+  async () => client.fetch<HomePageQueryResult>(homePageQuery),
+  ['home-page-data'],
+  {
+    revalidate: 300,
+    tags: ['home-page'],
+  }
+)
 
 export default async function HomePage() {
-  noStore()
-
   const t = await getTranslations('HomePage')
 
-  const [randomPool, latestHeroes, latestCountries, latestDetails] =
-    await Promise.all([
-      client.fetch<RawItem[]>(randomPoolQuery),
-      client.fetch<RawItem[]>(latestHeroesQuery),
-      client.fetch<RawItem[]>(latestCountriesQuery),
-      client.fetch<RawItem[]>(latestDetailsQuery),
-    ])
+  const { randomPool, latestHeroes, latestCountries, latestDetails } =
+    await getHomePageData()
 
   const localizeTypeLabel = (href: string, fallback: string) => {
     if (href.startsWith('/champions/')) return t('types.hero')
