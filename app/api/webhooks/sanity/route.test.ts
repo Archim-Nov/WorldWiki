@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-const { revalidatePathMock } = vi.hoisted(() => ({
+const { revalidatePathMock, revalidateTagMock } = vi.hoisted(() => ({
   revalidatePathMock: vi.fn(),
+  revalidateTagMock: vi.fn(),
 }))
 
 vi.mock("next/cache", () => ({
   revalidatePath: revalidatePathMock,
+  revalidateTag: revalidateTagMock,
 }))
 
 import { POST } from "./route"
@@ -40,10 +42,17 @@ describe("POST /api/webhooks/sanity", () => {
 
     expect(response.status).toBe(200)
     expect(json).toEqual({ revalidated: true })
-    expect(revalidatePathMock).toHaveBeenCalledTimes(3)
+    expect(revalidateTagMock).toHaveBeenCalledWith("home-page", "max")
+    expect(revalidatePathMock).toHaveBeenCalledTimes(9)
     expect(revalidatePathMock).toHaveBeenCalledWith("/countries")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN/countries")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en/countries")
     expect(revalidatePathMock).toHaveBeenCalledWith("/countries/avalon")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN/countries/avalon")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en/countries/avalon")
     expect(revalidatePathMock).toHaveBeenCalledWith("/")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en")
   })
 
   it("revalidates list page and home when slug is missing", async () => {
@@ -56,9 +65,14 @@ describe("POST /api/webhooks/sanity", () => {
 
     expect(response.status).toBe(200)
     expect(json).toEqual({ revalidated: true })
-    expect(revalidatePathMock).toHaveBeenCalledTimes(2)
+    expect(revalidateTagMock).toHaveBeenCalledWith("home-page", "max")
+    expect(revalidatePathMock).toHaveBeenCalledTimes(6)
     expect(revalidatePathMock).toHaveBeenCalledWith("/regions")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN/regions")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en/regions")
     expect(revalidatePathMock).toHaveBeenCalledWith("/")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en")
   })
 
   it("revalidates magic list/detail routes", async () => {
@@ -72,9 +86,16 @@ describe("POST /api/webhooks/sanity", () => {
 
     expect(response.status).toBe(200)
     expect(json).toEqual({ revalidated: true })
+    expect(revalidateTagMock).toHaveBeenCalledWith("home-page", "max")
     expect(revalidatePathMock).toHaveBeenCalledWith("/magics")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN/magics")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en/magics")
     expect(revalidatePathMock).toHaveBeenCalledWith("/magics/arcane-bolt")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN/magics/arcane-bolt")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en/magics/arcane-bolt")
     expect(revalidatePathMock).toHaveBeenCalledWith("/")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/zh-CN")
+    expect(revalidatePathMock).toHaveBeenCalledWith("/en")
   })
 
   it("returns success without revalidation for unsupported type", async () => {
@@ -89,6 +110,7 @@ describe("POST /api/webhooks/sanity", () => {
     expect(response.status).toBe(200)
     expect(json).toEqual({ revalidated: true })
     expect(revalidatePathMock).not.toHaveBeenCalled()
+    expect(revalidateTagMock).not.toHaveBeenCalled()
   })
 
   it("returns 401 when secret header is invalid", async () => {
@@ -98,6 +120,7 @@ describe("POST /api/webhooks/sanity", () => {
     expect(response.status).toBe(401)
     expect(json).toEqual({ error: "Unauthorized" })
     expect(revalidatePathMock).not.toHaveBeenCalled()
+    expect(revalidateTagMock).not.toHaveBeenCalled()
   })
 
   it("returns 500 when webhook secret is missing in server env", async () => {
@@ -108,6 +131,7 @@ describe("POST /api/webhooks/sanity", () => {
     expect(response.status).toBe(500)
     expect(json).toEqual({ error: "SANITY_WEBHOOK_SECRET is not configured" })
     expect(revalidatePathMock).not.toHaveBeenCalled()
+    expect(revalidateTagMock).not.toHaveBeenCalled()
   })
 
   it("returns 500 when request json parsing fails", async () => {
@@ -125,5 +149,6 @@ describe("POST /api/webhooks/sanity", () => {
 
     expect(response.status).toBe(500)
     expect(json).toEqual({ error: "Revalidation failed" })
+    expect(revalidateTagMock).not.toHaveBeenCalled()
   })
 })
